@@ -5,6 +5,9 @@ docker login
 
 if [ $? -eq 0 ]
 then
+    echo Downloading docker-compose.yml file.
+    curl -L https://raw.githubusercontent.com/susverwimp/honeur-public/master/docker-compose.yml --output docker-compose.yml
+
     read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' honeur_host_machine
     honeur_host_machine=${honeur_host_machine:-localhost}
     read -p 'Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: ' honeur_zeppelin_logs
