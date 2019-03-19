@@ -11,7 +11,7 @@ services:
       - shared:/var/lib/postgresql/envfileshared
     restart: always
     environment:
-      'POSTGRES_PASSWORD=h0n3uR#2019!'
+      - "POSTGRES_PASSWORD=h0n3uR#2019!"
     command:
       - /bin/sh
       - -c
@@ -31,7 +31,7 @@ services:
     depends_on:
       - "postgres"
     environment:
-      'BACKEND_HOST=http://localhost:8080'
+      - "BACKEND_HOST=http://localhost:8080"
     command:
       - /bin/sh
       - -c
@@ -53,8 +53,8 @@ services:
     depends_on:
       - "postgres"
     environment:
-      'ZEPPELIN_NOTEBOOK_DIR=/notebook'
-      'ZEPPELIN_LOG_DIR=/logs'
+      - "ZEPPELIN_NOTEBOOK_DIR=/notebook"
+      - "ZEPPELIN_LOG_DIR=/logs"
 
 networks:
   default:
