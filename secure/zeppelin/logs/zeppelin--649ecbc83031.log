@@ -1,0 +1,150 @@
+ WARN [2019-03-19 09:32:25,995] ({main} ZeppelinConfiguration.java[create]:117) - Failed to load configuration, proceeding with a default
+ INFO [2019-03-19 09:32:26,059] ({main} ZeppelinConfiguration.java[create]:129) - Server Host: 0.0.0.0
+ INFO [2019-03-19 09:32:26,059] ({main} ZeppelinConfiguration.java[create]:131) - Server Port: 8080
+ INFO [2019-03-19 09:32:26,060] ({main} ZeppelinConfiguration.java[create]:135) - Context Path: /
+ INFO [2019-03-19 09:32:26,071] ({main} ZeppelinConfiguration.java[create]:136) - Zeppelin Version: 0.8.0
+ INFO [2019-03-19 09:32:26,096] ({main} Log.java[initialized]:186) - Logging initialized @583ms
+ INFO [2019-03-19 09:32:26,221] ({main} ZeppelinServer.java[setupWebAppContext]:387) - ZeppelinServer Webapp path: /zeppelin/webapps
+ INFO [2019-03-19 09:32:26,382] ({main} ZeppelinServer.java[main]:213) - Starting zeppelin server
+ INFO [2019-03-19 09:32:26,396] ({main} Server.java[doStart]:327) - jetty-9.2.15.v20160210
+ INFO [2019-03-19 09:32:28,776] ({main} StandardDescriptorProcessor.java[visitServlet]:297) - NO JSP Support for /, did not find org.eclipse.jetty.jsp.JettyJspServlet
+ INFO [2019-03-19 09:32:28,829] ({main} ContextHandler.java[log]:2052) - Initializing Shiro environment
+ INFO [2019-03-19 09:32:28,830] ({main} EnvironmentLoader.java[initEnvironment]:128) - Starting Shiro environment initialization.
+ INFO [2019-03-19 09:32:29,239] ({main} ReflectionBuilder.java[createNewInstance]:296) - An instance with name 'authc' already exists.  Redefining this object as a new instance of type org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter
+ INFO [2019-03-19 09:32:29,348] ({main} EnvironmentLoader.java[initEnvironment]:141) - Shiro environment initialized in 518 ms.
+ WARN [2019-03-19 09:32:29,412] ({main} ServletHolder.java[getNameOfJspClass]:923) - Unable to make identifier for jsp rest trying rest instead
+ WARN [2019-03-19 09:32:30,178] ({main} ZeppelinConfiguration.java[getConfigFSDir]:527) - zeppelin.config.fs.dir is not specified, fall back to local conf directory zeppelin.conf.dir
+ WARN [2019-03-19 09:32:30,179] ({main} ZeppelinConfiguration.java[getConfigFSDir]:527) - zeppelin.config.fs.dir is not specified, fall back to local conf directory zeppelin.conf.dir
+ INFO [2019-03-19 09:32:30,350] ({main} InterpreterSettingManager.java[<init>]:163) - Using RecoveryStorage: org.apache.zeppelin.interpreter.recovery.NullRecoveryStorage
+ INFO [2019-03-19 09:32:30,351] ({main} InterpreterSettingManager.java[<init>]:167) - Using LifecycleManager: org.apache.zeppelin.interpreter.lifecycle.NullLifecycleManager
+ WARN [2019-03-19 09:32:30,385] ({main} InterpreterSettingManager.java[init]:329) - No interpreter-setting.json found in /zeppelin/interpreter/lib
+ INFO [2019-03-19 09:32:30,469] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: bigquery
+ INFO [2019-03-19 09:32:30,473] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: jdbc
+ INFO [2019-03-19 09:32:30,476] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: alluxio
+ INFO [2019-03-19 09:32:30,489] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: neo4j
+ INFO [2019-03-19 09:32:30,492] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: pig
+ INFO [2019-03-19 09:32:30,495] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: flink
+ INFO [2019-03-19 09:32:30,498] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: kylin
+ INFO [2019-03-19 09:32:30,504] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: livy
+ WARN [2019-03-19 09:32:30,714] ({main} InterpreterSettingManager.java[init]:329) - No interpreter-setting.json found in /zeppelin/interpreter/scio
+ INFO [2019-03-19 09:32:30,718] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: ignite
+ WARN [2019-03-19 09:32:30,719] ({main} InterpreterSettingManager.java[init]:329) - No interpreter-setting.json found in /zeppelin/interpreter/${interpreter.name}
+ INFO [2019-03-19 09:32:30,758] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: angular
+ INFO [2019-03-19 09:32:30,766] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: lens
+ INFO [2019-03-19 09:32:30,767] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: python
+ INFO [2019-03-19 09:32:30,769] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: groovy
+ INFO [2019-03-19 09:32:30,770] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: md
+ INFO [2019-03-19 09:32:30,771] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: hbase
+ INFO [2019-03-19 09:32:30,772] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: file
+ INFO [2019-03-19 09:32:30,773] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: sap
+ INFO [2019-03-19 09:32:30,816] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: elasticsearch
+ INFO [2019-03-19 09:32:30,836] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: cassandra
+ INFO [2019-03-19 09:32:30,847] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: spark
+ INFO [2019-03-19 09:32:30,849] ({main} InterpreterSettingManager.java[registerInterpreterSetting]:423) - Register InterpreterSettingTemplate: sh
+ INFO [2019-03-19 09:32:30,849] ({main} LocalConfigStorage.java[loadInterpreterSettings]:63) - Load Interpreter Setting from file: /zeppelin/conf/interpreter.json
+ INFO [2019-03-19 09:32:30,963] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting ignite from interpreter.json
+ INFO [2019-03-19 09:32:30,963] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting python from interpreter.json
+ INFO [2019-03-19 09:32:30,964] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting sap from interpreter.json
+ INFO [2019-03-19 09:32:30,964] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting jdbc from interpreter.json
+ INFO [2019-03-19 09:32:30,965] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting lens from interpreter.json
+ INFO [2019-03-19 09:32:30,965] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting pig from interpreter.json
+ INFO [2019-03-19 09:32:30,965] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting flink from interpreter.json
+ INFO [2019-03-19 09:32:30,965] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting angular from interpreter.json
+ INFO [2019-03-19 09:32:30,966] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting livy from interpreter.json
+ INFO [2019-03-19 09:32:30,966] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting neo4j from interpreter.json
+ INFO [2019-03-19 09:32:30,967] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting groovy from interpreter.json
+ INFO [2019-03-19 09:32:30,967] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting file from interpreter.json
+ INFO [2019-03-19 09:32:30,967] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting elasticsearch from interpreter.json
+ INFO [2019-03-19 09:32:30,969] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting cassandra from interpreter.json
+ INFO [2019-03-19 09:32:30,969] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting sh from interpreter.json
+ INFO [2019-03-19 09:32:30,970] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting spark from interpreter.json
+ INFO [2019-03-19 09:32:30,970] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting md from interpreter.json
+ INFO [2019-03-19 09:32:30,970] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting alluxio from interpreter.json
+ INFO [2019-03-19 09:32:30,971] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting bigquery from interpreter.json
+ INFO [2019-03-19 09:32:30,971] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting honeur from interpreter.json
+ INFO [2019-03-19 09:32:30,988] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting hbase from interpreter.json
+ INFO [2019-03-19 09:32:30,989] ({main} InterpreterSettingManager.java[loadFromFile]:277) - Create Interpreter Setting kylin from interpreter.json
+ INFO [2019-03-19 09:32:31,032] ({main} LocalConfigStorage.java[save]:53) - Save Interpreter Setting to /zeppelin/conf/interpreter.json
+ INFO [2019-03-19 09:32:31,308] ({main} VfsLog.java[info]:138) - Using "/tmp/vfs_cache" as temporary files store.
+ INFO [2019-03-19 09:32:31,360] ({main} GitNotebookRepo.java[<init>]:64) - Opening a git repo at '/notebook'
+ INFO [2019-03-19 09:32:31,772] ({main} GitNotebookRepo.java[<init>]:67) - Git repo /notebook/.git does not exist, creating a new one
+ INFO [2019-03-19 09:32:31,948] ({main} NotebookRepoSync.java[<init>]:77) - Instantiate NotebookRepo: org.apache.zeppelin.notebook.repo.GitNotebookRepo
+ WARN [2019-03-19 09:32:32,131] ({main} NotebookAuthorization.java[getInstance]:86) - Notebook authorization module was called without initialization, initializing with default configuration
+ WARN [2019-03-19 09:32:32,131] ({main} LocalConfigStorage.java[loadNotebookAuthorization]:77) - NotebookAuthorization file /zeppelin/conf/notebook-authorization.json is not existed
+ INFO [2019-03-19 09:32:32,132] ({main} Credentials.java[loadFromFile]:121) - /zeppelin/conf/credentials.json
+ INFO [2019-03-19 09:32:32,169] ({main} StdSchedulerFactory.java[instantiate]:1184) - Using default implementation for ThreadExecutor
+ INFO [2019-03-19 09:32:32,172] ({main} SimpleThreadPool.java[initialize]:268) - Job execution threads will use class loader of thread: main
+ INFO [2019-03-19 09:32:32,213] ({main} SchedulerSignalerImpl.java[<init>]:61) - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+ INFO [2019-03-19 09:32:32,216] ({main} QuartzScheduler.java[<init>]:240) - Quartz Scheduler v.2.2.1 created.
+ INFO [2019-03-19 09:32:32,218] ({main} RAMJobStore.java[initialize]:155) - RAMJobStore initialized.
+ INFO [2019-03-19 09:32:32,220] ({main} QuartzScheduler.java[initialize]:305) - Scheduler meta-data: Quartz Scheduler (v2.2.1) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+ INFO [2019-03-19 09:32:32,220] ({main} StdSchedulerFactory.java[instantiate]:1339) - Quartz scheduler 'DefaultQuartzScheduler' initialized from default resource file in Quartz package: 'quartz.properties'
+ INFO [2019-03-19 09:32:32,220] ({main} StdSchedulerFactory.java[instantiate]:1343) - Quartz scheduler version: 2.2.1
+ INFO [2019-03-19 09:32:32,227] ({main} QuartzScheduler.java[start]:575) - Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+ INFO [2019-03-19 09:32:32,253] ({main} Notebook.java[<init>]:126) - Notebook indexing started...
+ INFO [2019-03-19 09:32:32,297] ({main} LuceneSearch.java[addIndexDocs]:305) - Indexing 0 notebooks took 43ms
+ INFO [2019-03-19 09:32:32,297] ({main} Notebook.java[<init>]:128) - Notebook indexing finished: 0 indexed in 0s
+ INFO [2019-03-19 09:32:32,300] ({main} Helium.java[loadConf]:103) - Add helium local registry /zeppelin/helium
+ INFO [2019-03-19 09:32:32,301] ({main} Helium.java[loadConf]:100) - Add helium online registry https://s3.amazonaws.com/helium-package/helium.json
+ WARN [2019-03-19 09:32:32,330] ({main} Helium.java[loadConf]:111) - /zeppelin/conf/helium.json does not exists
+ INFO [2019-03-19 09:32:36,245] ({main} ContextHandler.java[doStart]:744) - Started o.e.j.w.WebAppContext@797badd3{/,file:/zeppelin/webapps/webapp/,AVAILABLE}{/zeppelin/zeppelin-web-0.8.0.war}
+ INFO [2019-03-19 09:32:36,304] ({main} AbstractConnector.java[doStart]:266) - Started ServerConnector@2f1d0bbc{HTTP/1.1}{0.0.0.0:8080}
+ INFO [2019-03-19 09:32:36,304] ({main} Server.java[doStart]:379) - Started @10794ms
+ INFO [2019-03-19 09:32:36,305] ({main} ZeppelinServer.java[main]:223) - Done, zeppelin server started
+ INFO [2019-03-19 09:42:29,844] ({Thread-36} ZeppelinServer.java[run]:227) - Shutting down Zeppelin Server ... 
+ INFO [2019-03-19 09:42:29,859] ({Thread-36} AbstractConnector.java[doStop]:306) - Stopped ServerConnector@2f1d0bbc{HTTP/1.1}{0.0.0.0:8080}
+ INFO [2019-03-19 09:42:29,921] ({Thread-36} ContextHandler.java[log]:2052) - Cleaning up Shiro Environment
+ INFO [2019-03-19 09:42:29,921] ({Thread-36} ContextHandler.java[doStop]:865) - Stopped o.e.j.w.WebAppContext@797badd3{/,file:/zeppelin/webapps/webapp/,UNAVAILABLE}{/zeppelin/zeppelin-web-0.8.0.war}
+ INFO [2019-03-19 09:42:31,203] ({Thread-37} InterpreterSetting.java[close]:483) - Close InterpreterSetting: ignite
+ INFO [2019-03-19 09:42:31,208] ({Thread-40} InterpreterSetting.java[close]:483) - Close InterpreterSetting: sap
+ INFO [2019-03-19 09:42:31,208] ({Thread-55} InterpreterSetting.java[close]:483) - Close InterpreterSetting: sh
+ INFO [2019-03-19 09:42:31,207] ({Thread-54} InterpreterSetting.java[close]:483) - Close InterpreterSetting: cassandra
+ INFO [2019-03-19 09:42:31,207] ({Thread-53} InterpreterSetting.java[close]:483) - Close InterpreterSetting: elasticsearch
+ INFO [2019-03-19 09:42:31,222] ({Thread-68} InterpreterSetting.java[close]:483) - Close InterpreterSetting: kylin
+ INFO [2019-03-19 09:42:31,207] ({Thread-52} InterpreterSetting.java[close]:483) - Close InterpreterSetting: file
+ INFO [2019-03-19 09:42:31,224] ({Thread-73} InterpreterSetting.java[close]:483) - Close InterpreterSetting: sh
+ INFO [2019-03-19 09:42:31,207] ({Thread-51} InterpreterSetting.java[close]:483) - Close InterpreterSetting: groovy
+ INFO [2019-03-19 09:42:31,207] ({Thread-50} InterpreterSetting.java[close]:483) - Close InterpreterSetting: neo4j
+ INFO [2019-03-19 09:42:31,206] ({Thread-49} InterpreterSetting.java[close]:483) - Close InterpreterSetting: livy
+ INFO [2019-03-19 09:42:31,226] ({Thread-80} InterpreterSetting.java[close]:483) - Close InterpreterSetting: kylin
+ INFO [2019-03-19 09:42:31,206] ({Thread-48} InterpreterSetting.java[close]:483) - Close InterpreterSetting: angular
+ INFO [2019-03-19 09:42:31,206] ({Thread-47} InterpreterSetting.java[close]:483) - Close InterpreterSetting: flink
+ INFO [2019-03-19 09:42:31,206] ({Thread-46} InterpreterSetting.java[close]:483) - Close InterpreterSetting: pig
+ INFO [2019-03-19 09:42:31,206] ({Thread-45} InterpreterSetting.java[close]:483) - Close InterpreterSetting: lens
+ INFO [2019-03-19 09:42:31,205] ({Thread-44} InterpreterSetting.java[close]:483) - Close InterpreterSetting: jdbc
+ INFO [2019-03-19 09:42:31,205] ({Thread-43} InterpreterSetting.java[close]:483) - Close InterpreterSetting: sap
+ INFO [2019-03-19 09:42:31,205] ({Thread-42} InterpreterSetting.java[close]:483) - Close InterpreterSetting: python
+ INFO [2019-03-19 09:42:31,205] ({Thread-38} InterpreterSetting.java[close]:483) - Close InterpreterSetting: ignite
+ INFO [2019-03-19 09:42:31,204] ({Thread-39} InterpreterSetting.java[close]:483) - Close InterpreterSetting: python
+ INFO [2019-03-19 09:42:31,226] ({Thread-63} InterpreterSetting.java[close]:483) - Close InterpreterSetting: livy
+ INFO [2019-03-19 09:42:31,225] ({Thread-79} InterpreterSetting.java[close]:483) - Close InterpreterSetting: hbase
+ INFO [2019-03-19 09:42:31,225] ({Thread-78} InterpreterSetting.java[close]:483) - Close InterpreterSetting: honeur
+ INFO [2019-03-19 09:42:31,225] ({Thread-77} InterpreterSetting.java[close]:483) - Close InterpreterSetting: bigquery
+ INFO [2019-03-19 09:42:31,225] ({Thread-75} InterpreterSetting.java[close]:483) - Close InterpreterSetting: md
+ INFO [2019-03-19 09:42:31,225] ({Thread-76} InterpreterSetting.java[close]:483) - Close InterpreterSetting: alluxio
+ INFO [2019-03-19 09:42:31,224] ({Thread-62} InterpreterSetting.java[close]:483) - Close InterpreterSetting: angular
+ INFO [2019-03-19 09:42:31,224] ({Thread-74} InterpreterSetting.java[close]:483) - Close InterpreterSetting: spark
+ INFO [2019-03-19 09:42:31,224] ({Thread-72} InterpreterSetting.java[close]:483) - Close InterpreterSetting: cassandra
+ INFO [2019-03-19 09:42:31,224] ({Thread-71} InterpreterSetting.java[close]:483) - Close InterpreterSetting: elasticsearch
+ INFO [2019-03-19 09:42:31,223] ({Thread-70} InterpreterSetting.java[close]:483) - Close InterpreterSetting: file
+ INFO [2019-03-19 09:42:31,223] ({Thread-69} InterpreterSetting.java[close]:483) - Close InterpreterSetting: groovy
+ INFO [2019-03-19 09:42:31,223] ({Thread-64} InterpreterSetting.java[close]:483) - Close InterpreterSetting: neo4j
+ INFO [2019-03-19 09:42:31,222] ({Thread-58} InterpreterSetting.java[close]:483) - Close InterpreterSetting: alluxio
+ INFO [2019-03-19 09:42:31,222] ({Thread-67} InterpreterSetting.java[close]:483) - Close InterpreterSetting: hbase
+ INFO [2019-03-19 09:42:31,222] ({Thread-66} InterpreterSetting.java[close]:483) - Close InterpreterSetting: honeur
+ INFO [2019-03-19 09:42:31,221] ({Thread-65} InterpreterSetting.java[close]:483) - Close InterpreterSetting: bigquery
+ INFO [2019-03-19 09:42:31,210] ({Thread-61} InterpreterSetting.java[close]:483) - Close InterpreterSetting: flink
+ INFO [2019-03-19 09:42:31,210] ({Thread-60} InterpreterSetting.java[close]:483) - Close InterpreterSetting: pig
+ INFO [2019-03-19 09:42:31,209] ({Thread-59} InterpreterSetting.java[close]:483) - Close InterpreterSetting: lens
+ INFO [2019-03-19 09:42:31,208] ({Thread-41} InterpreterSetting.java[close]:483) - Close InterpreterSetting: jdbc
+ INFO [2019-03-19 09:42:31,208] ({Thread-57} InterpreterSetting.java[close]:483) - Close InterpreterSetting: md
+ INFO [2019-03-19 09:42:31,208] ({Thread-56} InterpreterSetting.java[close]:483) - Close InterpreterSetting: spark
+ INFO [2019-03-19 09:42:31,241] ({Thread-36} NotebookRepoSync.java[close]:428) - Closing all notebook storages
+ INFO [2019-03-19 09:42:34,255] ({Thread-36} ZeppelinServer.java[run]:238) - Bye
