@@ -6,7 +6,7 @@ docker login
 if [ $? -eq 0 ]
 then
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/susverwimp/honeur-public/master/docker-compose.yml --output docker-compose.yml
+    curl -L https://raw.githubusercontent.com/susverwimp/honeur-public/master/non-secure/docker-compose.yml --output docker-compose.yml
 
     read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' honeur_host_machine
     honeur_host_machine=${honeur_host_machine:-localhost}

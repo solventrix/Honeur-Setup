@@ -11,6 +11,9 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 :honeur_setup
+echo Downloading docker-compose.yml file.
+curl -L https://raw.githubusercontent.com/susverwimp/honeur-public/master/non-secure/docker-compose.yml --output docker-compose.yml
+
 set /p honeur_host_machine="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET honeur_host_machine=localhost
 set /p honeur_zeppelin_logs="Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: " || SET honeur_zeppelin_logs=./zeppelin/logs
 set /p honeur_zeppelin_notebooks="Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: " || SET honeur_zeppelin_notebooks=./zeppelin/notebook
