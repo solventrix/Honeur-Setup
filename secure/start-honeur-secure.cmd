@@ -39,7 +39,7 @@ echo Press [Enter] key to continue
 pause>NUL
 
 echo Downloading docker-compose.yml file.
-curl -L https://raw.githubusercontent.com/susverwimp/honeur-public/master/secure/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/docker-compose.yml --output docker-compose.yml
 set /p honeur_host_machine="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET honeur_host_machine=localhost
 set /p honeur_zeppelin_logs="Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: " || SET honeur_zeppelin_logs=./zeppelin/logs
 set /p honeur_zeppelin_notebooks="Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: " || SET honeur_zeppelin_notebooks=./zeppelin/notebook
@@ -53,11 +53,11 @@ IF "%honeur_ldap_or_jdbc%" == "ldap" (
     set /p honeur_security_ldap_base_dn="security.ldap.baseDn [dc=example,dc=com]: " || SET "honeur_security_ldap_base_dn=dc=example,dc=com"
     set /p honeur_security_ldap_dn="security.ldap.dn [uid={0},dc=example,dc=com]: " || SET "honeur_security_ldap_dn=uid={0},dc=example,dc=com"
 ) ELSE (
-    set "honeur_security_ldap_url=false"
-    set honeur_security_ldap_system_username=
-    set honeur_security_ldap_system_password=
-    set honeur_security_ldap_base_dn=
-    set honeur_security_ldap_dn=
+    set "honeur_security_ldap_url=ldap://localhost:389"
+    set "honeur_security_ldap_system_username=username"
+    set "honeur_security_ldap_system_password=password"
+    set "honeur_security_ldap_base_dn=dc=example,dc=org"
+    set "honeur_security_ldap_dn=cn={0},dc=example,dc=org"
 )
 
 echo %honeur_security_ldap_url%
@@ -65,17 +65,17 @@ echo %honeur_security_ldap_url%
 set /p honeur_usermgmt_admin_username="usermgmt admin username [admin]: " || SET honeur_usermgmt_admin_username=admin
 set /p honeur_usermgmt_admin_password="usermgmt admin password [admin]: " || SET honeur_usermgmt_admin_password=admin
 
-sed -i -e "s@BACKEND_HOST: http://localhost@BACKEND_HOST: http://%honeur_host_machine%@g" docker-compose.yml
+sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://%honeur_host_machine%@g" docker-compose.yml
 sed -i -e "s@- ./zeppelin/logs@- %honeur_zeppelin_logs%@g" docker-compose.yml
 sed -i -e "s@- ./zeppelin/notebook@- %honeur_zeppelin_notebooks%@g" docker-compose.yml
-sed -i -e "s@ZEPPELIN_SECURITY: jdbc@ZEPPELIN_SECURITY: %honeur_ldap_or_jdbc%@g" docker-compose.yml
-sed -i -e "s@LDAP_URL: ldap://ldap.forumsys.com:389@LDAP_URL: %honeur_security_ldap_url%@g" docker-compose.yml
-sed -i -e "s@LDAP_SYSTEM_USERNAME: cn=read-only-admin,dc=example,dc=com@LDAP_SYSTEM_USERNAME: %honeur_security_ldap_system_username%@g" docker-compose.yml
-sed -i -e "s@LDAP_SYSTEM_PASSWORD: password@LDAP_SYSTEM_PASSWORD: %honeur_security_ldap_system_password%@g" docker-compose.yml
-sed -i -e "s@LDAP_BASE_DN: dc=example,dc=com@LDAP_BASE_DN: %honeur_security_ldap_base_dn%@g" docker-compose.yml
-sed -i -e "s@LDAP_DN: uid={0},dc=example,dc=com@LDAP_DN: %honeur_security_ldap_dn%@g" docker-compose.yml
-sed -i -e "s@USERMGMT_ADMIN_USERNAME: admin@USERMGMT_ADMIN_USERNAME: %honeur_usermgmt_admin_username%@g" docker-compose.yml
-sed -i -e "s@USERMGMT_ADMIN_PASSWORD: admin@USERMGMT_ADMIN_PASSWORD: %honeur_usermgmt_admin_password%@g" docker-compose.yml
+sed -i -e "s@- \"ZEPPELIN_SECURITY=jdbc@- \"ZEPPELIN_SECURITY=%honeur_ldap_or_jdbc%@g" docker-compose.yml
+sed -i -e "s@- \"LDAP_URL=ldap://ldap.forumsys.com:389@- \"LDAP_URL=%honeur_security_ldap_url%@g" docker-compose.yml
+sed -i -e "s@- \"LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com@- \"LDAP_SYSTEM_USERNAME=%honeur_security_ldap_system_username%@g" docker-compose.yml
+sed -i -e "s@- \"LDAP_SYSTEM_PASSWORD=password@- \"LDAP_SYSTEM_PASSWORD=%honeur_security_ldap_system_password%@g" docker-compose.yml
+sed -i -e "s@- \"LDAP_BASE_DN=dc=example,dc=com@- \"LDAP_BASE_DN=%honeur_security_ldap_base_dn%@g" docker-compose.yml
+sed -i -e "s@- \"LDAP_DN=uid={0},dc=example,dc=com@- \"LDAP_DN=%honeur_security_ldap_dn%@g" docker-compose.yml
+sed -i -e "s@- \"USERMGMT_ADMIN_USERNAME=admin@- \"USERMGMT_ADMIN_USERNAME=%honeur_usermgmt_admin_username%@g" docker-compose.yml
+sed -i -e "s@- \"USERMGMT_ADMIN_PASSWORD=admin@- \"USERMGMT_ADMIN_PASSWORD=%honeur_usermgmt_admin_password%@g" docker-compose.yml
 
 docker volume create --name pgdata
 docker volume create --name shared
