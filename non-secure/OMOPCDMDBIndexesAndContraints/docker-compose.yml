@@ -1,0 +1,16 @@
+version: '3'
+services:
+  omop-indexes-and-constraints:
+    container_name: omop-indexes-and-constraints
+    volumes:
+      - ./setup-conf:/postgres/setup-scripts/conf
+    image: honeur/postgres-omop-cdm-constraints-and-indexes
+    external_links:
+      - postgres
+    networks:
+      - non-secure_default
+    env_file: 
+      - ../WebAPIDBInitialization/setup-conf/webapi.env
+networks:
+ non-secure_default:
+  external: true
