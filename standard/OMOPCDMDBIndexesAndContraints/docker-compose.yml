@@ -9,7 +9,7 @@ services:
     external_links:
       - postgres
     networks:
-      - secure_default
+      - standard_default
     command:
       - /bin/bash
       - -c
@@ -17,7 +17,7 @@ services:
           source /postgres/setup-scripts/setenv.sh
           python -u indexes_and_constraints_omopcdm.py conf/setup.yml
 networks:
- secure_default:
+ standard_default:
   external: true
   
 volumes:
