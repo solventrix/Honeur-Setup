@@ -7,55 +7,29 @@ if [ $? -eq 0 ]
 then
     read -p "Press [Enter] to start removing the existing containers"
 
-    echo Stop previous containers. Ignore errors when no containers exist yet.
-    echo stop webapi
-    docker stop webapi
-    echo stop zeppelin
-    docker stop zeppelin
-    echo stop user-mgmt
-    docker stop user-mgmt
-    echo stop postgres
-    docker stop postgres
+    echo Stop previous containers. Ignore errors when no omop-indexes-and-constraints container exist yet.
+    echo stop omop-indexes-and-constraints
+    docker stop omop-indexes-and-constraints
     
-    echo Removing previous containers. This can give errors when no containers exist yet.
-    echo remove webapi
-    docker rm webapi
-    echo remove zeppelin
-    docker rm zeppelin
-    echo remove user-mgmt
-    docker rm user-mgmt
-    echo remove postgres
-    docker rm postgres
+    echo Removing previous containers. This can give errors when no omop-indexes-and-constraints container exist yet.
+    echo remove omop-indexes-and-constraints
+    docker rm omop-indexes-and-constraints
     
     echo Succes
     read -p "Press [Enter] key to continue"
 
+    echo Creating folder setup-conf
+    mkdir setup-conf
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/non-secure/docker-compose.yml --output docker-compose.yml
-
-    read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' honeur_host_machine
-    honeur_host_machine=${honeur_host_machine:-localhost}
-    read -p 'Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: ' honeur_zeppelin_logs
-    honeur_zeppelin_logs=${honeur_zeppelin_logs:-./zeppelin/logs}
-    read -p 'Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: ' honeur_zeppelin_notebooks
-    honeur_zeppelin_notebooks=${honeur_zeppelin_notebooks:-./zeppelin/notebook}
-
-    sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://$honeur_host_machine@g" docker-compose.yml
-    sed -i -e "s@- ./zeppelin/logs@- $honeur_zeppelin_logs@g" docker-compose.yml
-    sed -i -e "s@- ./zeppelin/notebook@- $honeur_zeppelin_notebooks@g" docker-compose.yml
-
-    docker volume create --name pgdata
-    docker volume create --name shared
-
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
+    echo Downloading setup.yml file inside setup-conf folder
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/OMOPCDMDBIndexesAndContraints/setup-conf/setup.yml --output setup-conf/setup.yml
+    
     docker-compose rm -f
     docker-compose pull
-    docker-compose up -d
+    docker-compose up
     
-    echo postgresql is available on $honeur_host_machine:5444
-    echo webapi/atlas is available on http://$honeur_host_machine:8080/webapi and http://$honeur_host_machine:8080/atlas respectively
-    echo Zeppelin is available on http://$honeur_host_machine:8082
-    echo Zeppelin logs are available in directory $honeur_zeppelin_logs
-    echo Zeppelin notebooks are available in directory $honeur_zeppelin_notebooks
+    echo success
 
 fi
 read -p "Press [Enter] key to exit"
