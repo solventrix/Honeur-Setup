@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 services:
   omop-indexes-and-constraints:
     container_name: omop-indexes-and-constraints
