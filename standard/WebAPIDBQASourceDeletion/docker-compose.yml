@@ -1,0 +1,26 @@
+version: '3.5'
+services:
+  webapi-source-qa-disable:
+    container_name: webapi-source-qa-disable
+    volumes:
+      - ./setup-conf:/postgres/setup-scripts/conf
+      - shared:/var/lib/shared
+    image: honeur/postgres-webapi-source:disable-qa
+    external_links:
+      - postgres
+    networks:
+      - honeur-net
+    command:
+      - /bin/bash
+      - -c
+      - |
+          source /postgres/setup-scripts/setenv.sh
+          python -u source_deletion.py conf/setup.yml
+
+networks:
+  honeur-net:
+    name: honeur-net
+  
+volumes:
+  shared:
+    external: true
