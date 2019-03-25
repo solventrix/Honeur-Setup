@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 services:
   postgres:
@@ -12,6 +12,8 @@ services:
     restart: always
     environment:
       - "POSTGRES_PASSWORD=h0n3uR#2019!"
+    networks:
+      - honeur-net
     command:
       - /bin/sh
       - -c
@@ -31,6 +33,8 @@ services:
       - "postgres"
     environment:
       - "BACKEND_HOST=http://localhost:8080"
+    networks:
+      - honeur-net
     command:
       - /bin/sh
       - -c
@@ -53,9 +57,12 @@ services:
     environment:
       - "ZEPPELIN_NOTEBOOK_DIR=/notebook"
       - "ZEPPELIN_LOG_DIR=/logs"
+    networks:
+      - honeur-net
 
 networks:
-  default:
+  honeur-net:
+    name: honeur-net
 
 volumes:
   pgdata:

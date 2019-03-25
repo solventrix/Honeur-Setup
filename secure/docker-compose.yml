@@ -12,6 +12,8 @@ services:
     restart: always
     environment:
       - "POSTGRES_PASSWORD=h0n3uR#2019!"
+    networks:
+      - honeur-net
     command:
       - /bin/sh
       - -c
@@ -37,6 +39,8 @@ services:
       - "LDAP_SYSTEM_PASSWORD=password"
       - "LDAP_BASE_DN=dc=example,dc=com"
       - "LDAP_DN=uid={0},dc=example,dc=com"
+    networks:
+      - honeur-net
     command:
       - /bin/sh
       - -c
@@ -59,6 +63,8 @@ services:
       - "BACKEND_HOST=http://localhost:8081"
       - "USERMGMT_ADMIN_USERNAME=admin"
       - "USERMGMT_ADMIN_PASSWORD=admin"
+    networks:
+      - honeur-net
     command:
       - /bin/sh
       - -c
@@ -97,9 +103,12 @@ services:
       - "LDAP_DN=uid={0},dc=example,dc=com"
       - "ZEPPELIN_NOTEBOOK_DIR=/notebook"
       - "ZEPPELIN_LOG_DIR=/logs"
+    networks:
+      - honeur-net
 
 networks:
-  default:
+  honeur-net:
+    name: honeur-net
 
 volumes:
   pgdata:

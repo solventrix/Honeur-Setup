@@ -9,16 +9,17 @@ services:
     external_links:
       - postgres
     networks:
-      - secure_default
+      - honeur-net
     command:
       - /bin/bash
       - -c
       - |
           source /postgres/setup-scripts/setenv.sh
           python -u indexes_and_constraints_omopcdm.py conf/setup.yml
+
 networks:
- secure_default:
-  external: true
+  honeur-net:
+    name: honeur-net
   
 volumes:
   shared:
