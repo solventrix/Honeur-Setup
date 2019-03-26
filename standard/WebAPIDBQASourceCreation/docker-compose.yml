@@ -22,7 +22,7 @@ services:
     container_name: webapi-source-qa-enable
     volumes:
       - ./setup-conf:/postgres/setup-scripts/conf
-      - shared:/var/lib/shared
+      - shared-qa:/var/lib/shared
     image: honeur/postgres-webapi-source:enable-qa
     external_links:
       - postgres
