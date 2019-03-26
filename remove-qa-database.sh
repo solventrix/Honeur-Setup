@@ -24,9 +24,9 @@ then
 
     mkdir setup-conf
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/WebAPIDBQASourceDeletion/docker-compose.yml --output docker-compose.yml
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/WebAPIDBQASourceDeletion/docker-compose.yml --output docker-compose.yml
     echo Downloading setup.yml file inside setup-conf folder
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/WebAPIDBQASourceDeletion/setup-conf/setup.yml --output setup-conf/setup.yml
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/WebAPIDBQASourceDeletion/setup-conf/setup.yml --output setup-conf/setup.yml
 
     docker-compose pull
     docker-compose up -d
