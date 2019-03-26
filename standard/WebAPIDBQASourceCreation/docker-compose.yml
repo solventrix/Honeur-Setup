@@ -40,7 +40,9 @@ services:
 networks:
   honeur-net:
     name: honeur-net
-  
+
 volumes:
-  shared:
+  pgdata-qa:
+    external: true
+  shared-qa:
     external: true
