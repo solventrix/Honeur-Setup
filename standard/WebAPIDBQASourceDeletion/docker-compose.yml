@@ -4,7 +4,7 @@ services:
     container_name: webapi-source-qa-disable
     volumes:
       - ./setup-conf:/postgres/setup-scripts/conf
-      - shared:/var/lib/shared
+      - shared-qa:/var/lib/shared
     image: honeur/postgres-webapi-source:disable-qa
     external_links:
       - postgres
@@ -22,5 +22,5 @@ networks:
     name: honeur-net
   
 volumes:
-  shared:
+  shared-qa:
     external: true
