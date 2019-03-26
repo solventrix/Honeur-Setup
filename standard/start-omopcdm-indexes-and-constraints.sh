@@ -28,6 +28,8 @@ then
     docker-compose pull
     docker-compose up
     
+    sleep 5
+    
     echo Removing downloaded files
     rm docker-compose.yml
     rm -R setup-conf
