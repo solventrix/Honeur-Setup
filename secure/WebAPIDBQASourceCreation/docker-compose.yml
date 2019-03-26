@@ -1,13 +1,33 @@
 version: '3.5'
 services:
+  postgres-qa:
+    image: honeur/postgres
+    container_name: postgres-qa
+    ports:
+      - "5445:5432"
+    volumes:
+      - pgdata-qa:/var/lib/postgresql/data
+      - shared-qa:/var/lib/postgresql/envfileshared
+    restart: always
+    networks:
+      - honeur-net
+    command:
+      - /bin/sh
+      - -c
+      - |
+          mkdir -p /var/lib/postgresql/envfileshared
+          cp /var/lib/postgresql/envfile/honeur.env /var/lib/postgresql/envfileshared/honeur.env
+          docker-entrypoint.sh postgres
   webapi-source-qa-enable:
     container_name: webapi-source-qa-enable
     volumes:
       - ./setup-conf:/postgres/setup-scripts/conf
-      - shared:/var/lib/shared
+      - shared-qa:/var/lib/shared
     image: honeur/postgres-webapi-source:enable-qa
     external_links:
       - postgres
+    depends_on:
+      - postgres-qa
     networks:
       - honeur-net
     command:
@@ -20,7 +40,9 @@ services:
 networks:
   honeur-net:
     name: honeur-net
-  
+
 volumes:
-  shared:
+  pgdata-qa:
+    external: true
+  shared-qa:
     external: true

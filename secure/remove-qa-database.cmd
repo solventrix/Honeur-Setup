@@ -7,18 +7,22 @@ IF %ERRORLEVEL% EQU 0 (
     goto honeur_setup
 ) else (
     echo Failed to Login
-	goto eof
+    goto eof
 )
 
 :honeur_setup
 echo Press [Enter] to start removing the existing containers
 pause>NUL
 
-echo Stop previous containers. Ignore errors when no webapi-source-qa-disable container exist yet.
+echo Stop previous containers. Ignore errors when no containers exist yet.
+echo stop postgres-qa
+docker stop postgres-qa
 echo stop webapi-source-qa-disable
 docker stop webapi-source-qa-disable
 
-echo Removing previous containers. This can give errors when no webapi-source-qa-disable container exist yet.
+echo Removing previous containers. This can give errors when no containers exist yet.
+echo remove postgres-qa
+docker rm postgres-qa
 echo remove webapi-source-qa-disable
 docker rm webapi-source-qa-disable
 
@@ -34,11 +38,13 @@ echo Downloading setup.yml file inside setup-conf folder
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/WebAPIDBQASourceDeletion/setup-conf/setup.yml --output setup-conf/setup.yml
 
 docker-compose pull
-docker-compose up
+docker-compose up -d
 
-echo success
+echo Removing downloaded files
+rm docker-compose.yml
+rm -R setup-conf
+
 goto eof
-
 
 :eof
 echo Press [Enter] key to exit
