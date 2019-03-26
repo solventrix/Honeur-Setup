@@ -48,7 +48,6 @@ sed -i -e "s@- ./zeppelin/notebook@- %honeur_zeppelin_notebooks%@g" docker-compo
 docker volume create --name pgdata
 docker volume create --name shared
 
-docker-compose rm -f
 docker-compose pull
 docker-compose up -d
 

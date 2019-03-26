@@ -80,7 +80,6 @@ sed -i -e "s@- \"USERMGMT_ADMIN_PASSWORD=admin@- \"USERMGMT_ADMIN_PASSWORD=%hone
 docker volume create --name pgdata
 docker volume create --name shared
 
-docker-compose rm -f
 docker-compose pull
 docker-compose up -d
 

@@ -33,7 +33,6 @@ curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/
 echo Downloading setup.yml file inside setup-conf folder
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/WebAPIDBQASourceCreation/setup-conf/setup.yml --output setup-conf/setup.yml
 
-docker-compose rm -f
 docker-compose pull
 docker-compose up
 
