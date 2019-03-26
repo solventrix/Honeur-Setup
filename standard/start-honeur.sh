@@ -7,6 +7,9 @@ if [ $? -eq 0 ]
 then
     read -p "Press [Enter] to start removing the existing containers"
 
+    echo export COMPOSE_HTTP_TIMEOUT=300
+    export COMPOSE_HTTP_TIMEOUT=300
+
     echo Stop previous containers. Ignore errors when no containers exist yet.
     echo stop webapi
     docker stop webapi
