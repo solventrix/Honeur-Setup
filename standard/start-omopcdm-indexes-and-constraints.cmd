@@ -34,7 +34,7 @@ echo Downloading setup.yml file inside setup-conf folder
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/OMOPCDMDBIndexesAndContraints/setup-conf/setup.yml --output setup-conf/setup.yml
 
 docker-compose pull
-docker-compose up
+docker-compose up -d
 
 ping 127.0.0.1 -n 6 > nul
 

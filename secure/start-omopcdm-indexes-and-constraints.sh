@@ -26,7 +26,7 @@ then
     curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/OMOPCDMDBIndexesAndContraints/setup-conf/setup.yml --output setup-conf/setup.yml
 
     docker-compose pull
-    docker-compose up
+    docker-compose up -d
 
     sleep 5
 
