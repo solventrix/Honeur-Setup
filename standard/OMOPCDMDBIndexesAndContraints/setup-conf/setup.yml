@@ -1,3 +1,0 @@
-database:
-  host: postgres
-  port: 5432
