@@ -36,6 +36,10 @@ curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/
 docker-compose pull
 docker-compose up
 
+echo Removing downloaded files
+rm docker-compose.yml
+rm -R setup-conf
+
 echo success
 goto eof
 
