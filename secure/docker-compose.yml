@@ -5,40 +5,31 @@ services:
     image: honeur/postgres
     container_name: postgres
     ports:
-      - "5444:5432"
+      - "127.0.0.1:5444:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - shared:/var/lib/postgresql/envfileshared
     restart: always
-    environment:
-      - "POSTGRES_PASSWORD=h0n3uR#2019!"
     networks:
       - honeur-net
+    privileged: false
     command:
-      - /bin/sh
+      - /bin/bash
       - -c
       - |
-          mkdir -p /var/lib/postgresql/envfileshared
           cp /var/lib/postgresql/envfile/honeur.env /var/lib/postgresql/envfileshared/honeur.env
           docker-entrypoint.sh postgres
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 800m
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   webapi:
     image: honeur/webapi-atlas
     container_name: webapi
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
-      - shared:/var/lib/shared
+      - type: volume
+        source: shared
+        target: /var/lib/shared
+        read_only: true
     restart: always
     depends_on:
       - "postgres"
@@ -52,30 +43,23 @@ services:
     networks:
       - honeur-net
     command:
-      - /bin/sh
+      - /bin/bash
       - -c
       - |
           sed -i -e 's@http://localhost:8080@'"$${BACKEND_HOST}"'@g' /usr/local/tomcat/webapps/atlas/js/config-local.js
           cp /var/lib/shared/honeur.env /usr/local/tomcat/bin/setenv.sh
           catalina.sh run
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 800m
-    healthcheck:
-      test: curl --fail -s http://localhost:8080/atlas || exit 1
-      interval: 1m30s
-      timeout: 10s
-      retries: 5
 
   user-mgmt:
     image: honeur/user-mgmt
     container_name: user-mgmt
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     volumes:
-      - shared:/var/lib/shared
+      - type: volume
+        source: shared
+        target: /var/lib/shared
+        read_only: true
     restart: always
     depends_on:
       - "postgres"
@@ -86,31 +70,24 @@ services:
     networks:
       - honeur-net
     command:
-      - /bin/sh
+      - /bin/bash
       - -c
       - |
           sed -i -e 's@http://localhost:8081@'"$${BACKEND_HOST}"'@g' /usr/local/tomcat/webapps/usermgmt/main.js
           cp /var/lib/shared/honeur.env /usr/local/tomcat/bin/setenv.sh
           catalina.sh run
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 800m
-    healthcheck:
-      test: curl -sS http://127.0.0.1 || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 5
 
   zeppelin:
     image: honeur/zeppelin
     container_name: zeppelin
     ports:
-      - "7077:7077"
-      - "8082:8080"
+      - "127.0.0.1:7077:7077"
+      - "127.0.0.1:8082:8080"
     volumes:
-      - shared:/var/lib/shared
+      - type: volume
+        source: shared
+        target: /var/lib/shared
+        read_only: true
       - ./zeppelin/logs:/logs
       - ./zeppelin/notebook:/notebook
     restart: always
@@ -135,16 +112,6 @@ services:
       - "ZEPPELIN_LOG_DIR=/logs"
     networks:
       - honeur-net
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 800m
-    healthcheck:
-      test: curl -sS http://127.0.0.1 || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 5
 
 networks:
   honeur-net:
