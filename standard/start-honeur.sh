@@ -10,7 +10,7 @@ then
     echo export COMPOSE_HTTP_TIMEOUT=300
     export COMPOSE_HTTP_TIMEOUT=300
 
-    echo Stop previous containers. Ignore errors when no containers exist yet.
+    echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
     echo stop webapi
     docker stop webapi
     echo stop zeppelin
@@ -20,7 +20,7 @@ then
     echo stop postgres
     docker stop postgres
     
-    echo Removing previous containers. This can give errors when no containers exist yet.
+    echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
     echo remove webapi
     docker rm webapi
     echo remove zeppelin

@@ -11,13 +11,13 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 :honeur_setup
-echo Press [Enter] to start removing the existing containers
+echo Press [Enter] to start removing the existing HONEUR containers
 pause>NUL
 
 echo set COMPOSE_HTTP_TIMEOUT=300
 set COMPOSE_HTTP_TIMEOUT=300
 
-echo Stop previous containers. Ignore errors when no containers exist yet.
+echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
 echo stop webapi
 docker stop webapi
 echo stop zeppelin
@@ -27,7 +27,7 @@ docker stop user-mgmt
 echo stop postgres
 docker stop postgres
 
-echo Removing previous containers. This can give errors when no containers exist yet.
+echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
 echo remove webapi
 docker rm webapi
 echo remove zeppelin

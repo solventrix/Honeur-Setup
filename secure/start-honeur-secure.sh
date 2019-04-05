@@ -5,9 +5,9 @@ docker login
 
 if [ $? -eq 0 ]
 then
-    read -p "Press [Enter] to start removing the existing containers"
+    read -p "Press [Enter] to start removing the existing HONEUR containers"
 
-    echo Stop previous containers. Ignore errors when no containers exist yet.
+    echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
     echo stop webapi
     docker stop webapi
     echo stop zeppelin
@@ -17,7 +17,7 @@ then
     echo stop postgres
     docker stop postgres
     
-    echo Removing previous containers. This can give errors when no containers exist yet.
+    echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
     echo remove webapi
     docker rm webapi
     echo remove zeppelin
