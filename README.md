@@ -42,8 +42,8 @@ https://hub.docker.com/u/honeur
 #### Secure Version
 1. Open a terminal window (Command Prompt on Windows)
 2. Download the installation file
-   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.cmd --output start-honeur.cmd*
-   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.sh --output start-honeur.sh && chmod +x start-honeur.sh*
+   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.cmd --output start-honeur.cmd
+   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.sh --output start-honeur.sh && chmod +x start-honeur.sh
 3. Run *start-honeur-secure.sh* (on Linux or Mac) or *start-honeur-secure.cmd* (on Windows)
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing webapi, zeppelin and postgres container.
