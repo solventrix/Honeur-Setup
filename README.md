@@ -30,10 +30,8 @@ https://hub.docker.com/u/honeur
 #### Standard Version
 1. Open a terminal window (Command Prompt on Windows)
 2. Download the installation file
-   * For Windows:
-         * curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/start-honeur.cmd --output start-honeur.cmd
-   * For Linux and Mac
-         * curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/start-honeur.sh --output start-honeur.sh && chmod +x start-honeur.sh*
+   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/start-honeur.cmd --output start-honeur.cmd
+   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/standard/start-honeur.sh --output start-honeur.sh && chmod +x start-honeur.sh*
 3. Run *start-honeur.sh* (on Linux or Mac) or *start-honeur.cmd* (on Windows)
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing webapi, zeppelin and postgres container.
@@ -44,10 +42,8 @@ https://hub.docker.com/u/honeur
 #### Secure Version
 1. Open a terminal window (Command Prompt on Windows)
 2. Download the installation file
-**For Windows**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.cmd --output start-honeur.cmd*
-**For Linux and Mac**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.sh --output start-honeur.sh && chmod +x start-honeur.sh*
+   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.cmd --output start-honeur.cmd*
+   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/start-honeur-secure.sh --output start-honeur.sh && chmod +x start-honeur.sh*
 3. Run *start-honeur-secure.sh* (on Linux or Mac) or *start-honeur-secure.cmd* (on Windows)
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing webapi, zeppelin and postgres container.
@@ -72,10 +68,8 @@ when all custom data is imported, it is recommended that the constraints and ind
 ##### Installation steps
 1. Open a terminal window (Command Prompt on Windows)
 2. Download the installation file
-**For Windows**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-omopcdm-indexes-and-constraints.cmd --output start-omopcdm-indexes-and-constraints.cmd*
-**For Linux and Mac**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-omopcdm-indexes-and-constraints.sh --output start-omopcdm-indexes-and-constraints.sh && chmod +x start-omopcdm-indexes-and-constraints.sh*
+   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-omopcdm-indexes-and-constraints.cmd --output start-omopcdm-indexes-and-constraints.cmd*
+   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-omopcdm-indexes-and-constraints.sh --output start-omopcdm-indexes-and-constraints.sh && chmod +x start-omopcdm-indexes-and-constraints.sh*
 3. Run *start-omopcdm-indexes-and-constraints.sh* (on Linux or Mac) or *start-omopcdm-indexes-and-constraints.cmd* (on Windows)
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing omop-indexes-and-constraints container.
@@ -87,10 +81,8 @@ QA database can be used as a test database. It's an exact replica of the full da
 ##### Installation steps
 1. Open a terminal window (Command Prompt on Windowssh
 2. Download the installation file
-**For Windows**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-qa-database.cmd --output start-qa-database.cmd*
-**For Linux and Mac**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-qa-database.sh --output start-qa-database.sh && chmod +x start-qa-database.sh*
+   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-qa-database.cmd --output start-qa-database.cmd*
+   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/start-qa-database.sh --output start-qa-database.sh && chmod +x start-qa-database.sh*
 3. Run *start-qa-database.sh* (on Linux or Mac) or *start-qa-database.cmd* (on Windows)
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing postgres-qa and webapi-source-qa-enable container.
@@ -101,10 +93,8 @@ QA database can be used as a test database. It's an exact replica of the full da
 ##### Removal steps
 1. Open a terminal window (Command Prompt on Windows)
 2. Download the installation file
-**For Windows**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remove-qa-database.cmd --output remove-qa-database.cmd*
-**For Linux and Mac**
-*curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remove-qa-database.sh --output remove-qa-database.sh && chmod +x remove-qa-database.sh*
+   * For Windows: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remove-qa-database.cmd --output remove-qa-database.cmd*
+   * For Linux and Mac: curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remove-qa-database.sh --output remove-qa-database.sh && chmod +x remove-qa-database.sh*
 3. Run remove-qa-database.sh (on Linux or Mac) or remove-qa-database.cmd (on Windows)
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing postgres-qa and webapi-source-qa-disable container.
