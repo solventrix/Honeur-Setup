@@ -4,15 +4,20 @@ services:
   postgres:
     image: honeur/postgres
     container_name: postgres
+    security_opt:
+      - no-new-privileges
     ports:
-      - "127.0.0.1:5444:5432"
+      - "5444:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - shared:/var/lib/postgresql/envfileshared
+      - type: volume
+        source: pgdata
+        target: /var/lib/postgresql/data
+      - type: volume
+        source: shared
+        target: /var/lib/postgresql/envfileshared
     restart: always
     networks:
       - honeur-net
-    privileged: false
     command:
       - /bin/bash
       - -c
@@ -23,8 +28,10 @@ services:
   webapi:
     image: honeur/webapi-atlas
     container_name: webapi
+    security_opt:
+      - no-new-privileges
     ports:
-      - "127.0.0.1:8080:8080"
+      - "8080:8080"
     volumes:
       - type: volume
         source: shared
@@ -53,8 +60,10 @@ services:
   user-mgmt:
     image: honeur/user-mgmt
     container_name: user-mgmt
+    security_opt:
+      - no-new-privileges
     ports:
-      - "127.0.0.1:8081:8080"
+      - "8081:8080"
     volumes:
       - type: volume
         source: shared
@@ -80,16 +89,22 @@ services:
   zeppelin:
     image: honeur/zeppelin
     container_name: zeppelin
+    security_opt:
+      - no-new-privileges
     ports:
-      - "127.0.0.1:7077:7077"
-      - "127.0.0.1:8082:8080"
+      - "7077:7077"
+      - "8082:8080"
     volumes:
       - type: volume
         source: shared
         target: /var/lib/shared
         read_only: true
-      - ./zeppelin/logs:/logs
-      - ./zeppelin/notebook:/notebook
+      - type: bind
+        source: ./zeppelin/logs
+        target: /logs
+      - type: bind
+        source: ./zeppelin/notebook
+        target: /notebook
     restart: always
     depends_on:
       - "postgres"
