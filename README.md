@@ -1,5 +1,7 @@
 # HONEUR-Setup
 
+Check the honeur website at: https://www.honeur.org
+
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 HONEUR-Setup is a public repository. This repository is used for files that can be downloaded without restrictions
