@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo Docker login, Make sure to use an account with access to the honeur docker hub images.
 docker login
