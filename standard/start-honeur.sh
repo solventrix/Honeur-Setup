@@ -29,8 +29,11 @@ then
     docker rm user-mgmt
     echo remove postgres
     docker rm postgres
+
+    echo Removing shared volume
+    docker volume rm shared
     
-    echo Succes
+    echo Success
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.

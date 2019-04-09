@@ -37,7 +37,10 @@ docker rm user-mgmt
 echo remove postgres
 docker rm postgres
 
-echo Succes
+echo Removing shared volume
+docker volume rm shared
+
+echo Success
 echo Press [Enter] key to continue
 pause>NUL
 

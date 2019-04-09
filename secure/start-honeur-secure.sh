@@ -7,6 +7,9 @@ if [ $? -eq 0 ]
 then
     read -p "Press [Enter] to start removing the existing HONEUR containers"
 
+    echo export COMPOSE_HTTP_TIMEOUT=300
+    export COMPOSE_HTTP_TIMEOUT=300
+
     echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
     echo stop webapi
     docker stop webapi
@@ -26,8 +29,11 @@ then
     docker rm user-mgmt
     echo remove postgres
     docker rm postgres
+
+    echo Removing shared volume
+    docker volume rm shared
     
-    echo Succes
+    echo Success
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.

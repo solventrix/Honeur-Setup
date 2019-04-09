@@ -14,6 +14,9 @@ IF %ERRORLEVEL% EQU 0 (
 echo Press [Enter] to start removing the existing HONEUR containers
 pause>NUL
 
+echo set COMPOSE_HTTP_TIMEOUT=300
+set COMPOSE_HTTP_TIMEOUT=300
+
 echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
 echo stop webapi
 docker stop webapi
@@ -34,7 +37,10 @@ docker rm user-mgmt
 echo remove postgres
 docker rm postgres
 
-echo Succes
+echo Removing shared volume
+docker volume rm shared
+
+echo Success
 echo Press [Enter] key to continue
 pause>NUL
 
