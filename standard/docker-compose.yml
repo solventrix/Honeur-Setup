@@ -33,6 +33,11 @@ services:
       - "postgres"
     environment:
       - "BACKEND_HOST=http://localhost:8080"
+      - "LDAP_URL=ldap://ldap.forumsys.com:389"                     # default value, not used in standard setup but required for webapi
+      - "LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com" # default value, not used in standard setup but required for webapi
+      - "LDAP_SYSTEM_PASSWORD=password"                             # default value, not used in standard setup but required for webapi
+      - "LDAP_BASE_DN=dc=example,dc=com"                            # default value, not used in standard setup but required for webapi
+      - "LDAP_DN=uid={0},dc=example,dc=com"                         # default value, not used in standard setup but required for webapi
     networks:
       - honeur-net
     command:
