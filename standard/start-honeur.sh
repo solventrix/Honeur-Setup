@@ -5,7 +5,7 @@ docker login
 
 if [ $? -eq 0 ]
 then
-    read -p "Press [Enter] to start removing the existing containers"
+    read -p "Press [Enter] to start removing the existing HONEUR containers"
 
     echo export COMPOSE_HTTP_TIMEOUT=300
     export COMPOSE_HTTP_TIMEOUT=300
