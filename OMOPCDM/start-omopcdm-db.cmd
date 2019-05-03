@@ -44,7 +44,7 @@ docker-compose up -d
 echo Removing downloaded files
 rm docker-compose.yml
 
-echo postgresql is available on %honeur_host_machine%:5444
+echo postgresql is available on localhost:5444
 goto eof
 
 :eof

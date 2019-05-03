@@ -37,7 +37,7 @@ then
     echo Cleaning up
     rm docker-compose.yml
 
-    echo postgresql is available on $honeur_host_machine:5444
+    echo postgresql is available on localhost:5444
 
 fi
 read -p "Press [Enter] key to exit"
