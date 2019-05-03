@@ -24,13 +24,17 @@ then
     echo Downloading docker-compose.yml file.
     curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDM/docker-compose.yml --output docker-compose.yml
 
+    echo Creating volumes
     docker volume create --name pgdata
     docker volume create --name shared
 
+    echo Downloading database
     docker-compose pull
+
+    echo Starting database
     docker-compose up -d
 
-    echo Removing downloaded files
+    echo Cleaning up
     rm docker-compose.yml
 
     echo postgresql is available on $honeur_host_machine:5444
