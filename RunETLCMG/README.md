@@ -3,9 +3,9 @@
 ## Prerequisites
 1. Git client is installed
 2. Docker is installed 
-3. The user has (read) access to the CMG repository on GitHub: https://github.com/solventrix/CMG
-4. The HONEUR remote installation is running:
-    * See https://github.com/solventrix/Honeur-Setup/blob/master/README.md for more info
+3. The user has (read) access to the CMG repository containing the ETL code on GitHub: https://github.com/solventrix/CMG
+4. The HONEUR OMOP CDM database is running in a Docker container named 'postgres':
+    * See https://github.com/solventrix/Honeur-Setup/blob/master/OMOPCDM/README.md for more info
 
 ## Execution steps
 1. Open a terminal window 
