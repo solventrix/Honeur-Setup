@@ -1,5 +1,13 @@
 # How to execute the ETL for CMG
 
+## Prerequisites
+1. Git client is installed
+2. Docker is installed 
+3. The user has (read) access to the CMG repository on GitHub: https://github.com/solventrix/CMG
+4. The HONEUR remote installation is running:
+    * See https://github.com/solventrix/Honeur-Setup/blob/master/README.md for more info
+
+## Execution steps
 1. Open a terminal window 
 2. Download the installation script:
     * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLCMG/runETL.sh --output runETL.sh && chmod +x runETL.sh`
