@@ -73,8 +73,8 @@ then
     honeur_usermgmt_admin_password=${honeur_usermgmt_admin_password:-admin}
 
     sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://$honeur_host_machine@g" docker-compose.yml
-    sed -i -e "s@source: ./zeppelin/logs@source: $honeur_zeppelin_logs@g" docker-compose.yml
-    sed -i -e "s@source: ./zeppelin/notebook@source: $honeur_zeppelin_notebooks@g" docker-compose.yml
+    sed -i -e "s@- ./zeppelin/logs@- $honeur_zeppelin_logs@g" docker-compose.yml
+    sed -i -e "s@- ./zeppelin/notebook@- $honeur_zeppelin_notebooks@g" docker-compose.yml
     sed -i -e "s@- \"ZEPPELIN_SECURITY=jdbc@- \"ZEPPELIN_SECURITY=$honeur_ldap_or_jdbc@g" docker-compose.yml
     sed -i -e "s@- \"LDAP_URL=ldap://ldap.forumsys.com:389@- \"LDAP_URL=$honeur_security_ldap_url@g" docker-compose.yml
     sed -i -e "s@- \"LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com@- \"LDAP_SYSTEM_USERNAME=$honeur_security_ldap_system_username@g" docker-compose.yml
