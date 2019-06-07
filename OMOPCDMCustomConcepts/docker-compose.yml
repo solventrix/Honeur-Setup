@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   omop-cdm-custom-concepts:
-    image: honeur/postgres-omop-cdm-initialize:custom-concepts-update-04-2019
+    image: honeur/postgres-omop-cdm-initialize:custom-concepts-update-06-2019
     container_name: omop-cdm-custom-concepts
     volumes:
       - ./setup-conf:/postgres/setup-scripts/conf
