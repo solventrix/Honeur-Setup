@@ -115,3 +115,35 @@ QA database can be used as a test database. It's an exact replica of the full da
 4. The program will prompt you for username and password for your docker account. Make sure this docker account has read access on the honeur images. If you are already logged in to docker, the program will automatically use the existing credentials.
 5. Press Enter to remove existing postgres-qa and webapi-source-qa-disable container.
 6. After the program has downloaded the docker-compose.yml and setup-conf/setup.yml files, it will start removing the QA database and removing the source of the QA database inside the original database.
+
+### Backup and restore of the database
+
+#### Backup
+Download and run the script 'backup-database.sh': 
+
+`curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh`
+
+The backup script will create a tar file name 'postgres_backup_<date_time>.tar.bz2' in the current directory.
+Creating the backup file can take a long time depending on the size of the database.
+Copy the backup file to a save location for long term storage.
+
+#### Restore
+Download the script 'restore-database.sh'
+
+`curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/restore-database.sh --output restore-database.sh && chmod +x restore-database.sh`
+
+Run the script and provide the name of the backup file as parameter.  The name of the target volume can be provided as a second argument.  The backup will be restored in the pgdata volume if the target volume is not provided.
+The backup file should be present in the folder where the script is executed.
+
+`./restore-database postgres_backup_<date_time>.tar.bz2`
+
+#### Hot snapshot of the database
+The database volume can be copied to a new volume (with a different name) to take a snapshot of the current database state.
+Download the script 'clone-volume.sh'
+
+`curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/clone-volume.sh --output clone-volume.sh && chmod +x clone-volume.sh`
+
+Run the script, provide the source volume as first parameter and the target volume as second parameter.
+
+`./clone-volume.sh pgdata pgdata_snapshot1`
+
