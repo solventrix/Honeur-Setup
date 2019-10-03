@@ -21,7 +21,7 @@ services:
           python3 /var/lib/postgresql/setup-scripts/update_password_with_envfile.py &
           docker-entrypoint.sh postgres
   webapi:
-    image: honeur/webapi-atlas
+    image: honeur/webapi-atlas:standard
     container_name: webapi
     ports:
       - "8080:8080"
