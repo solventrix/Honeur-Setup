@@ -2,10 +2,10 @@ version: '3.5'
 
 services:
   etl:
-    image: edence/12doctubre:0-latest
+    image: edence/12doctubre:tag_name
     volumes:
       - "./log:/log"
-      - "/Users/freija/code/edence/12dOctubre/development_data:/data"
+      - "data_folder:/data"
     networks:
       - honeur_honeur-net
     environment:
@@ -14,9 +14,9 @@ services:
       DB_PORT: "5432"
       DB_DBNAME: "OHDSI"
       DB_SCHEMA: "omopcdm"
-      DB_USER: "honeur_admin"
-      DB_PASSWORD: "honeur_admin"
-      VERBOSITY_LEVEL: "0-latest"
+      DB_USER: "db_username"
+      DB_PASSWORD: "db_password"
+      VERBOSITY_LEVEL: "verbosity_level"
 
 networks:
   honeur_honeur-net:
