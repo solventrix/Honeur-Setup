@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   etl:
-    image: edence/12doctubre:tag_name
+    image: edence/12doctubre:image_tag
     volumes:
       - "./log:/log"
       - "data_folder:/data"
