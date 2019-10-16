@@ -11,7 +11,8 @@ read -p "DB password [honeur_admin]: " db_password
 db_password=${db_password:-honeur_admin}
 read -p "Output verbosity level [INFO]: " verbosity_level
 verbosity_level=${verbosity_level:-INFO}
-read -p "Docker Hub image tag: " image_tag
+read -p "Docker Hub image tag [current]: " image_tag
+verbosity_level=${verbosity_level:-current}
 
 sed -i -e "s@data_folder@$data_folder@g" docker-compose.yml
 sed -i -e "s/db_username/$db_username/g" docker-compose.yml
