@@ -1,4 +1,4 @@
-if [ $(docker ps -a | grep etl | wc -l) = 1 ]; then
+if [ $(docker ps --filter "name=etl" | grep -w 'etl' | wc -l) = 1 ]; then
   docker stop -t 1 etl && docker rm etl;
 fi
 
