@@ -1,5 +1,6 @@
-docker stop etl
-docker rm etl
+if [ $(docker ps --filter "name=etl" | grep -w 'etl' | wc -l) = 1 ]; then
+  docker stop -t 1 etl && docker rm etl;
+fi
 
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETL12doctubre/docker-compose.yml --output docker-compose.yml
 
@@ -21,4 +22,5 @@ sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
 sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 
 docker login
-docker-compose run --rm etl
+docker-compose pull
+docker-compose run --rm --name etl etl
