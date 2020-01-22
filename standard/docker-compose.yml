@@ -18,6 +18,7 @@ services:
       - |
           mkdir -p /var/lib/postgresql/envfileshared
           cp /var/lib/postgresql/envfile/honeur.env /var/lib/postgresql/envfileshared/honeur.env
+          python3 /var/lib/postgresql/setup-scripts/update_password_with_envfile.py &
           docker-entrypoint.sh postgres
   webapi:
     image: honeur/webapi-atlas:standard
