@@ -47,6 +47,34 @@ services:
           sed -i -e 's@http://localhost:8080@'"$${BACKEND_HOST}"'@g' /usr/local/tomcat/webapps/atlas/js/config-local.js
           cp /var/lib/shared/honeur.env /usr/local/tomcat/bin/setenv.sh
           catalina.sh run
+  user-mgmt:
+    image: honeur/user-mgmt:1.0.0
+    container_name: user-mgmt
+    security_opt:
+      - no-new-privileges
+    ports:
+      - "8081:8080"
+    volumes:
+      - type: volume
+        source: shared
+        target: /var/lib/shared
+        read_only: true
+    restart: always
+    depends_on:
+      - "postgres"
+    environment:
+      - "BACKEND_HOST=http://localhost:8081"
+      - "USERMGMT_ADMIN_USERNAME=admin"
+      - "USERMGMT_ADMIN_PASSWORD=admin"
+    networks:
+      - honeur-net
+    command:
+      - /bin/bash
+      - -c
+      - |
+          sed -i -e 's@http://localhost:8081@'"$${BACKEND_HOST}"'@g' /usr/local/tomcat/webapps/usermgmt/main.js
+          cp /var/lib/shared/honeur.env /usr/local/tomcat/bin/setenv.sh
+          catalina.sh run
   zeppelin:
     image: honeur/zeppelin:0.8.0
     container_name: zeppelin
