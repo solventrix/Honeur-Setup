@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   postgres:
-    image: honeur/postgres
+    image: honeur/postgres:9.6-omopcdm-5.3.1-webapi-2.7.1
     container_name: postgres
     ports:
       - "5444:5432"
@@ -21,7 +21,7 @@ services:
           python3 /var/lib/postgresql/setup-scripts/update_password_with_envfile.py &
           docker-entrypoint.sh postgres
   webapi:
-    image: honeur/webapi-atlas:standard
+    image: honeur/webapi-atlas:2.7.1-1.5-standard
     container_name: webapi
     ports:
       - "8080:8080"
