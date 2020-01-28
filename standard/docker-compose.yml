@@ -2,8 +2,10 @@ version: '3.5'
 
 services:
   postgres:
-    image: honeur/postgres:9.6-omopcdm-5.3.1-webapi-2.7.1
+    image: honeur/postgres:HONEUR-9.6-omopcdm-5.3.1-webapi-2.7.1-1.5
     container_name: postgres
+    security_opt:
+      - no-new-privileges
     ports:
       - "5444:5432"
     volumes:
@@ -20,13 +22,19 @@ services:
           cp /var/lib/postgresql/envfile/honeur.env /var/lib/postgresql/envfileshared/honeur.env
           python3 /var/lib/postgresql/setup-scripts/update_password_with_envfile.py &
           docker-entrypoint.sh postgres
+
   webapi:
     image: honeur/webapi-atlas:2.7.1-1.5-standard
     container_name: webapi
+    security_opt:
+      - no-new-privileges
     ports:
       - "8080:8080"
     volumes:
-      - shared:/var/lib/shared
+      - type: volume
+        source: shared
+        target: /var/lib/shared
+        read_only: true
     restart: always
     depends_on:
       - "postgres"
@@ -42,9 +50,12 @@ services:
           sed -i -e 's@http://localhost:8080@'"$${BACKEND_HOST}"'@g' /usr/local/tomcat/webapps/atlas/js/config-local.js
           cp /var/lib/shared/honeur.env /usr/local/tomcat/bin/setenv.sh
           catalina.sh run
+
   zeppelin:
     image: honeur/zeppelin:0.8.0
     container_name: zeppelin
+    security_opt:
+      - no-new-privileges
     ports:
       - "7077:7077"
       - "8082:8080"
