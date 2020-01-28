@@ -33,6 +33,11 @@ services:
     environment:
       - "BACKEND_HOST=http://localhost:8080"
       - "OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI"
+      - "LDAP_URL=ldap://ldap.forumsys.com:389"
+      - "LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com"
+      - "LDAP_SYSTEM_PASSWORD=password"
+      - "LDAP_BASE_DN=dc=example,dc=com"
+      - "LDAP_DN=uid={0},dc=example,dc=com"
     networks:
       - honeur-net
     command:
