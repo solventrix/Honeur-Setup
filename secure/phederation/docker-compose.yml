@@ -88,6 +88,8 @@ services:
   zeppelin:
     image: honeur/zeppelin:0.8.0
     container_name: zeppelin
+    security_opt:
+      - no-new-privileges
     ports:
       - "7077:7077"
       - "8082:8080"
