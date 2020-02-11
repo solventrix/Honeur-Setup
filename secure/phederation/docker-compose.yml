@@ -100,6 +100,10 @@ services:
     depends_on:
       - "postgres"
     environment:
+      - "ZEPPELIN_SECURITY=jdbc"
+      - "LDAP_URL=ldap://ldap.forumsys.com:389"
+      - "LDAP_BASE_DN=dc=example,dc=com"
+      - "LDAP_DN=uid={0},dc=example,dc=com"
       - "ZEPPELIN_NOTEBOOK_DIR=/notebook"
       - "ZEPPELIN_LOG_DIR=/logs"
     networks:
