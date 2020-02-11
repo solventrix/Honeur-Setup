@@ -1,6 +1,6 @@
 @echo off
 
-echo Docker login, Make sure to use an account with access to the honeur docker hub images.
+echo Docker login, Make sure to use an account with access to the PHederation docker hub images.
 docker login
 
 IF %ERRORLEVEL% EQU 0 (
@@ -11,13 +11,13 @@ IF %ERRORLEVEL% EQU 0 (
 )
 
 :honeur_setup
-echo Press [Enter] to start removing the existing HONEUR containers
+echo Press [Enter] to start removing the existing PHederation containers
 pause>NUL
 
 echo set COMPOSE_HTTP_TIMEOUT=300
 set COMPOSE_HTTP_TIMEOUT=300
 
-echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
+echo Stop previous PHederation containers. Ignore errors when no such containers exist yet.
 echo stop webapi
 docker stop webapi
 echo stop zeppelin
@@ -27,7 +27,7 @@ docker stop user-mgmt
 echo stop postgres
 docker stop postgres
 
-echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
+echo Removing previous PHederation containers. This can give errors when no such containers exist yet.
 echo remove webapi
 docker rm webapi
 echo remove zeppelin
