@@ -94,6 +94,10 @@ services:
       - "7077:7077"
       - "8082:8080"
     volumes:
+      - type: volume
+        source: shared
+        target: /var/lib/shared
+        read_only: true
       - ./zeppelin/logs:/logs
       - ./zeppelin/notebook:/notebook
     restart: always
@@ -108,6 +112,16 @@ services:
       - "ZEPPELIN_LOG_DIR=/logs"
     networks:
       - honeur-net
+    command:
+      - /bin/bash
+      - -c
+      - |
+        cp /var/lib/shared/honeur.env /zeppelin/bin/zeppelin-env.sh
+        sed -i -e 's/^/export /' /zeppelin/bin/zeppelin-env.sh
+        source /zeppelin/bin/zeppelin-env.sh
+        alias python=python3
+        alias pip=pip3
+        bin/zeppelin.sh
 
 networks:
   honeur-net:
