@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   postgres:
-    image: honeur/postgres:PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-1.5
+    image: honeur/postgres:PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-1.4
     container_name: postgres
     security_opt:
       - no-new-privileges
@@ -24,7 +24,7 @@ services:
           docker-entrypoint.sh postgres
 
   webapi:
-    image: honeur/webapi-atlas:2.7.1-1.5-standard
+    image: honeur/webapi-atlas:2.7.1-1.4-standard
     container_name: webapi
     security_opt:
       - no-new-privileges
@@ -52,7 +52,7 @@ services:
           catalina.sh run
 
   zeppelin:
-    image: honeur/zeppelin:0.8.0
+    image: honeur/zeppelin:0.8.0-1.4
     container_name: zeppelin
     security_opt:
       - no-new-privileges
