@@ -66,8 +66,6 @@ IF "%honeur_ldap_or_jdbc%" == "ldap" (
     set "honeur_security_ldap_dn=cn={0},dc=example,dc=org"
 )
 
-echo %honeur_security_ldap_url%
-
 set /p honeur_usermgmt_admin_username="usermgmt admin username [admin]: " || SET honeur_usermgmt_admin_username=admin
 set /p honeur_usermgmt_admin_password="usermgmt admin password [admin]: " || SET honeur_usermgmt_admin_password=admin
 
