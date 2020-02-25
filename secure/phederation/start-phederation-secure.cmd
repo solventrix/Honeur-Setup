@@ -17,25 +17,15 @@ pause>NUL
 echo set COMPOSE_HTTP_TIMEOUT=300
 set COMPOSE_HTTP_TIMEOUT=300
 
-echo Stop previous PHederation containers. Ignore errors when no such containers exist yet.
-echo stop webapi
-docker stop webapi
-echo stop zeppelin
-docker stop zeppelin
-echo stop user-mgmt
-docker stop user-mgmt
-echo stop postgres
-docker stop postgres
-
-echo Removing previous PHederation containers. This can give errors when no such containers exist yet.
-echo remove webapi
-docker rm webapi
-echo remove zeppelin
-docker rm zeppelin
-echo remove user-mgmt
-docker rm user-mgmt
-echo remove postgres
-docker rm postgres
+echo Stop and Remove previous PHederation containers. Ignore errors when no such containers exist yet.
+echo Stop and Remove webapi
+docker stop webapi && docker rm webapi
+echo Stop and Remove zeppelin
+docker stop zeppelin && docker rm zeppelin
+echo Stop and Remove user-mgmt
+docker stop user-mgmt && docker rm user-mgmt
+echo Stop and Remove postgres
+docker stop postgres && docker rm postgres
 
 echo Removing shared volume
 docker volume rm shared
@@ -69,17 +59,17 @@ IF "%honeur_ldap_or_jdbc%" == "ldap" (
 set /p honeur_usermgmt_admin_username="usermgmt admin username [admin]: " || SET honeur_usermgmt_admin_username=admin
 set /p honeur_usermgmt_admin_password="usermgmt admin password [admin]: " || SET honeur_usermgmt_admin_password=admin
 
-sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://%honeur_host_machine%@g" docker-compose.yml
-sed -i -e "s@- ./zeppelin/logs@- %honeur_zeppelin_logs%@g" docker-compose.yml
-sed -i -e "s@- ./zeppelin/notebook@- %honeur_zeppelin_notebooks%@g" docker-compose.yml
-sed -i -e "s@- \"ZEPPELIN_SECURITY=jdbc@- \"ZEPPELIN_SECURITY=%honeur_ldap_or_jdbc%@g" docker-compose.yml
-sed -i -e "s@- \"LDAP_URL=ldap://ldap.forumsys.com:389@- \"LDAP_URL=%honeur_security_ldap_url%@g" docker-compose.yml
-sed -i -e "s@- \"LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com@- \"LDAP_SYSTEM_USERNAME=%honeur_security_ldap_system_username%@g" docker-compose.yml
-sed -i -e "s@- \"LDAP_SYSTEM_PASSWORD=password@- \"LDAP_SYSTEM_PASSWORD=%honeur_security_ldap_system_password%@g" docker-compose.yml
-sed -i -e "s@- \"LDAP_BASE_DN=dc=example,dc=com@- \"LDAP_BASE_DN=%honeur_security_ldap_base_dn%@g" docker-compose.yml
-sed -i -e "s@- \"LDAP_DN=uid={0},dc=example,dc=com@- \"LDAP_DN=%honeur_security_ldap_dn%@g" docker-compose.yml
-sed -i -e "s@- \"USERMGMT_ADMIN_USERNAME=admin@- \"USERMGMT_ADMIN_USERNAME=%honeur_usermgmt_admin_username%@g" docker-compose.yml
-sed -i -e "s@- \"USERMGMT_ADMIN_PASSWORD=admin@- \"USERMGMT_ADMIN_PASSWORD=%honeur_usermgmt_admin_password%@g" docker-compose.yml
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'BACKEND_HOST=http://localhost','BACKEND_HOST=http://%honeur_host_machine%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- ./zeppelin/logs','- %honeur_zeppelin_logs%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- ./zeppelin/notebook','- %honeur_zeppelin_notebooks%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"ZEPPELIN_SECURITY=jdbc','- \"ZEPPELIN_SECURITY=%honeur_ldap_or_jdbc%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_URL=ldap://ldap.forumsys.com:389','- \"LDAP_URL=%honeur_security_ldap_url%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com','- \"LDAP_SYSTEM_USERNAME=%honeur_security_ldap_system_username%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_SYSTEM_PASSWORD=password','- \"LDAP_SYSTEM_PASSWORD=%honeur_security_ldap_system_password%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_BASE_DN=dc=example,dc=com','- \"LDAP_DN=%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_DN=uid={0},dc=example,dc=com','- \"LDAP_DN=%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"USERMGMT_ADMIN_USERNAME=admin','- \"USERMGMT_ADMIN_USERNAME=%honeur_usermgmt_admin_username%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"USERMGMT_ADMIN_PASSWORD=admin','- \"USERMGMT_ADMIN_PASSWORD=%honeur_usermgmt_admin_password%') | Set-Content docker-compose.yml"
 
 docker volume create --name pgdata
 docker volume create --name shared
@@ -88,7 +78,7 @@ docker-compose pull
 docker-compose up -d
 
 echo Removing downloaded files
-rm docker-compose.yml
+del docker-compose.yml
 
 echo postgresql is available on %honeur_host_machine%:5444
 echo webapi/atlas is available on http://%honeur_host_machine%:8080/webapi and http://%honeur_host_machine%:8080/atlas respectively
