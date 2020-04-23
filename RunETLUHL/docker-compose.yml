@@ -1,0 +1,29 @@
+version: '3.5'
+services:
+  run-python-etl:
+    image: python:3
+    container_name: run-etl-uhl
+    volumes:
+      - ./UHL/UHL-ETL:/UHL-ETL
+      - <data_folder>:/data
+      - ./UHL/UHL-ETL/logs:/var/log
+    external_links:
+      - postgres
+    networks:
+      - honeur-net
+    command:
+      - /bin/bash
+      - -c
+      - |
+          pip3 install click
+          pip3 install sqlalchemy
+          pip3 install psycopg2-binary
+          pip3 install pyyaml
+          pip3 install numpy
+          pip3 install pandas
+          pip3 install xlrd
+          cd /UHL-ETL
+          python main.py --db_host <db_host> --db_port <db_port> --db_name <db_name> --db_username <db_username> --db_password <db_password> --source_excel "/data/<data_file>" --source_sheet <data_sheet>
+networks:
+  honeur-net:
+    name: honeur-net
