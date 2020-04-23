@@ -31,6 +31,6 @@ sed -i -e "s@<db_host>@$db_host@g" docker-compose.yml
 sed -i -e "s@<db_port>@$db_port@g" docker-compose.yml
 sed -i -e "s@<db_name>@$db_name@g" docker-compose.yml
 sed -i -e "s@<db_username>@$db_username@g" docker-compose.yml
-sed -i -e "s@>db_password>@$db_password@g" docker-compose.yml
+sed -i -e "s@<db_password>@$db_password@g" docker-compose.yml
 
 docker-compose up
