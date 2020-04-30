@@ -37,7 +37,7 @@ then
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/docker-compose.yml --output docker-compose.yml
+    curl -fsSL https://github.com/solventrix/Honeur-Setup/releases/download/v1.5/docker-compose-honeur-secure.yml --output docker-compose.yml
     
     read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' honeur_host_machine
     honeur_host_machine=${honeur_host_machine:-localhost}
