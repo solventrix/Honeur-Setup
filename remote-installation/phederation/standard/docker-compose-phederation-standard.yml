@@ -75,7 +75,7 @@ services:
       - honeur-net
 
   distributed-analytics-r-server:
-    image: honeur/distribute-analytics:r-server-1.5
+    image: honeur/distributed-analytics:r-server-1.5
     container_name: distributed-analytics-r-server
     security_opt:
       - no-new-privileges
@@ -89,7 +89,7 @@ services:
       - honeur-net
 
   distributed-analytics-remote:
-    image: honeur/distribute-analytics:remote-1.5
+    image: honeur/distributed-analytics:remote-1.5
     container_name: distributed-analytics-remote
     security_opt:
       - no-new-privileges
