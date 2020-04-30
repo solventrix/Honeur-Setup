@@ -35,7 +35,8 @@ echo Press [Enter] key to continue
 pause>NUL
 
 echo Downloading docker-compose.yml file.
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/phederation/docker-compose.yml --output docker-compose.yml
+curl -fsSL https://github.com/solventrix/Honeur-Setup/releases/download/v1.5/docker-compose-phederation-secure.yml --output docker-compose.yml
+
 set /p honeur_host_machine="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET honeur_host_machine=localhost
 set /p honeur_zeppelin_logs="Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: " || SET honeur_zeppelin_logs=./zeppelin/logs
 set /p honeur_zeppelin_notebooks="Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: " || SET honeur_zeppelin_notebooks=./zeppelin/notebook
@@ -68,8 +69,8 @@ PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_S
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_SYSTEM_PASSWORD=password','- \"LDAP_SYSTEM_PASSWORD=%honeur_security_ldap_system_password%') | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_BASE_DN=dc=example,dc=com','- \"LDAP_DN=%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_DN=uid={0},dc=example,dc=com','- \"LDAP_DN=%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"USERMGMT_ADMIN_USERNAME=admin','- \"USERMGMT_ADMIN_USERNAME=%honeur_usermgmt_admin_username%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"USERMGMT_ADMIN_PASSWORD=admin','- \"USERMGMT_ADMIN_PASSWORD=%honeur_usermgmt_admin_password%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR_USERMGMT_USERNAME=admin','- \"HONEUR_USERMGMT_USERNAME=%honeur_usermgmt_admin_username%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR_USERMGMT_PASSWORD=admin','- \"HONEUR_USERMGMT_PASSWORD=%honeur_usermgmt_admin_password%') | Set-Content docker-compose.yml"
 
 docker volume create --name pgdata
 docker volume create --name shared
@@ -82,7 +83,7 @@ del docker-compose.yml
 
 echo postgresql is available on %honeur_host_machine%:5444
 echo webapi/atlas is available on http://%honeur_host_machine%:8080/webapi and http://%honeur_host_machine%:8080/atlas respectively
-echo User management is available on http://%honeur_host_machine%:8081/usermgmt
+echo User management is available on http://%honeur_host_machine%:8081
 echo Zeppelin is available on http://%honeur_host_machine%:8082
 goto eof
 

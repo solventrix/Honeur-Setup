@@ -37,7 +37,7 @@ then
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/secure/phederation/docker-compose.yml --output docker-compose.yml
+    curl -fsSL https://github.com/solventrix/Honeur-Setup/releases/download/v1.5/docker-compose-phederation-secure.yml --output docker-compose.yml
     
     read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' honeur_host_machine
     honeur_host_machine=${honeur_host_machine:-localhost}
@@ -81,8 +81,8 @@ then
     sed -i -e "s@- \"LDAP_SYSTEM_PASSWORD=password@- \"LDAP_SYSTEM_PASSWORD=$honeur_security_ldap_system_password@g" docker-compose.yml
     sed -i -e "s@- \"LDAP_BASE_DN=dc=example,dc=com@- \"LDAP_BASE_DN=$honeur_security_ldap_base_dn@g" docker-compose.yml
     sed -i -e "s@- \"LDAP_DN=uid={0},dc=example,dc=com@- \"LDAP_DN=$honeur_security_ldap_dn@g" docker-compose.yml
-    sed -i -e "s@- \"USERMGMT_ADMIN_USERNAME=admin@- \"USERMGMT_ADMIN_USERNAME=$honeur_usermgmt_admin_username@g" docker-compose.yml
-    sed -i -e "s@- \"USERMGMT_ADMIN_PASSWORD=admin@- \"USERMGMT_ADMIN_PASSWORD=$honeur_usermgmt_admin_password@g" docker-compose.yml
+    sed -i -e "s@- \"HONEUR_USERMGMT_USERNAME=admin@- \"HONEUR_USERMGMT_USERNAME=$honeur_usermgmt_admin_username@g" docker-compose.yml
+    sed -i -e "s@- \"HONEUR_USERMGMT_PASSWORD=admin@- \"HONEUR_USERMGMT_PASSWORD=$honeur_usermgmt_admin_password@g" docker-compose.yml
     
     docker volume create --name pgdata
     docker volume create --name shared
@@ -95,7 +95,7 @@ then
     
     echo postgresql is available on $honeur_host_machine:5444
     echo webapi/atlas is available on http://$honeur_host_machine:8080/webapi and http://$honeur_host_machine:8080/atlas respectively
-    echo User management is available on http://$honeur_host_machine:8081/usermgmt
+    echo User management is available on http://$honeur_host_machine:8081
     echo Zeppelin is available on http://$honeur_host_machine:8082
 fi
 read -p "Press [Enter] key to exit"
