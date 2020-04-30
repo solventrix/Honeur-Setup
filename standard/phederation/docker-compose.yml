@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   postgres:
-    image: honeur/postgres:PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-1.4
+    image: honeur/postgres:PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-1.5
     container_name: postgres
     security_opt:
       - no-new-privileges
@@ -15,7 +15,7 @@ services:
     networks:
       - honeur-net
     command:
-      - /bin/sh
+      - /bin/bash
       - -c
       - |
           mkdir -p /var/lib/postgresql/envfileshared
@@ -24,7 +24,7 @@ services:
           docker-entrypoint.sh postgres
 
   webapi:
-    image: honeur/webapi-atlas:2.7.1-1.4-standard
+    image: honeur/webapi-atlas:2.7.1-1.5-standard
     container_name: webapi
     security_opt:
       - no-new-privileges
@@ -44,7 +44,7 @@ services:
     networks:
       - honeur-net
     command:
-      - /bin/sh
+      - /bin/bash
       - -c
       - |
           sed -i -e 's@http://localhost:8080@'"$${BACKEND_HOST}"'@g' /usr/local/tomcat/webapps/atlas/js/config-local.js
@@ -52,7 +52,7 @@ services:
           catalina.sh run
 
   zeppelin:
-    image: honeur/zeppelin:0.8.0-1.4
+    image: honeur/zeppelin:0.8.0-1.5
     container_name: zeppelin
     security_opt:
       - no-new-privileges
