@@ -19,7 +19,7 @@ then
     docker stop user-mgmt
     echo stop postgres
     docker stop postgres
-    
+
     echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
     echo remove webapi
     docker rm webapi
@@ -32,13 +32,13 @@ then
 
     echo Removing shared volume
     docker volume rm shared
-    
+
     echo Success
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.
     curl -fsSL https://github.com/solventrix/Honeur-Setup/releases/download/v1.5/docker-compose-honeur-secure.yml --output docker-compose.yml
-    
+
     read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' honeur_host_machine
     honeur_host_machine=${honeur_host_machine:-localhost}
     read -p 'Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: ' honeur_zeppelin_logs
@@ -66,7 +66,7 @@ then
         honeur_security_ldap_base_dn=dc=example,dc=org
         honeur_security_ldap_dn=cn={0},dc=example,dc=org
     fi
-    
+
     read -p "usermgmt admin username [admin]: " honeur_usermgmt_admin_username
     honeur_usermgmt_admin_username=${honeur_usermgmt_admin_username:-admin}
     read -p "usermgmt admin password [admin]: " honeur_usermgmt_admin_password
@@ -83,16 +83,17 @@ then
     sed -i -e "s@- \"LDAP_DN=uid={0},dc=example,dc=com@- \"LDAP_DN=$honeur_security_ldap_dn@g" docker-compose.yml
     sed -i -e "s@- \"HONEUR_USERMGMT_USERNAME=admin@- \"HONEUR_USERMGMT_USERNAME=$honeur_usermgmt_admin_username@g" docker-compose.yml
     sed -i -e "s@- \"HONEUR_USERMGMT_PASSWORD=admin@- \"HONEUR_USERMGMT_PASSWORD=$honeur_usermgmt_admin_password@g" docker-compose.yml
-    
+
     docker volume create --name pgdata
     docker volume create --name shared
+    docker volume create --name r-server-data
 
     docker-compose pull
     docker-compose up -d
-    
+
     echo Removing downloaded files
     rm docker-compose.yml
-    
+
     echo postgresql is available on $honeur_host_machine:5444
     echo webapi/atlas is available on http://$honeur_host_machine:8080/webapi and http://$honeur_host_machine:8080/atlas respectively
     echo User management is available on http://$honeur_host_machine:8081

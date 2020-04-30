@@ -94,6 +94,9 @@ services:
         source: shared
         target: /var/lib/shared
         read_only: true
+      - type: volume
+        source: r-server-data
+        target: /usr/local/src/datafiles
       - ./zeppelin/logs:/logs
       - ./zeppelin/notebook:/notebook
     restart: always
@@ -119,6 +122,49 @@ services:
         alias pip=pip3
         bin/zeppelin.sh
 
+  distributed-analytics-r-server:
+    image: honeur/distribute-analytics:r-server-1.5
+    container_name: distributed-analytics-r-server
+    security_opt:
+      - no-new-privileges
+    restart: always
+    volumes:
+      - type: volume
+        source: r-server-data
+        target: /usr/local/src/datafiles
+        read_only: true
+    networks:
+      - honeur-net
+
+  distributed-analytics-remote:
+    image: honeur/distribute-analytics:remote-1.5
+    container_name: distributed-analytics-remote
+    security_opt:
+      - no-new-privileges
+    restart: always
+    depends_on:
+      - "webapi"
+      - "distributed-analytics-r-server"
+    environment:
+      - "DISTRIBUTED_SERVICE_CLIENT_SCHEME=https"
+      - "DISTRIBUTED_SERVICE_CLIENT_HOST=CHANGE_DISTRIBUTED_SERVICE_CLIENT_HOST"
+      - "DISTRIBUTED_SERVICE_CLIENT_PORT=443"
+      - "DISTRIBUTED_SERVICE_CLIENT_BIND="
+      - "DISTRIBUTED_SERVICE_CLIENT_API=api"
+      - "WEBAPI_CLIENT_SCHEME=http"
+      - "WEBAPI_CLIENT_HOST=webapi"
+      - "WEBAPI_CLIENT_PORT=8080"
+      - "WEBAPI_CLIENT_BIND=webapi"
+      - "WEBAPI_CLIENT_API="
+      - "R_SERVER_CLIENT_SCHEME=http"
+      - "R_SERVER_CLIENT_HOST=distributed-analytics-r-server"
+      - "R_SERVER_CLIENT_PORT=8080"
+      - "R_SERVER_CLIENT_BIND="
+      - "R_SERVER_CLIENT_API="
+      - "HONEUR_ANALYTICS_ORGANIZATION=CHANGE_HONEUR_ANALYTICS_ORGANIZATION"
+    networks:
+      - honeur-net
+
 networks:
   honeur-net:
     name: honeur-net
@@ -127,4 +173,6 @@ volumes:
   pgdata:
     external: true
   shared:
+    external: true
+  r-server-data:
     external: true

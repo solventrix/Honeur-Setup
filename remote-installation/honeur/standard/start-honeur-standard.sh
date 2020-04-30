@@ -19,7 +19,7 @@ then
     docker stop user-mgmt
     echo stop postgres
     docker stop postgres
-    
+
     echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
     echo remove webapi
     docker rm webapi
@@ -32,7 +32,7 @@ then
 
     echo Removing shared volume
     docker volume rm shared
-    
+
     echo Success
     read -p "Press [Enter] key to continue"
 
@@ -52,13 +52,14 @@ then
 
     docker volume create --name pgdata
     docker volume create --name shared
+    docker volume create --name r-server-data
 
     docker-compose pull
     docker-compose up -d
-    
+
     echo Removing downloaded files
     rm docker-compose.yml
-    
+
     echo postgresql is available on $honeur_host_machine:5444
     echo webapi/atlas is available on http://$honeur_host_machine:8080/webapi and http://$honeur_host_machine:8080/atlas respectively
     echo Zeppelin is available on http://$honeur_host_machine:8082

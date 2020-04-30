@@ -73,6 +73,7 @@ PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR
 
 docker volume create --name pgdata
 docker volume create --name shared
+docker volume create --name r-server-data
 
 docker-compose pull
 docker-compose up -d
