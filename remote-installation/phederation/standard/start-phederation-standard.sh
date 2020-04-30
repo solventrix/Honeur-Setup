@@ -17,6 +17,10 @@ then
     docker stop zeppelin
     echo stop user-mgmt
     docker stop user-mgmt
+    echo stop distributed-analytics-r-server
+    docker stop distributed-analytics-r-server
+    echo stop distributed-analytics-remote
+    docker stop distributed-analytics-remote
     echo stop postgres
     docker stop postgres
 
@@ -27,6 +31,10 @@ then
     docker rm zeppelin
     echo remove user-mgmt
     docker rm user-mgmt
+    echo remove distributed-analytics-r-server
+    docker rm distributed-analytics-r-server
+    echo remove distributed-analytics-remote
+    docker rm distributed-analytics-remote
     echo remove postgres
     docker rm postgres
 

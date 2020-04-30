@@ -24,6 +24,10 @@ echo Stop and Remove zeppelin
 docker stop zeppelin && docker rm zeppelin
 echo Stop and Remove user-mgmt
 docker stop user-mgmt && docker rm user-mgmt
+echo Stop and Remove distributed-analytics-r-server
+docker stop distributed-analytics-r-server && docker rm distributed-analytics-r-server
+echo Stop and Remove distributed-analytics-remote
+docker stop distributed-analytics-remote && docker rm distributed-analytics-remote
 echo Stop and Remove postgres
 docker stop postgres && docker rm postgres
 
