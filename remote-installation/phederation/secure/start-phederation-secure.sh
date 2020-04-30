@@ -71,6 +71,8 @@ then
     honeur_usermgmt_admin_username=${honeur_usermgmt_admin_username:-admin}
     read -p "usermgmt admin password [admin]: " honeur_usermgmt_admin_password
     honeur_usermgmt_admin_password=${honeur_usermgmt_admin_password:-admin}
+    read -p 'Enter your PHederation organization [Jannsen]: ' honeur_analytics_organization
+    honeur_analytics_organization=${honeur_analytics_organization:-Jannsen}
 
     sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://$honeur_host_machine@g" docker-compose.yml
     sed -i -e "s@- ./zeppelin/logs@- $honeur_zeppelin_logs@g" docker-compose.yml
@@ -83,6 +85,7 @@ then
     sed -i -e "s@- \"LDAP_DN=uid={0},dc=example,dc=com@- \"LDAP_DN=$honeur_security_ldap_dn@g" docker-compose.yml
     sed -i -e "s@- \"HONEUR_USERMGMT_USERNAME=admin@- \"HONEUR_USERMGMT_USERNAME=$honeur_usermgmt_admin_username@g" docker-compose.yml
     sed -i -e "s@- \"HONEUR_USERMGMT_PASSWORD=admin@- \"HONEUR_USERMGMT_PASSWORD=$honeur_usermgmt_admin_password@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ANALYTICS_ORGANIZATION@$honeur_analytics_organization@g" docker-compose.yml
 
     docker volume create --name pgdata
     docker volume create --name shared

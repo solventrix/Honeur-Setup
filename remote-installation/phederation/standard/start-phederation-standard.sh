@@ -45,10 +45,13 @@ then
     honeur_zeppelin_logs=${honeur_zeppelin_logs:-./zeppelin/logs}
     read -p 'Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: ' honeur_zeppelin_notebooks
     honeur_zeppelin_notebooks=${honeur_zeppelin_notebooks:-./zeppelin/notebook}
+    read -p 'Enter your PHederation organization [Jannsen]: ' honeur_analytics_organization
+    honeur_analytics_organization=${honeur_analytics_organization:-Jannsen}
 
     sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://$honeur_host_machine@g" docker-compose.yml
     sed -i -e "s@- ./zeppelin/logs@- $honeur_zeppelin_logs@g" docker-compose.yml
     sed -i -e "s@- ./zeppelin/notebook@- $honeur_zeppelin_notebooks@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ANALYTICS_ORGANIZATION@$honeur_analytics_organization@g" docker-compose.yml
 
     docker volume create --name pgdata
     docker volume create --name shared

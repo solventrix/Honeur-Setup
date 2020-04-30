@@ -59,6 +59,8 @@ IF "%honeur_ldap_or_jdbc%" == "ldap" (
 set /p honeur_usermgmt_admin_username="usermgmt admin username [admin]: " || SET honeur_usermgmt_admin_username=admin
 set /p honeur_usermgmt_admin_password="usermgmt admin password [admin]: " || SET honeur_usermgmt_admin_password=admin
 
+set /p honeur_analytics_organization="Enter your HONEUR organization [Jannsen]: " || SET honeur_analytics_organization=Jannsen
+
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'BACKEND_HOST=http://localhost','BACKEND_HOST=http://%honeur_host_machine%') | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- ./zeppelin/logs','- %honeur_zeppelin_logs%') | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- ./zeppelin/notebook','- %honeur_zeppelin_notebooks%') | Set-Content docker-compose.yml"
@@ -70,6 +72,7 @@ PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_B
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_DN=uid=\{0\},dc=example,dc=com','- \"LDAP_DN=%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR_USERMGMT_USERNAME=admin','- \"HONEUR_USERMGMT_USERNAME=%honeur_usermgmt_admin_username%') | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR_USERMGMT_PASSWORD=admin','- \"HONEUR_USERMGMT_PASSWORD=%honeur_usermgmt_admin_password%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace \"CHANGE_HONEUR_ANALYTICS_ORGANIZATION\",\"%honeur_analytics_organization%\") | Set-Content docker-compose.yml"
 
 docker volume create --name pgdata
 docker volume create --name shared

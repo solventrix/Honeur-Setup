@@ -99,7 +99,7 @@ services:
       - "distributed-analytics-r-server"
     environment:
       - "DISTRIBUTED_SERVICE_CLIENT_SCHEME=https"
-      - "DISTRIBUTED_SERVICE_CLIENT_HOST=CHANGE_DISTRIBUTED_SERVICE_CLIENT_HOST"
+      - "DISTRIBUTED_SERVICE_CLIENT_HOST=distributed-analytics.honeur.org"
       - "DISTRIBUTED_SERVICE_CLIENT_PORT=443"
       - "DISTRIBUTED_SERVICE_CLIENT_BIND="
       - "DISTRIBUTED_SERVICE_CLIENT_API=api"

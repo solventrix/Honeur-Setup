@@ -24,6 +24,10 @@ echo Stop and Remove zeppelin
 docker stop zeppelin && docker rm zeppelin
 echo Stop and Remove user-mgmt
 docker stop user-mgmt && docker rm user-mgmt
+echo Stop and Remove distributed-analytics-r-server
+docker stop distributed-analytics-r-server && docker rm distributed-analytics-r-server
+echo Stop and Remove distributed-analytics-remote
+docker stop distributed-analytics-remote && docker rm distributed-analytics-remote
 echo Stop and Remove postgres
 docker stop postgres && docker rm postgres
 
@@ -40,10 +44,12 @@ curl -fsSL https://github.com/solventrix/Honeur-Setup/releases/download/v1.5/doc
 set /p honeur_host_machine="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET honeur_host_machine=localhost
 set /p honeur_zeppelin_logs="Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: " || SET honeur_zeppelin_logs=./zeppelin/logs
 set /p honeur_zeppelin_notebooks="Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: " || SET honeur_zeppelin_notebooks=./zeppelin/notebook
+set /p honeur_analytics_organization="Enter your HONEUR organization [Jannsen]: " || SET honeur_analytics_organization=Jannsen
 
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace \"BACKEND_HOST=http://localhost\",\"BACKEND_HOST=http://%honeur_host_machine%\") | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace \"- ./zeppelin/logs\",\"- %honeur_zeppelin_logs%\") | Set-Content docker-compose.yml"
 PowerShell -Command "((get-content docker-compose.yml -raw) -replace \"- ./zeppelin/notebook\",\"- %honeur_zeppelin_notebooks%\") | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace \"CHANGE_HONEUR_ANALYTICS_ORGANIZATION\",\"%honeur_analytics_organization%\") | Set-Content docker-compose.yml"
 
 docker volume create --name pgdata
 docker volume create --name shared
