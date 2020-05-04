@@ -14,8 +14,8 @@ IF %ERRORLEVEL% EQU 0 (
 echo Press [Enter] to start removing the existing PHederation containers
 pause>NUL
 
-echo set COMPOSE_HTTP_TIMEOUT=300
-set COMPOSE_HTTP_TIMEOUT=300
+echo set COMPOSE_HTTP_TIMEOUT=3000
+set COMPOSE_HTTP_TIMEOUT=3000
 
 echo Stop and Remove previous PHederation containers. Ignore errors when no such containers exist yet.
 echo Stop and Remove webapi

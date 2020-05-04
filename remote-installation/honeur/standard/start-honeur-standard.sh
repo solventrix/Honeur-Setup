@@ -7,8 +7,8 @@ if [ $? -eq 0 ]
 then
     read -p "Press [Enter] to start removing the existing HONEUR containers"
 
-    echo export COMPOSE_HTTP_TIMEOUT=300
-    export COMPOSE_HTTP_TIMEOUT=300
+    echo export COMPOSE_HTTP_TIMEOUT=3000
+    export COMPOSE_HTTP_TIMEOUT=3000
 
     echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
     echo stop webapi
