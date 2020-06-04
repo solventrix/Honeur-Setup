@@ -94,9 +94,7 @@ services:
         source: shared
         target: /var/lib/shared
         read_only: true
-      - type: bind
-        source: CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED
-        target: /usr/local/src/datafiles
+      - CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED:/usr/local/src/datafiles
       - CHANGE_HONEUR_ZEPPELIN_LOGS:/logs
       - CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS:/notebook
     restart: always
@@ -129,10 +127,7 @@ services:
       - no-new-privileges
     restart: always
     volumes:
-      - type: bind
-        source: CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED
-        target: /usr/local/src/datafiles
-        read_only: true
+      - CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED:/usr/local/src/datafiles:ro
     networks:
       - honeur-net
 
