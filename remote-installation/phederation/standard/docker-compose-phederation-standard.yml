@@ -39,7 +39,7 @@ services:
     depends_on:
       - "postgres"
     environment:
-      - "BACKEND_HOST=http://localhost:8080"
+      - "BACKEND_HOST=http://CHANGE_HONEUR_BACKEND_HOST:8080"
       - "OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI"
     networks:
       - honeur-net
@@ -52,7 +52,7 @@ services:
           catalina.sh run
 
   zeppelin:
-    image: honeur/zeppelin:0.8.0-1.5
+    image: honeur/zeppelin:0.8.2-1.5
     container_name: zeppelin
     security_opt:
       - no-new-privileges
@@ -60,11 +60,11 @@ services:
       - "7077:7077"
       - "8082:8080"
     volumes:
-      - type: volume
-        source: r-server-data
+      - type: bind
+        source: CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED
         target: /usr/local/src/datafiles
-      - ./zeppelin/logs:/logs
-      - ./zeppelin/notebook:/notebook
+      - CHANGE_HONEUR_ZEPPELIN_LOGS:/logs
+      - CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS:/notebook
     restart: always
     depends_on:
       - "postgres"
@@ -81,8 +81,8 @@ services:
       - no-new-privileges
     restart: always
     volumes:
-      - type: volume
-        source: r-server-data
+      - type: bind
+        source: CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED
         target: /usr/local/src/datafiles
         read_only: true
     networks:
@@ -125,6 +125,4 @@ volumes:
   pgdata:
     external: true
   shared:
-    external: true
-  r-server-data:
     external: true

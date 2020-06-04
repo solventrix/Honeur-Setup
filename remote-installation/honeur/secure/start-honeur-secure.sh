@@ -7,39 +7,12 @@ if [ $? -eq 0 ]
 then
     read -p "Press [Enter] to start removing the existing HONEUR containers"
 
-    echo export COMPOSE_HTTP_TIMEOUT=3000
-    export COMPOSE_HTTP_TIMEOUT=3000
-
-    echo Stop previous HONEUR containers. Ignore errors when no such containers exist yet.
-    echo stop webapi
-    docker stop webapi
-    echo stop zeppelin
-    docker stop zeppelin
-    echo stop user-mgmt
-    docker stop user-mgmt
-    echo stop distributed-analytics-r-server
-    docker stop distributed-analytics-r-server
-    echo stop distributed-analytics-remote
-    docker stop distributed-analytics-remote
-    echo stop postgres
-    docker stop postgres
-
-    echo Removing previous HONEUR containers. This can give errors when no such containers exist yet.
-    echo remove webapi
-    docker rm webapi
-    echo remove zeppelin
-    docker rm zeppelin
-    echo remove user-mgmt
-    docker rm user-mgmt
-    echo remove distributed-analytics-r-server
-    docker rm distributed-analytics-r-server
-    echo remove distributed-analytics-remote
-    docker rm distributed-analytics-remote
-    echo remove postgres
-    docker rm postgres
+    echo Stop previous HONEUR containers.
+    docker stop $(docker ps --filter 'network=honeur-net' -q -a) > /dev/null 2>&1
+    docker rm $(docker ps --filter 'network=honeur-net' -q -a) > /dev/null 2>&1
 
     echo Removing shared volume
-    docker volume rm shared
+    docker volume rm shared > /dev/null 2>&1
 
     echo Success
     read -p "Press [Enter] key to continue"
@@ -79,25 +52,31 @@ then
     honeur_usermgmt_admin_username=${honeur_usermgmt_admin_username:-admin}
     read -p "usermgmt admin password [admin]: " honeur_usermgmt_admin_password
     honeur_usermgmt_admin_password=${honeur_usermgmt_admin_password:-admin}
-    read -p 'Enter your HONEUR organization [Jannsen]: ' honeur_analytics_organization
-    honeur_analytics_organization=${honeur_analytics_organization:-Jannsen}
+    read -p 'Enter your HONEUR organization [Janssen]: ' honeur_analytics_organization
+    honeur_analytics_organization=${honeur_analytics_organization:-Janssen}
+    read -p 'Enter the directory where Zeppelin will save the prepared distributed analytics data [./distributed-analytics]: ' honeur_analytics_shared_folder
+    honeur_analytics_shared_folder=${honeur_analytics_shared_folder:-./distributed-analytics}
 
-    sed -i -e "s@- \"BACKEND_HOST=http://localhost@- \"BACKEND_HOST=http://$honeur_host_machine@g" docker-compose.yml
-    sed -i -e "s@- ./zeppelin/logs@- $honeur_zeppelin_logs@g" docker-compose.yml
-    sed -i -e "s@- ./zeppelin/notebook@- $honeur_zeppelin_notebooks@g" docker-compose.yml
-    sed -i -e "s@- \"ZEPPELIN_SECURITY=jdbc@- \"ZEPPELIN_SECURITY=$honeur_ldap_or_jdbc@g" docker-compose.yml
-    sed -i -e "s@- \"LDAP_URL=ldap://ldap.forumsys.com:389@- \"LDAP_URL=$honeur_security_ldap_url@g" docker-compose.yml
-    sed -i -e "s@- \"LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com@- \"LDAP_SYSTEM_USERNAME=$honeur_security_ldap_system_username@g" docker-compose.yml
-    sed -i -e "s@- \"LDAP_SYSTEM_PASSWORD=password@- \"LDAP_SYSTEM_PASSWORD=$honeur_security_ldap_system_password@g" docker-compose.yml
-    sed -i -e "s@- \"LDAP_BASE_DN=dc=example,dc=com@- \"LDAP_BASE_DN=$honeur_security_ldap_base_dn@g" docker-compose.yml
-    sed -i -e "s@- \"LDAP_DN=uid={0},dc=example,dc=com@- \"LDAP_DN=$honeur_security_ldap_dn@g" docker-compose.yml
-    sed -i -e "s@- \"HONEUR_USERMGMT_USERNAME=admin@- \"HONEUR_USERMGMT_USERNAME=$honeur_usermgmt_admin_username@g" docker-compose.yml
-    sed -i -e "s@- \"HONEUR_USERMGMT_PASSWORD=admin@- \"HONEUR_USERMGMT_PASSWORD=$honeur_usermgmt_admin_password@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_BACKEND_HOST@$honeur_host_machine@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_LOGS@$honeur_zeppelin_logs@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_NOTEBOOK@$honeur_zeppelin_notebooks@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_SECURITY@$honeur_ldap_or_jdbc@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_LDAP_URL@$honeur_security_ldap_url@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_LDAP_SYSTEM_USERNAME@$honeur_security_ldap_system_username@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_LDAP_SYSTEM_PASSWORD@$honeur_security_ldap_system_password@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_LDAP_BASE_DN@$honeur_security_ldap_base_dn@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_LDAP_DN@$honeur_security_ldap_dn@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_USERMGMT_ADMIN_USERNAME@$honeur_usermgmt_admin_username@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_USERMGMT_ADMIN_PASSWORD@$honeur_usermgmt_admin_password@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_ANALYTICS_ORGANIZATION@$honeur_analytics_organization@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED@$honeur_analytics_shared_folder@g" docker-compose.yml
 
     docker volume create --name pgdata
     docker volume create --name shared
     docker volume create --name r-server-data
+
+    echo export COMPOSE_HTTP_TIMEOUT=3000
+    export COMPOSE_HTTP_TIMEOUT=3000
 
     docker-compose pull
     docker-compose up -d
@@ -109,6 +88,9 @@ then
     echo webapi/atlas is available on http://$honeur_host_machine:8080/webapi and http://$honeur_host_machine:8080/atlas respectively
     echo User management is available on http://$honeur_host_machine:8081
     echo Zeppelin is available on http://$honeur_host_machine:8082
+    echo Zeppelin Spark Master URL is available on spark://$honeur_host_machine:7077
+    echo Zeppelin logs are available in directory $honeur_zeppelin_logs
+    echo Zeppelin notebooks are available in directory $honeur_zeppelin_notebooks
 fi
 read -p "Press [Enter] key to exit"
 echo bye

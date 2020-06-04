@@ -14,25 +14,12 @@ IF %ERRORLEVEL% EQU 0 (
 echo Press [Enter] to start removing the existing HONEUR containers
 pause>NUL
 
-echo set COMPOSE_HTTP_TIMEOUT=3000
-set COMPOSE_HTTP_TIMEOUT=3000
-
-echo Stop and Remove previous HONEUR containers. Ignore errors when no such containers exist yet.
-echo Stop and Remove webapi
-docker stop webapi && docker rm webapi
-echo Stop and Remove zeppelin
-docker stop zeppelin && docker rm zeppelin
-echo Stop and Remove user-mgmt
-docker stop user-mgmt && docker rm user-mgmt
-echo Stop and Remove distributed-analytics-r-server
-docker stop distributed-analytics-r-server && docker rm distributed-analytics-r-server
-echo Stop and Remove distributed-analytics-remote
-docker stop distributed-analytics-remote && docker rm distributed-analytics-remote
-echo Stop and Remove postgres
-docker stop postgres && docker rm postgres
+echo Stop and Remove previous HONEUR containers.
+PowerShell -Command "docker stop $(docker ps --filter 'network=honeur-net' -q -a)" >nul 2>&1
+PowerShell -Command "docker rm $(docker ps --filter 'network=honeur-net' -q -a)" >nul 2>&1
 
 echo Removing shared volume
-docker volume rm shared
+docker volume rm shared >nul 2>&1
 
 echo Success
 echo Press [Enter] key to continue
@@ -40,6 +27,7 @@ pause>NUL
 
 echo Downloading docker-compose.yml file.
 curl -fsSL https://github.com/solventrix/Honeur-Setup/releases/download/v1.5/docker-compose-honeur-secure.yml --output docker-compose.yml
+
 set /p honeur_host_machine="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET honeur_host_machine=localhost
 set /p honeur_zeppelin_logs="Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: " || SET honeur_zeppelin_logs=./zeppelin/logs
 set /p honeur_zeppelin_notebooks="Enter the directory where the zeppelin notebooks will kept on the host machine [./zeppelin/notebook]: " || SET honeur_zeppelin_notebooks=./zeppelin/notebook
@@ -63,24 +51,29 @@ IF "%honeur_ldap_or_jdbc%" == "ldap" (
 set /p honeur_usermgmt_admin_username="usermgmt admin username [admin]: " || SET honeur_usermgmt_admin_username=admin
 set /p honeur_usermgmt_admin_password="usermgmt admin password [admin]: " || SET honeur_usermgmt_admin_password=admin
 
-set /p honeur_analytics_organization="Enter your HONEUR organization [Jannsen]: " || SET honeur_analytics_organization=Jannsen
+set /p honeur_analytics_organization="Enter your HONEUR organization [Janssen]: " || SET honeur_analytics_organization=Janssen
+set /p honeur_analytics_shared_folder="Enter the directory where Zeppelin will save the prepared distributed analytics data [./distributed-analytics]: " || SET honeur_analytics_shared_folder=./distributed-analytics
 
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'BACKEND_HOST=http://localhost','BACKEND_HOST=http://%honeur_host_machine%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- ./zeppelin/logs','- %honeur_zeppelin_logs%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- ./zeppelin/notebook','- %honeur_zeppelin_notebooks%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"ZEPPELIN_SECURITY=jdbc','- \"ZEPPELIN_SECURITY=%honeur_ldap_or_jdbc%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_URL=ldap://ldap.forumsys.com:389','- \"LDAP_URL=%honeur_security_ldap_url%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com','- \"LDAP_SYSTEM_USERNAME=%honeur_security_ldap_system_username%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_SYSTEM_PASSWORD=password','- \"LDAP_SYSTEM_PASSWORD=%honeur_security_ldap_system_password%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_BASE_DN=dc=example,dc=com','- \"LDAP_BASE_DN=%honeur_security_ldap_base_dn%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"LDAP_DN=uid=\{0\},dc=example,dc=com','- \"LDAP_DN=%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR_USERMGMT_USERNAME=admin','- \"HONEUR_USERMGMT_USERNAME=%honeur_usermgmt_admin_username%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace '- \"HONEUR_USERMGMT_PASSWORD=admin','- \"HONEUR_USERMGMT_PASSWORD=%honeur_usermgmt_admin_password%') | Set-Content docker-compose.yml"
-PowerShell -Command "((get-content docker-compose.yml -raw) -replace \"CHANGE_HONEUR_ANALYTICS_ORGANIZATION\",\"%honeur_analytics_organization%\") | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_BACKEND_HOST','%honeur_host_machine%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_ZEPPELIN_LOGS','%honeur_zeppelin_logs%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS','%honeur_zeppelin_notebooks%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_ZEPPELIN_SECURITY','%honeur_ldap_or_jdbc%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_LDAP_URL','%honeur_security_ldap_url%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_LDAP_SYSTEM_USERNAME','%honeur_security_ldap_system_username%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_LDAP_SYSTEM_PASSWORD','%honeur_security_ldap_system_password%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_LDAP_BASE_DN','%honeur_security_ldap_base_dn%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_LDAP_DN','%honeur_security_ldap_dn%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_USERMGMT_ADMIN_USERNAME','%honeur_usermgmt_admin_username%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_USERMGMT_ADMIN_PASSWORD','%honeur_usermgmt_admin_password%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_ANALYTICS_ORGANIZATION','%honeur_analytics_organization%') | Set-Content docker-compose.yml"
+PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED','%honeur_analytics_shared_folder%') | Set-Content docker-compose.yml"
 
 docker volume create --name pgdata
 docker volume create --name shared
 docker volume create --name r-server-data
+
+echo set COMPOSE_HTTP_TIMEOUT=3000
+set COMPOSE_HTTP_TIMEOUT=3000
 
 docker-compose pull
 docker-compose up -d
@@ -92,7 +85,11 @@ echo postgresql is available on %honeur_host_machine%:5444
 echo webapi/atlas is available on http://%honeur_host_machine%:8080/webapi and http://%honeur_host_machine%:8080/atlas respectively
 echo User management is available on http://%honeur_host_machine%:8081
 echo Zeppelin is available on http://%honeur_host_machine%:8082
+echo Zeppelin Spark Master URL is available on spark://%honeur_host_machine%:7077
+echo Zeppelin logs are available in directory %honeur_zeppelin_logs%
+echo Zeppelin notebooks are available in directory %honeur_zeppelin_notebooks%
 goto eof
+
 
 :eof
 echo Press [Enter] key to exit

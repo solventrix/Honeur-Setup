@@ -39,13 +39,13 @@ services:
     depends_on:
       - "postgres"
     environment:
-      - "BACKEND_HOST=http://localhost:8080"
+      - "BACKEND_HOST=http://CHANGE_HONEUR_BACKEND_HOST:8080"
       - "OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI"
-      - "LDAP_URL=ldap://ldap.forumsys.com:389"
-      - "LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com"
-      - "LDAP_SYSTEM_PASSWORD=password"
-      - "LDAP_BASE_DN=dc=example,dc=com"
-      - "LDAP_DN=uid={0},dc=example,dc=com"
+      - "LDAP_URL=CHANGE_HONEUR_LDAP_URL"
+      - "LDAP_SYSTEM_USERNAME=CHANGE_HONEUR_LDAP_SYSTEM_USERNAME"
+      - "LDAP_SYSTEM_PASSWORD=CHANGE_HONEUR_LDAP_SYSTEM_PASSWORD"
+      - "LDAP_BASE_DN=CHANGE_HONEUR_LDAP_BASE_DN"
+      - "LDAP_DN=CHANGE_HONEUR_LDAP_DN"
       - "JAVA_OPTS=-Xms512m -Xmx512m"
     networks:
       - honeur-net
@@ -73,8 +73,8 @@ services:
     depends_on:
       - "postgres"
     environment:
-      - "HONEUR_USERMGMT_USERNAME=admin"
-      - "HONEUR_USERMGMT_PASSWORD=admin"
+      - "HONEUR_USERMGMT_USERNAME=CHANGE_HONEUR_USERMGMT_ADMIN_USERNAME"
+      - "HONEUR_USERMGMT_PASSWORD=CHANGE_HONEUR_USERMGMT_ADMIN_PASSWORD"
       - "DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver"
       - "DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi"
       - "WEBAPI_ADMIN_USERNAME=ohdsi_admin_user"
@@ -82,7 +82,7 @@ services:
       - honeur-net
 
   zeppelin:
-    image: honeur/zeppelin:0.8.0-1.5
+    image: honeur/zeppelin:0.8.2-1.5
     container_name: zeppelin
     security_opt:
       - no-new-privileges
@@ -94,19 +94,19 @@ services:
         source: shared
         target: /var/lib/shared
         read_only: true
-      - type: volume
-        source: r-server-data
+      - type: bind
+        source: CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED
         target: /usr/local/src/datafiles
-      - ./zeppelin/logs:/logs
-      - ./zeppelin/notebook:/notebook
+      - CHANGE_HONEUR_ZEPPELIN_LOGS:/logs
+      - CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS:/notebook
     restart: always
     depends_on:
       - "postgres"
     environment:
-      - "ZEPPELIN_SECURITY=jdbc"
-      - "LDAP_URL=ldap://ldap.forumsys.com:389"
-      - "LDAP_BASE_DN=dc=example,dc=com"
-      - "LDAP_DN=uid={0},dc=example,dc=com"
+      - "ZEPPELIN_SECURITY=CHANGE_HONEUR_ZEPPELIN_SECURITY"
+      - "LDAP_URL=CHANGE_HONEUR_LDAP_URL"
+      - "LDAP_BASE_DN=CHANGE_HONEUR_LDAP_BASE_DN"
+      - "LDAP_DN=uid=CHANGE_HONEUR_LDAP_DN"
       - "ZEPPELIN_NOTEBOOK_DIR=/notebook"
       - "ZEPPELIN_LOG_DIR=/logs"
     networks:
@@ -129,8 +129,8 @@ services:
       - no-new-privileges
     restart: always
     volumes:
-      - type: volume
-        source: r-server-data
+      - type: bind
+        source: CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED
         target: /usr/local/src/datafiles
         read_only: true
     networks:
@@ -173,6 +173,4 @@ volumes:
   pgdata:
     external: true
   shared:
-    external: true
-  r-server-data:
     external: true
