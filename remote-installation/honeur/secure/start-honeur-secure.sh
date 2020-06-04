@@ -73,7 +73,6 @@ then
 
     docker volume create --name pgdata
     docker volume create --name shared
-    docker volume create --name r-server-data
 
     echo export COMPOSE_HTTP_TIMEOUT=3000
     export COMPOSE_HTTP_TIMEOUT=3000

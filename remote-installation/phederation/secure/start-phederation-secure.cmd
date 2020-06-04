@@ -70,7 +70,6 @@ PowerShell -Command "((get-content docker-compose.yml -raw) -replace 'CHANGE_HON
 
 docker volume create --name pgdata
 docker volume create --name shared
-docker volume create --name r-server-data
 
 echo set COMPOSE_HTTP_TIMEOUT=3000
 set COMPOSE_HTTP_TIMEOUT=3000
