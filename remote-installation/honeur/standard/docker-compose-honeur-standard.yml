@@ -79,7 +79,7 @@ services:
       - no-new-privileges
     restart: always
     volumes:
-      - CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED:/usr/local/src/datafiles:ro
+      - CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED:/usr/local/src/datafiles
     networks:
       - honeur-net
 
