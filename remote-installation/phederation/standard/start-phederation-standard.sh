@@ -33,7 +33,7 @@ then
 
     sed -i -e "s@CHANGE_HONEUR_BACKEND_HOST@$honeur_host_machine@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_LOGS@$honeur_zeppelin_logs@g" docker-compose.yml
-    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_NOTEBOOK@$honeur_zeppelin_notebooks@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS@$honeur_zeppelin_notebooks@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_ANALYTICS_ORGANIZATION@$honeur_analytics_organization@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED@$honeur_analytics_shared_folder@g" docker-compose.yml
 

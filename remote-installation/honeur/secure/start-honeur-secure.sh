@@ -59,7 +59,7 @@ then
 
     sed -i -e "s@CHANGE_HONEUR_BACKEND_HOST@$honeur_host_machine@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_LOGS@$honeur_zeppelin_logs@g" docker-compose.yml
-    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_NOTEBOOK@$honeur_zeppelin_notebooks@g" docker-compose.yml
+    sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS@$honeur_zeppelin_notebooks@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_ZEPPELIN_SECURITY@$honeur_ldap_or_jdbc@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_LDAP_URL@$honeur_security_ldap_url@g" docker-compose.yml
     sed -i -e "s@CHANGE_HONEUR_LDAP_SYSTEM_USERNAME@$honeur_security_ldap_system_username@g" docker-compose.yml
