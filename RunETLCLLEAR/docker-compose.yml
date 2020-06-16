@@ -1,0 +1,23 @@
+version: '3.5'
+services:
+  run-python-etl:
+    image: python:3
+    container_name: run-etl-cllear
+    volumes:
+      - ./CLLEAR:/CLLEAR
+      - data_folder:/data
+    external_links:
+      - postgres
+    networks:
+      - honeur-net
+    command:
+      - /bin/bash
+      - -c
+      - |
+          cd /CLLEAR
+          pip3 install -r ./requirements.txt
+          python main.py -s /data -h postgres -p 5432 -d OHDSI -u db_username -w db_password
+
+networks:
+  honeur-net:
+    name: honeur-net
