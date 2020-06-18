@@ -60,7 +60,6 @@ services:
       - "7077:7077"
       - "8082:8080"
     volumes:
-      - CHANGE_HONEUR_DISTRIBUTED_ANALYTICS_SHARED:/usr/local/src/datafiles
       - CHANGE_HONEUR_ZEPPELIN_LOGS:/logs
       - CHANGE_HONEUR_ZEPPELIN_NOTEBOOKS:/notebook
     restart: always
