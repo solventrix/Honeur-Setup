@@ -25,15 +25,11 @@ echo Success
 echo Press [Enter] key to continue
 pause>NUL
 
-echo Creating folder setup-conf
-mkdir setup-conf
 echo Downloading docker-compose.yml file.
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDMCustomConcepts/docker-compose.yml --output docker-compose.yml
-echo Downloading setup.yml file inside setup-conf folder
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDMCustomConcepts/setup-conf/setup.yml --output setup-conf/setup.yml
 
 docker-compose pull
-docker-compose up -d
+docker-compose up
 
 ping 127.0.0.1 -n 6 > nul
 
