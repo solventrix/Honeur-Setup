@@ -1,25 +1,20 @@
 version: '3.5'
 services:
   omop-cdm-custom-concepts:
-    image: honeur/postgres-omop-cdm-initialize:custom-concepts-update-06-2019
+    image: honeur/postgres:omop-cdm-initialize-custom-concepts-update-07-2020
     container_name: omop-cdm-custom-concepts
     volumes:
-      - ./setup-conf:/postgres/setup-scripts/conf
       - shared:/var/lib/shared
     external_links:
       - postgres
     networks:
       - honeur-net
-    command:
-      - /bin/bash
-      - -c
-      - |
-          source /postgres/setup-scripts/setenv.sh
-          python -u update_custom_concepts.py conf/setup.yml
+    environment:
+      - "DB_HOST=postgres"
 
 networks:
   honeur-net:
-    name: honeur-net
+    external: true
 
 volumes:
   shared:
