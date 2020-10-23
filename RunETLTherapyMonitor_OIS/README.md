@@ -14,7 +14,7 @@
    * `cd etl_therapymonitor`
 2. Download the installation script:
     * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLTherapyMonitor_OIS/runETL.sh --output runETL.sh && chmod +x runETL.sh`
-3. Execute the `runETL.sh` script by running `./runETL.sh` form inside the directory where the script is located.
+3. Execute the `runETL.sh` script by running `./runETL.sh` from inside the directory where the script is located.
 4. The script will request for:
     * the path to the folder that contains the input CSV data file
     * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
