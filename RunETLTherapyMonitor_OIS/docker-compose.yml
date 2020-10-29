@@ -17,6 +17,7 @@ services:
       DB_USER: "db_username"
       DB_PASSWORD: "db_password"
       VERBOSITY_LEVEL: "verbosity_level"
+      FILENAME: "filename"
 
 networks:
   honeur_honeur-net:
