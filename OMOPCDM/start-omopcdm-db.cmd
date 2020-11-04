@@ -33,13 +33,13 @@ echo Press [Enter] key to continue
 pause>NUL
 
 echo Downloading docker-compose.yml file.
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDM/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/OMOPCDM/docker-compose.yml --output docker-compose.yml
 
 docker volume create --name pgdata
 docker volume create --name shared
 
 docker-compose pull
-docker-compose up -d
+docker-compose up
 
 echo Removing downloaded files
 rm docker-compose.yml
