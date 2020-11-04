@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/usr/env bash
 
 echo Docker login, Make sure to use an account with access to the honeur docker hub images.
 docker login
@@ -18,19 +18,14 @@ then
     echo Succes
     read -p "Press [Enter] key to continue"
 
-    echo Creating folder setup-conf
-    mkdir setup-conf
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v1.5.1/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
 
     docker-compose pull
-    docker-compose up -d
-
-    sleep 5
+    docker-compose up
 
     echo Removing downloaded files
-    rm docker-compose.yml
-    rm -R setup-conf
+    rm -rf docker-compose.yml
 
     echo success
 
