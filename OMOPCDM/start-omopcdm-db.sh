@@ -22,7 +22,7 @@ then
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDM/docker-compose.yml --output docker-compose.yml
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/OMOPCDM/docker-compose.yml --output docker-compose.yml
 
     echo Creating volumes
     docker volume create --name pgdata
@@ -32,7 +32,7 @@ then
     docker-compose pull
 
     echo Starting database
-    docker-compose up -d
+    docker-compose up
 
     echo Cleaning up
     rm docker-compose.yml
