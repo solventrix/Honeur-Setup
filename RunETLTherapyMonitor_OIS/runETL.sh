@@ -6,6 +6,8 @@ curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLT
 
 read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}
+read -p "Filename [TM_MM_DE_OIS_OMOP_Testdata.csv]: " filename
+filename=${filename:-TM_MM_DE_OIS_OMOP_Testdata.csv}
 read -p "DB username [honeur_admin]: " db_username
 db_username=${db_username:-honeur_admin}
 read -p "DB password [honeur_admin]: " db_password
@@ -20,6 +22,7 @@ sed -i -e "s/db_username/$db_username/g" docker-compose.yml
 sed -i -e "s/db_password/$db_password/g" docker-compose.yml
 sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
 sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
+sed -i -e "s/filename/$filename/g" docker-compose.yml
 
 docker login
 docker-compose pull

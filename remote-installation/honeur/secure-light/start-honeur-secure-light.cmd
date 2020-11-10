@@ -26,7 +26,7 @@ echo Press [Enter] key to continue
 pause>NUL
 
 echo Downloading docker-compose.yml file.
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/honeur/secure-light/docker-compose-honeur-secure-light.yml --output docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/honeur/secure-light/docker-compose-honeur-secure-light.yml --output docker-compose.yml
 
 set /p honeur_host_machine="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET honeur_host_machine=localhost
 set /p honeur_zeppelin_logs="Enter the directory where the zeppelin logs will kept on the host machine [./zeppelin/logs]: " || SET honeur_zeppelin_logs=./zeppelin/logs

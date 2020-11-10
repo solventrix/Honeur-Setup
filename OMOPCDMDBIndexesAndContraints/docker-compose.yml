@@ -1,26 +1,21 @@
 version: '3.5'
 services:
   omop-indexes-and-constraints:
+    image: honeur/postgres:omop-cdm-constraints-and-indexes-latest
     container_name: omop-indexes-and-constraints
     volumes:
-      - ./setup-conf:/postgres/setup-scripts/conf
       - shared:/var/lib/shared
-    image: honeur/postgres-omop-cdm-constraints-and-indexes
     external_links:
       - postgres
     networks:
       - honeur-net
-    command:
-      - /bin/bash
-      - -c
-      - |
-          source /postgres/setup-scripts/setenv.sh
-          python -u indexes_and_constraints_omopcdm.py conf/setup.yml
+    environment:
+      - "DB_HOST=postgres"
 
 networks:
   honeur-net:
-    name: honeur-net
-  
+    external: true
+
 volumes:
   shared:
     external: true

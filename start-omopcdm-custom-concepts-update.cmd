@@ -26,12 +26,10 @@ echo Press [Enter] key to continue
 pause>NUL
 
 echo Downloading docker-compose.yml file.
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDMCustomConcepts/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/OMOPCDMCustomConcepts/docker-compose.yml --output docker-compose.yml
 
 docker-compose pull
 docker-compose up
-
-ping 127.0.0.1 -n 6 > nul
 
 echo Removing downloaded files
 rm docker-compose.yml
