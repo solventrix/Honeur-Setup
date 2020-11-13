@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-TAG="2.0.0"
+VERSION=2.0.0
+TAG=$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
 read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' HONEUR_HOST_MACHINE

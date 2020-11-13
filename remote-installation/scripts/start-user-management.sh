@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-TAG="2.0.0"
+VERSION=2.0.0
+TAG=$VERSION
 
 read -p "usermgmt admin username [admin]: " HONEUR_USERMGMT_ADMIN_USERNAME
 HONEUR_USERMGMT_ADMIN_USERNAME=${HONEUR_USERMGMT_ADMIN_USERNAME:-admin}

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-TAG="0.8.2-2.0.0"
+VERSION=2.0.0
+TAG=0.8.2-$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
 read -p "Enter the directory where the zeppelin logs will kept on the host machine [$CURRENT_DIRECTORY/zeppelin/logs]: " HONEUR_ZEPPELIN_LOGS
