@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-TAG="2.7.1-2.0.0"
+VERSION=2.0.0
+TAG=2.7.1-$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
 
@@ -37,6 +38,8 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     echo "LDAP_SYSTEM_PASSWORD=$HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD" >> atlas-webapi.env
     echo "LDAP_BASE_DN=$HONEUR_SECURITY_LDAP_BASE_DN" >> atlas-webapi.env
     echo "LDAP_DN=$HONEUR_SECURITY_LDAP_DN" >> atlas-webapi.env
+else
+    echo "USER_AUTHENTICATION_ENABLED=false" >> atlas-webapi.env
 fi
 
 docker stop webapi > /dev/null 2>&1 || true
@@ -57,7 +60,7 @@ docker run \
 --env-file atlas-webapi.env \
 -v "shared:/var/lib/shared:ro" \
 -d \
-honeur/webapi-atlas:$TAG
+honeur/webapi-atlas:$TAG > /dev/null
 
 docker network connect honeur-net webapi > /dev/null 2>&1 || true
 
