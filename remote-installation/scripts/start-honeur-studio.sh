@@ -89,6 +89,7 @@ docker run \
 -p "8084:8080" \
 --restart always \
 --env-file honeur-studio.env \
+-v "shared:/var/lib/shared:ro" \
 -v "/var/run/docker.sock:/var/run/docker.sock" \
 -d \
 honeur/honeur-studio:$TAG shinyproxy > /dev/null 2>&1

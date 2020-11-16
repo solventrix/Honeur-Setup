@@ -25,7 +25,13 @@ if [ "$HONEUR_SECURITY_METHOD" = "ldap" ]; then
     read -p "security.ldap.baseDn [dc=example,dc=com]: " HONEUR_SECURITY_LDAP_BASE_DN
     HONEUR_SECURITY_LDAP_BASE_DN=${HONEUR_SECURITY_LDAP_BASE_DN:-dc=example,dc=com}
     read -p "security.ldap.dn [uid={0},dc=example,dc=com]: " HONEUR_SECURITY_LDAP_DN
-    HONEUR_SECURITY_LDAP_DN=${honeur_security_ldap_dn:-uid=\{0\},dc=example,dc=com}
+    HONEUR_SECURITY_LDAP_DN=${HONEUR_SECURITY_LDAP_DN:-uid=\{0\},dc=example,dc=com}
+elif [ "$HONEUR_SECURITY_METHOD" = "jdbc" ]; then
+    HONEUR_SECURITY_LDAP_URL=ldap://localhost:389
+    HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=username
+    HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=password
+    HONEUR_SECURITY_LDAP_BASE_DN=dc=example,dc=org
+    HONEUR_SECURITY_LDAP_DN=cn={0},dc=example,dc=org
 fi
 
 echo "OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI" > atlas-webapi.env
@@ -66,4 +72,4 @@ honeur/webapi-atlas:$TAG > /dev/null
 
 docker network connect honeur-net webapi > /dev/null 2>&1 || true
 
-rm -rf atlas-webapi.env
+# rm -rf atlas-webapi.env
