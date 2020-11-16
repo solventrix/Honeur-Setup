@@ -12,6 +12,8 @@ docker volume rm shared > /dev/null 2>&1 || true
 echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
+docker pull honeur/postgres:$TAG
+
 docker run \
 --name "postgres" \
 --restart always \

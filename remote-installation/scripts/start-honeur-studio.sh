@@ -64,6 +64,8 @@ docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 docker network create --driver bridge honeur-studio-frontend-net > /dev/null 2>&1 || true
 docker network create --driver bridge honeur-studio-net > /dev/null 2>&1 || true
 
+docker pull honeur/honeur-studio:$TAG
+
 docker run \
 --name "honeur-studio-chronicle" \
 -p "8085:3012" \

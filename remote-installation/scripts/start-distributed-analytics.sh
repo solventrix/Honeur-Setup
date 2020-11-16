@@ -32,6 +32,8 @@ docker rm $(docker ps --filter 'network=honeur-distributed-analytics-net' -q -a)
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 docker network create --driver bridge honeur-distributed-analytics-net > /dev/null 2>&1 || true
 
+docker pull honeur/distributed-analytics:r-server-$VERSION
+
 docker run \
 --name "distributed-analytics-r-server" \
 --restart always \
@@ -42,6 +44,8 @@ honeur/distributed-analytics:r-server-$VERSION
 
 docker network connect honeur-net distributed-analytics-r-server > /dev/null 2>&1 || true
 docker network connect honeur-distributed-analytics-net distributed-analytics-r-server > /dev/null 2>&1 || true
+
+docker pull honeur/distributed-analytics:remote-$VERSION
 
 docker run \
 --name "distributed-analytics-remote" \

@@ -20,6 +20,8 @@ docker rm user-mgmt > /dev/null 2>&1 || true
 
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
+docker pull honeur/user-mgmt:$TAG
+
 docker run \
 --name "user-mgmt" \
 --restart always \

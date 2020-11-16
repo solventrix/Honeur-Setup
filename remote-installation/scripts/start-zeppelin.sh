@@ -53,6 +53,8 @@ docker rm zeppelin > /dev/null 2>&1 || true
 
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
+docker pull honeur/zeppelin:$TAG
+
 docker run \
 --name "zeppelin" \
 --restart always \

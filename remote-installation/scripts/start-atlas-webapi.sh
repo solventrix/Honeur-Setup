@@ -53,6 +53,8 @@ else
     TAG=$TAG-standard
 fi
 
+docker pull honeur/webapi-atlas:$TAG
+
 docker run \
 --name "webapi" \
 --restart always \
