@@ -68,7 +68,6 @@ docker pull honeur/honeur-studio:$TAG
 
 docker run \
 --name "honeur-studio-chronicle" \
--p "8085:3012" \
 --restart always \
 --env-file honeur-studio-chronicle.env \
 --hostname "cronicle" \
@@ -86,7 +85,6 @@ docker network connect honeur-net honeur-studio-chronicle > /dev/null 2>&1 || tr
 
 docker run \
 --name "honeur-studio" \
--p "8084:8080" \
 --restart always \
 --env-file honeur-studio.env \
 -v "shared:/var/lib/shared:ro" \
