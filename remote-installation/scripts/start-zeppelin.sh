@@ -32,6 +32,8 @@ if [ "$HONEUR_SECURITY_METHOD" = "ldap" ]; then
     HONEUR_SECURITY_LDAP_DN=${honeur_security_ldap_dn:-uid=\{0\},dc=example,dc=com}
 fi
 
+touch zeppelin.env
+
 echo "ZEPPELIN_NOTEBOOK_DIR=/notebook" > zeppelin.env
 echo "ZEPPELIN_LOG_DIR=/logs" >> zeppelin.env
 if [ "$HONEUR_SECURITY_METHOD" = "jdbc" ]; then

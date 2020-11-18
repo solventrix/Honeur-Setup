@@ -4,6 +4,8 @@ set -e
 VERSION=2.0.0
 TAG=$VERSION
 
+touch nginx.env
+
 if [ "$( docker container inspect -f '{{.State.Running}}' webapi )" == "true" ]; then
     echo "ATLAS_ENABLED=true" >> nginx.env
     echo "ATLAS_URL=/atlas" >> nginx.env

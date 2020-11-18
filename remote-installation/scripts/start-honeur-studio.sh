@@ -33,6 +33,8 @@ fi
 
 USERID=${UID:-1000}
 
+touch honeur-studio.env
+
 echo "TAG=$TAG" > honeur-studio.env
 echo "APPLICATION_LOGS_TO_STDOUT=false" >> honeur-studio.env
 echo "SITE_NAME=honeurstudio" >> honeur-studio.env

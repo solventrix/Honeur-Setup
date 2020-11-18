@@ -9,6 +9,8 @@ HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECT
 read -p 'Enter your HONEUR organization [Janssen]: ' HONEUR_ANALYTICS_ORGANIZATION
 HONEUR_ANALYTICS_ORGANIZATION=${HONEUR_ANALYTICS_ORGANIZATION:-Janssen}
 
+touch distributed-analytics.env
+
 echo "DISTRIBUTED_SERVICE_CLIENT_SCHEME=https" > distributed-analytics.env
 echo "DISTRIBUTED_SERVICE_CLIENT_HOST=distributed-analytics.honeur.org" >> distributed-analytics.env
 echo "DISTRIBUTED_SERVICE_CLIENT_PORT=443" >> distributed-analytics.env
