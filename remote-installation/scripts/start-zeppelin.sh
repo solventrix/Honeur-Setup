@@ -50,13 +50,17 @@ elif [ "$HONEUR_SECURITY_METHOD" = "ldap" ]; then
     echo "LDAP_DN=$HONEUR_SECURITY_LDAP_DN" >> zeppelin.env
 fi
 
+echo "Stop and remove zeppelin container if exists"
 docker stop zeppelin > /dev/null 2>&1 || true
 docker rm zeppelin > /dev/null 2>&1 || true
 
+echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
-docker pull honeur/zeppelin:$TAG
+echo "Pull honeur/zeppelin:$TAG from docker hub. This could take a while if not present on machine"
+docker pull honeur/zeppelin:$TAG > /dev/null 2>&1 || true
 
+echo "Run honeur/zeppelin:$TAG container. This could take a while..."
 docker run \
 --name "zeppelin" \
 --restart always \
@@ -67,8 +71,12 @@ docker run \
 -v $HONEUR_ZEPPELIN_LOGS:/logs \
 -v $HONEUR_ZEPPELIN_NOTEBOOKS:/notebook \
 -d \
-honeur/zeppelin:$TAG
+honeur/zeppelin:$TAG > /dev/null 2>&1
 
+echo "Connect zeppelin to honeur-net network"
 docker network connect honeur-net zeppelin > /dev/null 2>&1 || true
 
+echo "Clean up helper files"
 rm -rf zeppelin.env
+
+echo "Done"

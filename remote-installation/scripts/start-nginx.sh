@@ -30,13 +30,17 @@ if [ "$( docker container inspect -f '{{.State.Running}}' honeur-studio )" == "t
     echo "DOCUMENTS_URL=/honeur-studio/app/documents" >> nginx.env
 fi
 
+echo "Stop and remove nginx container if exists"
 docker stop nginx > /dev/null 2>&1 || true
 docker rm nginx > /dev/null 2>&1 || true
 
+echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
+echo "Pull honeur/nginx:$TAG from docker hub. This could take a while if not present on machine"
 docker pull honeur/nginx:$TAG
 
+echo "Run honeur/nginx:$TAG container. This could take a while..."
 docker run \
 --name "nginx" \
 -p "80:80" \
@@ -47,4 +51,7 @@ docker run \
 -d \
 honeur/nginx:$TAG
 
+echo "Clean up helper files"
 rm -rf nginx.env
+
+echo "Done"

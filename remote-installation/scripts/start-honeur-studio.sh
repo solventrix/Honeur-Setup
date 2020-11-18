@@ -59,15 +59,21 @@ echo "SITE_NAME=honeurstudio" > honeur-studio-chronicle.env
 echo "USERID=$USERID" >> honeur-studio-chronicle.env
 echo "USER=honeurstudio" >> honeur-studio-chronicle.env
 
+echo "Stop and remove all honeur-studio containers if exists"
 docker stop $(docker ps --filter 'network=honeur-studio-net' -q -a) > /dev/null 2>&1 || true
 docker rm $(docker ps --filter 'network=honeur-studio-net' -q -a) > /dev/null 2>&1 || true
 
+echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
+echo "Create honeur-studio-frontend-net network if it does not exists"
 docker network create --driver bridge honeur-studio-frontend-net > /dev/null 2>&1 || true
+echo "Create honeur-studio-net network if it does not exists"
 docker network create --driver bridge honeur-studio-net > /dev/null 2>&1 || true
 
+echo "Pull honeur/honeur-studio:$TAG from docker hub. This could take a while if not present on machine"
 docker pull honeur/honeur-studio:$TAG
 
+echo "Run honeur/honeur-studio:$TAG container. This could take a while..."
 docker run \
 --name "honeur-studio-chronicle" \
 --restart always \
@@ -79,12 +85,17 @@ docker run \
 -v "cronicle_data:/opt/cronicle" \
 -v "pwsh_modules:/home/honeurstudio/.local/share/powershell/Modules" \
 -d \
-honeur/honeur-studio:$TAG cronicle
+honeur/honeur-studio:$TAG cronicle > /dev/null 2>&1
 
-docker network connect honeur-studio-frontend-net honeur-studio-chronicle > /dev/null 2>&1 || true
-docker network connect honeur-studio-net honeur-studio-chronicle > /dev/null 2>&1 || true
+echo "Connect honeur-studio-chronicle to honeur-net network"
 docker network connect honeur-net honeur-studio-chronicle > /dev/null 2>&1 || true
+echo "Connect honeur-studio-chronicle to honeur-studio-frontend-net network"
+docker network connect honeur-studio-frontend-net honeur-studio-chronicle > /dev/null 2>&1 || true
+echo "Connect honeur-studio-chronicle to honeur-studio-net network"
+docker network connect honeur-studio-net honeur-studio-chronicle > /dev/null 2>&1 || true
 
+
+echo "Run honeur/honeur-studio:$TAG container. This could take a while..."
 docker run \
 --name "honeur-studio" \
 --restart always \
@@ -94,9 +105,15 @@ docker run \
 -d \
 honeur/honeur-studio:$TAG shinyproxy > /dev/null 2>&1
 
+echo Connect honeur-studio to honeur-net network
 docker network connect honeur-net honeur-studio > /dev/null 2>&1 || true
+echo Connect honeur-studio to honeur-studio-frontend-net network
 docker network connect honeur-studio-frontend-net honeur-studio > /dev/null 2>&1 || true
+echo Connect honeur-studio to honeur-studio-net network
 docker network connect honeur-studio-net honeur-studio > /dev/null 2>&1 || true
 
+echo "Clean up helper files"
 rm -rf honeur-studio.env
 rm -rf honeur-studio-chronicle.env
+
+echo "Done"

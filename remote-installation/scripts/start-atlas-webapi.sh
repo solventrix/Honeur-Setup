@@ -48,10 +48,9 @@ else
     echo "USER_AUTHENTICATION_ENABLED=false" >> atlas-webapi.env
 fi
 
+echo "Stop and remove webapi container if exists"
 docker stop webapi > /dev/null 2>&1 || true
 docker rm webapi > /dev/null 2>&1 || true
-
-docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     TAG=$TAG-secure
@@ -59,8 +58,13 @@ else
     TAG=$TAG-standard
 fi
 
+echo "Create honeur-net network if it does not exists"
+docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
+
+echo "Pull honeur/webapi-atlas:$TAG from docker hub. This could take a while if not present on machine"
 docker pull honeur/webapi-atlas:$TAG
 
+echo "Run honeur/webapi-atlas:$TAG container. This could take a while..."
 docker run \
 --name "webapi" \
 --restart always \
@@ -70,6 +74,10 @@ docker run \
 -d \
 honeur/webapi-atlas:$TAG > /dev/null
 
+echo "Connect webapi to honeur-net network"
 docker network connect honeur-net webapi > /dev/null 2>&1 || true
 
-# rm -rf atlas-webapi.env
+echo "Clean up helper files"
+rm -rf atlas-webapi.env
+
+echo "Done"

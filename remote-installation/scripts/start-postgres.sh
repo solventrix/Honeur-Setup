@@ -7,13 +7,21 @@ TAG=HONEUR-9.6-omopcdm-5.3.1-webapi-2.7.1-$VERSION
 echo "Stop and remove postgres container if exists"
 docker stop postgres > /dev/null 2>&1 || true
 docker rm postgres > /dev/null 2>&1 || true
+
 echo "Removing existing helper volumes"
 docker volume rm shared > /dev/null 2>&1 || true
+
 echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
+echo "Pull honeur/postgres:$TAG from docker hub. This could take a while if not present on machine..."
 docker pull honeur/postgres:$TAG
 
+echo "Creating helper volumes"
+docker volume create shared > /dev/null 2>&1 || true
+docker volume create pgdata > /dev/null 2>&1 || true
+
+echo "Run honeur/postgres:$TAG container. This could take a while..."
 docker run \
 --name "postgres" \
 --restart always \

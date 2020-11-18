@@ -52,15 +52,21 @@ echo SITE_NAME=honeurstudio> honeur-studio-chronicle.env
 echo USERID=%USERID%>> honeur-studio-chronicle.env
 echo USER=honeurstudio>> honeur-studio-chronicle.env
 
+echo Stop and remove all honeur-studio containers if exists
 PowerShell -Command "docker stop $(docker ps --filter 'network=honeur-studio-net' -q -a)" >nul 2>&1
 PowerShell -Command "docker rm $(docker ps --filter 'network=honeur-studio-net' -q -a)" >nul 2>&1
 
+echo Create honeur-net network if it does not exists
 docker network create --driver bridge honeur-net >nul 2>&1
+echo Create honeur-studio-frontend-net network if it does not exists
 docker network create --driver bridge honeur-studio-frontend-net >nul 2>&1
+echo Create honeur-studio-net network if it does not exists
 docker network create --driver bridge honeur-studio-net >nul 2>&1
 
-docker pull honeur/honeur-studio:%TAG%
+echo Pull honeur/honeur-studio:%TAG% from docker hub. This could take a while if not present on machine
+docker pull honeur/honeur-studio:%TAG% >nul 2>&1
 
+echo Run honeur/honeur-studio:%TAG% container. This could take a while...
 docker run ^
 --name "honeur-studio-chronicle" ^
 --restart always ^
@@ -72,12 +78,16 @@ docker run ^
 -v "cronicle_data:/opt/cronicle" ^
 -v "pwsh_modules:/home/honeurstudio/.local/share/powershell/Modules" ^
 -d ^
-honeur/honeur-studio:%TAG% cronicle
+honeur/honeur-studio:%TAG% cronicle >nul 2>&1
 
-docker network connect honeur-studio-frontend-net honeur-studio-chronicle >nul 2>&1
-docker network connect honeur-studio-net honeur-studio-chronicle >nul 2>&1
+echo Connect honeur-studio-chronicle to honeur-net network
 docker network connect honeur-net honeur-studio-chronicle >nul 2>&1
+echo Connect honeur-studio-chronicle to honeur-studio-frontend-net network
+docker network connect honeur-studio-frontend-net honeur-studio-chronicle >nul 2>&1
+echo Connect honeur-studio-chronicle to honeur-studio-net network
+docker network connect honeur-studio-net honeur-studio-chronicle >nul 2>&1
 
+echo Run honeur/honeur-studio:%TAG% container. This could take a while...
 docker run ^
 --name "honeur-studio" ^
 --restart always ^
@@ -85,11 +95,17 @@ docker run ^
 -v "shared:/var/lib/shared:ro" ^
 -v "/var/run/docker.sock:/var/run/docker.sock" ^
 -d ^
-honeur/honeur-studio:%TAG% shinyproxy
+honeur/honeur-studio:%TAG% shinyproxy >nul 2>&1
 
+echo Connect honeur-studio to honeur-net network
 docker network connect honeur-net honeur-studio >nul 2>&1
+echo Connect honeur-studio to honeur-studio-frontend-net network
 docker network connect honeur-studio-frontend-net honeur-studio >nul 2>&1
+echo Connect honeur-studio to honeur-studio-net network
 docker network connect honeur-studio-net honeur-studio >nul 2>&1
 
+echo Clean up helper files
 DEL /Q honeur-studio.env
 DEL /Q honeur-studio-chronicle.env
+
+echo Done

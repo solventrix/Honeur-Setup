@@ -1,3 +1,5 @@
+@echo off
+
 SET VERSION=2.0.0
 SET TAG=%VERSION%
 
@@ -35,13 +37,17 @@ for /f "delims=" %%A in ('docker container inspect -f "{{.State.Running}}" honeu
     )
 )
 
+echo Stop and remove nginx container if exists
 docker stop nginx > /dev/null >nul 2>&1
 docker rm nginx > /dev/null >nul 2>&1
 
+echo Create honeur-net network if it does not exists
 docker network create --driver bridge honeur-net >nul 2>&1
 
+echo Pull honeur/nginx:%TAG% from docker hub. This could take a while if not present on machine
 docker pull honeur/nginx:%TAG% >nul 2>&1
 
+echo Run honeur/nginx:%TAG% container. This could take a while...
 docker run ^
 --name "nginx" ^
 -p "80:80" ^
@@ -50,6 +56,9 @@ docker run ^
 --env-file nginx.env ^
 --network honeur-net ^
 -d ^
-honeur/nginx:%TAG%
+honeur/nginx:%TAG% >nul 2>&1
 
+echo Clean up helper files
 DEL /Q nginx.env
+
+echo Done
