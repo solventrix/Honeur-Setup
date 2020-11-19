@@ -15,7 +15,7 @@ echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/postgres:$TAG from docker hub. This could take a while if not present on machine..."
-docker pull honeur/postgres:$TAG
+docker pull honeur/postgres:$TAG > /dev/null 2>&1
 
 echo "Creating helper volumes"
 docker volume create shared > /dev/null 2>&1 || true
