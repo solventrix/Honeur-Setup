@@ -71,7 +71,7 @@ echo "Create honeur-studio-net network if it does not exists"
 docker network create --driver bridge honeur-studio-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/honeur-studio:$TAG from docker hub. This could take a while if not present on machine"
-docker pull honeur/honeur-studio:$TAG
+docker pull honeur/honeur-studio:$TAG > /dev/null 2>&1
 
 echo "Run honeur/honeur-studio:$TAG container. This could take a while..."
 docker run \
@@ -88,11 +88,11 @@ docker run \
 honeur/honeur-studio:$TAG cronicle > /dev/null 2>&1
 
 echo "Connect honeur-studio-chronicle to honeur-net network"
-docker network connect honeur-net honeur-studio-chronicle > /dev/null 2>&1 || true
+docker network connect honeur-net honeur-studio-chronicle > /dev/null 2>&1
 echo "Connect honeur-studio-chronicle to honeur-studio-frontend-net network"
-docker network connect honeur-studio-frontend-net honeur-studio-chronicle > /dev/null 2>&1 || true
+docker network connect honeur-studio-frontend-net honeur-studio-chronicle > /dev/null 2>&1
 echo "Connect honeur-studio-chronicle to honeur-studio-net network"
-docker network connect honeur-studio-net honeur-studio-chronicle > /dev/null 2>&1 || true
+docker network connect honeur-studio-net honeur-studio-chronicle > /dev/null 2>&1
 
 
 echo "Run honeur/honeur-studio:$TAG container. This could take a while..."
@@ -106,11 +106,11 @@ docker run \
 honeur/honeur-studio:$TAG shinyproxy > /dev/null 2>&1
 
 echo Connect honeur-studio to honeur-net network
-docker network connect honeur-net honeur-studio > /dev/null 2>&1 || true
+docker network connect honeur-net honeur-studio > /dev/null 2>&1
 echo Connect honeur-studio to honeur-studio-frontend-net network
-docker network connect honeur-studio-frontend-net honeur-studio > /dev/null 2>&1 || true
+docker network connect honeur-studio-frontend-net honeur-studio > /dev/null 2>&1
 echo Connect honeur-studio to honeur-studio-net network
-docker network connect honeur-studio-net honeur-studio > /dev/null 2>&1 || true
+docker network connect honeur-studio-net honeur-studio > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf honeur-studio.env

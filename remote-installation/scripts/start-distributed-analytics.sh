@@ -52,9 +52,9 @@ docker run \
 honeur/distributed-analytics:r-server-$VERSION > /dev/null 2>&1
 
 echo "Connect distributed-analytics-r-server to honeur-net network"
-docker network connect honeur-net distributed-analytics-r-server > /dev/null 2>&1 || true
+docker network connect honeur-net distributed-analytics-r-server > /dev/null 2>&1
 echo "Connect distributed-analytics-r-server to honeur-distributed-analytics-net network"
-docker network connect honeur-distributed-analytics-net distributed-analytics-r-server > /dev/null 2>&1 || true
+docker network connect honeur-distributed-analytics-net distributed-analytics-r-server > /dev/null 2>&1
 
 echo "Run honeur/distributed-analytics:remote-$VERSION container. This could take a while..."
 docker run \
@@ -66,9 +66,9 @@ docker run \
 honeur/distributed-analytics:remote-$VERSION > /dev/null 2>&1
 
 echo "Connect distributed-analytics-remote to honeur-net network"
-docker network connect honeur-net distributed-analytics-remote > /dev/null 2>&1 || true
+docker network connect honeur-net distributed-analytics-remote > /dev/null 2>&1
 echo "Connect distributed-analytics-remote to honeur-distributed-analytics-net network"
-docker network connect honeur-distributed-analytics-net distributed-analytics-remote > /dev/null 2>&1 || true
+docker network connect honeur-distributed-analytics-net distributed-analytics-remote > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf distributed-analytics.env

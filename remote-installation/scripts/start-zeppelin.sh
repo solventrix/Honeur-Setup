@@ -58,7 +58,7 @@ echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/zeppelin:$TAG from docker hub. This could take a while if not present on machine"
-docker pull honeur/zeppelin:$TAG > /dev/null 2>&1 || true
+docker pull honeur/zeppelin:$TAG > /dev/null 2>&1
 
 echo "Run honeur/zeppelin:$TAG container. This could take a while..."
 docker run \
@@ -74,7 +74,7 @@ docker run \
 honeur/zeppelin:$TAG > /dev/null 2>&1
 
 echo "Connect zeppelin to honeur-net network"
-docker network connect honeur-net zeppelin > /dev/null 2>&1 || true
+docker network connect honeur-net zeppelin > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf zeppelin.env

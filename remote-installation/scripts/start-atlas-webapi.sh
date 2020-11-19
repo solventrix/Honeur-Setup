@@ -62,7 +62,7 @@ echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/webapi-atlas:$TAG from docker hub. This could take a while if not present on machine"
-docker pull honeur/webapi-atlas:$TAG
+docker pull honeur/webapi-atlas:$TAG > /dev/null 2>&1
 
 echo "Run honeur/webapi-atlas:$TAG container. This could take a while..."
 docker run \
@@ -72,10 +72,10 @@ docker run \
 --env-file atlas-webapi.env \
 -v "shared:/var/lib/shared:ro" \
 -d \
-honeur/webapi-atlas:$TAG > /dev/null
+honeur/webapi-atlas:$TAG > /dev/null 2>&1
 
 echo "Connect webapi to honeur-net network"
-docker network connect honeur-net webapi > /dev/null 2>&1 || true
+docker network connect honeur-net webapi > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf atlas-webapi.env

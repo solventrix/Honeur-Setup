@@ -25,7 +25,7 @@ echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/user-mgmt:$TAG from docker hub. This could take a while if not present on machine"
-docker pull honeur/user-mgmt:$TAG
+docker pull honeur/user-mgmt:$TAG > /dev/null 2>&1
 
 echo "Run honeur/user-mgmt:$TAG container. This could take a while..."
 docker run \
@@ -35,10 +35,10 @@ docker run \
 --env-file user-mgmt.env \
 -v "shared:/var/lib/shared:ro" \
 -d \
-honeur/user-mgmt:$TAG
+honeur/user-mgmt:$TAG > /dev/null 2>&1
 
 echo "Connect user-mgmt to honeur-net network"
-docker network connect honeur-net user-mgmt > /dev/null 2>&1 || true
+docker network connect honeur-net user-mgmt > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf user-mgmt.env

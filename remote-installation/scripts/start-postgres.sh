@@ -33,6 +33,6 @@ docker run \
 honeur/postgres:$TAG > /dev/null 2>&1
 
 echo "Connect postgres to honeur-net network"
-docker network connect honeur-net postgres > /dev/null 2>&1 || true
+docker network connect honeur-net postgres > /dev/null 2>&1
 
 echo "Done"
