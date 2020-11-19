@@ -8,8 +8,8 @@ SET /p HONEUR_USERMGMT_ADMIN_PASSWORD="usermgmt admin password [admin]: " || SET
 
 echo. 2>user-mgmt.env
 
-echo HONEUR_USERMGMT_USERNAME=$HONEUR_USERMGMT_ADMIN_USERNAME> user-mgmt.env
-echo HONEUR_USERMGMT_PASSWORD=$HONEUR_USERMGMT_ADMIN_PASSWORD>> user-mgmt.env
+echo HONEUR_USERMGMT_USERNAME=%HONEUR_USERMGMT_ADMIN_USERNAME%> user-mgmt.env
+echo HONEUR_USERMGMT_PASSWORD=%HONEUR_USERMGMT_ADMIN_PASSWORD%>> user-mgmt.env
 echo DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver>> user-mgmt.env
 echo DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi>> user-mgmt.env
 echo WEBAPI_ADMIN_USERNAME=ohdsi_admin_user>> user-mgmt.env
