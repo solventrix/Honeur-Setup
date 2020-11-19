@@ -16,7 +16,7 @@ if NOT "%HONEUR_SECURITY_METHOD%" == "none" if NOT "%HONEUR_SECURITY_METHOD%" ==
    goto :while-security-mode-not-correct
 )
 
-if "$HONEUR_SECURITY_METHOD" == "ldap" (
+if "%HONEUR_SECURITY_METHOD%" == "ldap" (
     set /p HONEUR_SECURITY_LDAP_URL="security.ldap.url [ldap://ldap.forumsys.com:389]: " || SET "HONEUR_SECURITY_LDAP_URL=ldap://ldap.forumsys.com:389"
     set /p HONEUR_SECURITY_LDAP_SYSTEM_USERNAME="security.ldap.system.username [cn=read-only-admin,dc=example,dc=com]: " || SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com"
     set /p HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD="security.ldap.system.password [password]: " || SET HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=password
