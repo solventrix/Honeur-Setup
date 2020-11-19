@@ -65,7 +65,7 @@ docker run ^
 honeur/zeppelin:%TAG% >nul 2>&1
 
 echo Connect zeppelin to honeur-net network
-docker network connect honeur-net user-mgmt >nul 2>&1
+docker network connect honeur-net zeppelin >nul 2>&1
 
 echo Clean up helper files
 DEL /Q zeppelin.env
