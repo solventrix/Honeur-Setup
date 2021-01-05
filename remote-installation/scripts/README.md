@@ -1,4 +1,20 @@
 # Installation Scripts
+Table of Contents
+=================
+
+  * [Important Note](#important-note)
+  * [Postgres installation instructions](#postgres-installation-instructions)
+    * [HONEUR](#honeur)
+    * [PHederation](#phederation)
+  * [Atlas/WebAPI installation instructions](#atlas/webapi-installation-instructions)
+  * [Zeppelin installation instructions](#zeppelin-installation-instructions)
+  * [User Management installation instructions](#user-management-installation-instructions)
+  * [Distributed Analytics installation instructions](#distributed-analytics-installation-instructions)
+  * [HONEUR Studio installation instructions](#honeur-studio-installation-instructions)
+  * [HONEUR Proxy](#honeur-proxy)
+
+## Important Note
+Components like [Atlas/WebAPI](#atlas/webapi-installation-instructions), [Zeppelin](#zeppelin-installation-instructions), [User Management](#user-management-installation-instructions) and [HONEUR Studio](#honeur-studio-installation-instructions) are only accessible through a web browser when installing the [HONEUR Proxy](#honeur-proxy). Please run the installation script of the [HONEUR Proxy](#honeur-proxy) after installing or updating one of the previous mentioned components.
 
 ## Postgres installation instructions
 Postgres database can be installed by running the installation script. :warning: Please install the postgres database for your disease area (e.g. HONEUR or PHederation).
@@ -88,6 +104,8 @@ Windows
 
 Once done, the script will download the Atlas/WebAPI docker image and will create the docker container.
 
+:warning: Please run the installation script of the [HONEUR Proxy](#honeur-proxy) after installing or updating Atlas/WebAPI. The proxy is necessary for accessing Atlas/WebAPI through the browser.
+
 ## Zeppelin installation instructions
 Zeppelin can be installed by running the installation script.
 
@@ -121,6 +139,8 @@ Windows
 
 Once done, the script will download the Zeppelin docker image and will create the docker container.
 
+:warning: Please run the installation script of the [HONEUR Proxy](#honeur-proxy) after installing or updating Zeppelin. The proxy is necessary for accessing Zeppelin through the browser.
+
 ## User Management installation instructions
 :warning: User Management should only be installed when other components are installed with the **_secure_** version. When other components are installed with the standard version, you can skip this installation.
 
@@ -153,6 +173,8 @@ Windows
 3. The script will prompt you to enter credentials for the administrator user that can manage users and roles.
 
 Once done, the script will download the User Management docker image and will create the docker container.
+
+:warning: Please run the installation script of the [HONEUR Proxy](#honeur-proxy) after installing or updating User Management. The proxy is necessary for accessing User Management through the browser.
 
 ## Distributed Analytics installation instructions
 :warning: Distributed Analytics requires you to install the [Zeppelin](#zeppelin-installation-instructions) component.
@@ -221,6 +243,8 @@ Windows
 6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server
 
 Once done, the script will download the HONEUR Studio docker image and will create the docker container.
+
+:warning: Please run the installation script of the [HONEUR Proxy](#honeur-proxy) after installing or updating HONEUR Studio. The proxy is necessary for accessing HONEUR Studio through the browser.
 
 ## HONEUR Proxy
 HONEUR Proxy can be downloaded right next to an existing installation. Please follow the installation steps:
