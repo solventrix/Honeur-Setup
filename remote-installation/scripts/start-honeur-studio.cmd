@@ -64,7 +64,7 @@ echo Create honeur-studio-net network if it does not exists
 docker network create --driver bridge honeur-studio-net >nul 2>&1
 
 echo Pull honeur/honeur-studio:%TAG% from docker hub. This could take a while if not present on machine
-docker pull honeur/honeur-studio:%TAG% >nul 2>&1
+docker pull honeur/honeur-studio:%TAG%
 
 echo Run honeur/honeur-studio:%TAG% container. This could take a while...
 docker run ^

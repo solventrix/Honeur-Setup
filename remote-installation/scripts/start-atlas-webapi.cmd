@@ -57,7 +57,7 @@ echo Create honeur-net network if it does not exists
 docker network create --driver bridge honeur-net >nul 2>&1
 
 echo Pull honeur/webapi-atlas:%TAG% from docker hub. This could take a while if not present on machine
-docker pull honeur/webapi-atlas:%TAG% >nul 2>&1
+docker pull honeur/webapi-atlas:%TAG%
 
 echo Run honeur/webapi-atlas:%TAG% container. This could take a while...
 docker run ^

@@ -45,7 +45,7 @@ echo Create honeur-net network if it does not exists
 docker network create --driver bridge honeur-net >nul 2>&1
 
 echo Pull honeur/nginx:%TAG% from docker hub. This could take a while if not present on machine
-docker pull honeur/nginx:%TAG% >nul 2>&1
+docker pull honeur/nginx:%TAG%
 
 echo Run honeur/nginx:%TAG% container. This could take a while...
 docker run ^

@@ -38,9 +38,9 @@ echo "Create honeur-distributed-analytics-net network if it does not exists"
 docker network create --driver bridge honeur-distributed-analytics-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/distributed-analytics:r-server-$VERSION from docker hub. This could take a while if not present on machine"
-docker pull honeur/distributed-analytics:r-server-$VERSION > /dev/null 2>&1
+docker pull honeur/distributed-analytics:r-server-$VERSION
 echo "Pull honeur/distributed-analytics:remote-$VERSION from docker hub. This could take a while if not present on machine"
-docker pull honeur/distributed-analytics:remote-$VERSION > /dev/null 2>&1
+docker pull honeur/distributed-analytics:remote-$VERSION
 
 echo "Run honeur/distributed-analytics:r-server-$VERSION container. This could take a while..."
 docker run \

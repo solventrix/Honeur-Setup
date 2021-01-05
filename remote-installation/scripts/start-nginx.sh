@@ -38,7 +38,7 @@ echo "Create honeur-net network if it does not exists"
 docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 
 echo "Pull honeur/nginx:$TAG from docker hub. This could take a while if not present on machine"
-docker pull honeur/nginx:$TAG > /dev/null 2>&1
+docker pull honeur/nginx:$TAG
 
 echo "Run honeur/nginx:$TAG container. This could take a while..."
 docker run \
