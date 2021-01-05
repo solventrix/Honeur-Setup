@@ -1,9 +1,197 @@
 # Installation Scripts
 
+## Postgres installation instructions
+Postgres database can be installed by running the installation script. :warning: Please install the postgres database for your disease area (e.g. HONEUR or PHederation).
+### HONEUR
+1. download the installation script **_start-postgres-honeur.sh_** for MacOS/Linux or **_start-postgres-honeur.cmd_** for Windows. You can download this script using the following command:
+
+MacOS/Linux
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-postgres-honeur.sh --output start-postgres-honeur.sh && chmod +x start-postgres-honeur.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-postgres-honeur.cmd --output start-postgres-honeur.cmd
+```
+
+2. You can run this script using the following command:
+
+MacOS/Linux
+```
+./start-postgres-honeur.sh
+```
+
+Windows
+```
+.\start-postgres-honeur.cmd
+```
+
+### PHederation
+
+1. download the installation script **_start-postgres-phederation.sh_** for MacOS/Linux or **_start-postgres-phederation.cmd_** for Windows. You can download this script using the following command:
+
+MacOS/Linux
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-postgres-phederation.sh --output start-postgres-phederation.sh && chmod +x start-postgres-phederation.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-postgres-phederation.cmd --output start-postgres-phederation.cmd
+```
+
+2. You can run this script using the following command:
+
+MacOS/Linux
+```
+./start-postgres-phederation.sh
+```
+
+Windows
+```
+.\start-postgres-phederation.cmd
+```
+
+## Atlas/WebAPI installation instructions
+The Postgres database installed in the previous step is required for Atlas/WebAPI to function.
+
+Atlas/WebAPI can be installed by running the installation script.
+
+1. download the installation script **_start-atlas-webapi.sh_** for MacOS/Linux or **_start-atlas-webapi.cmd_** for Windows. You can download this script using the following command:
+
+MacOS/Linux
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+```
+
+2. You can run this script using the following command:
+
+MacOS/Linux
+```
+./start-atlas-webapi.sh
+```
+
+Windows
+```
+.\start-atlas-webapi.cmd
+```
+
+3. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
+5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing HONEUR Components like Postgres/Zeppelin or HONEUR studio. Please use the same security settings as with these previous installation.
+6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server.
+
+Once done, the script will download the Atlas/WebAPI docker image and will create the docker container.
+
+## Zeppelin installation instructions
+Zeppelin can be installed by running the installation script.
+
+1. download the installation script **_start-zeppelin.sh_** for MacOS/Linux or **_start-zeppelin.cmd_** for Windows. You can download this script using the following command:
+
+MacOS/Linux
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+```
+
+2. You can run this script using the following command:
+
+MacOS/Linux
+```
+./start-zeppelin.sh
+```
+
+Windows
+```
+.\start-zeppelin.cmd
+```
+
+3. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
+4. The script will prompt you to enter the security options for Zeppelin. If you have existing HONEUR Components like Postgres/Atlas/WebAPI or HONEUR studio. Please use the same security settings as with these previous installation.
+6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server.
+
+Once done, the script will download the Zeppelin docker image and will create the docker container.
+
+## User Management installation instructions
+:warning: User Management should only be installed when other components are installed with the **_secure_** version. When other components are installed with the standard version, you can skip this installation.
+
+User Management can be installed by running the installation script.
+
+1. download the installation script **_start-user-management.sh_** for MacOS/Linux or **_start-user-management.cmd_** for Windows. You can download this script using the following command:
+
+MacOS/Linux
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-user-management.cmd --output start-user-management.cmd
+```
+
+2. You can run this script using the following command:
+
+MacOS/Linux
+```
+./start-user-management.sh
+```
+
+Windows
+```
+.\start-user-management.cmd
+```
+
+3. The script will prompt you to enter credentials for the administrator user that can manage users and roles.
+
+Once done, the script will download the User Management docker image and will create the docker container.
+
+## Distributed Analytics installation instructions
+:warning: Distributed Analytics requires you to install the [Zeppelin](#zeppelin-installation-instructions) component.
+
+Distributed Analytics can be installed by running the installation script.
+
+1. download the installation script **_start-distributed-analytics.sh_** for MacOS/Linux or **_start-distributed-analytics.cmd_** for Windows. You can download this script using the following command:
+
+MacOS/Linux
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/remote-installation/scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
+```
+
+2. You can run this script using the following command:
+
+MacOS/Linux
+```
+./start-distributed-analytics.sh
+```
+
+Windows
+```
+.\start-distributed-analytics.cmd
+```
+
+3. The script will prompt you to enter the directory where zeppelin will save its prepared distributed analytics data. Use the same directory as with the installation of Zeppelin.
+4. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the HONEUR Team.
+
+Once done, the script will download the Distributed Analytics docker images and will create the docker containers.
+
 ## HONEUR Studio installation instructions
 HONEUR Studio can be downloaded right next to an existing installation. Please follow the installation steps:
 
-1. download the installation script **_start-honeur-studio.sh_** for MacOS or **_start-honeur-studio.cmd_** for Windows. You can download this script using the following command:
+1. download the installation script **_start-honeur-studio.sh_** for MacOS/Linux or **_start-honeur-studio.cmd_** for Windows. You can download this script using the following command:
 
 MacOS/Linux
 ```
@@ -33,7 +221,6 @@ Windows
 6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server
 
 Once done, the script will download the HONEUR Studio docker image and will create the docker container.
-
 
 ## HONEUR Proxy
 HONEUR Proxy can be downloaded right next to an existing installation. Please follow the installation steps:
