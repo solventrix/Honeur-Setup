@@ -111,3 +111,15 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     } | ./start-user-management.sh
     rm -rf start-user-management.sh
 fi
+
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh
+chmod +x start-nginx.sh
+./start-nginx.sh
+rm -rf start-nginx.sh
+
+echo "postgresql is available on $HONEUR_HOST_MACHINE:5444"
+echo "Atlas/WebAPI is available on http://$HONEUR_HOST_MACHINE/atlas and http://$HONEUR_HOST_MACHINE/webapi respectively"
+echo "Zeppelin is available on http://$HONEUR_HOST_MACHINE/zeppelin"
+echo "Zeppelin logs are available in directory $HONEUR_ZEPPELIN_LOGS"
+echo "Zeppelin notebooks are available in directory $HONEUR_ZEPPELIN_NOTEBOOKS"
+[ ! "$HONEUR_SECURITY_METHOD" = "none" ] && echo "User Management is available on http://$HONEUR_HOST_MACHINE/user-mgmt"
