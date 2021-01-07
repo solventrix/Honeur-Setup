@@ -56,12 +56,12 @@ Essential remote installation can be installed by running the installation helpe
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/honeur/start-honeur.sh --output start-honeur.sh && chmod +x start-honeur.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur.sh --output start-honeur.sh && chmod +x start-honeur.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/honeur/start-honeur.cmd --output start-honeur.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur.cmd --output start-honeur.cmd
 ```
 
 2. You can run this script using the following command:
@@ -88,12 +88,12 @@ Once done, the script will download all essential docker images and will create 
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/phederation/start-phederation.sh --output start-phederation.sh && chmod +x start-phederation.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation.sh --output start-phederation.sh && chmod +x start-phederation.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/phederation/start-phederation.cmd --output start-phederation.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation.cmd --output start-phederation.cmd
 ```
 
 2. You can run this script using the following command:
@@ -133,12 +133,12 @@ Full remote installation can be installed by running the installation helper scr
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/honeur/start-honeur-full.sh --output start-honeur.sh && chmod +x start-honeur.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur-full.sh --output start-honeur.sh && chmod +x start-honeur.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/honeur/start-honeur-full.cmd --output start-honeur.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur-full.cmd --output start-honeur.cmd
 ```
 
 2. You can run this script using the following command:
@@ -167,12 +167,12 @@ Once done, the script will download all docker images and will create the docker
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/phederation/start-phederation-full.sh --output start-phederation.sh && chmod +x start-phederation.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation-full.sh --output start-phederation.sh && chmod +x start-phederation.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/phederation/start-phederation-full.cmd --output start-phederation.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation-full.cmd --output start-phederation.cmd
 ```
 
 2. You can run this script using the following command:
