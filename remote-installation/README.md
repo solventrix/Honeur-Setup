@@ -26,9 +26,9 @@ Installation instructions can be found [here](https://github.com/solventrix/Hone
 You can find the more information about the installation in pdf and docx format.
 
 ### HONEUR - Remote setup with Docker
-- [HONEUR Remote setup PDF](https://github.com/solventrix/HONEUR-Setup/releases/latest/download/HONEUR.local.installation.instructions.pdf)
-- [HONEUR Remote setup docx](https://github.com/solventrix/HONEUR-Setup/releases/latest/download/HONEUR.local.installation.instructions.docx)
+- [HONEUR Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/HONEUR%20local%20installation%20instructions.pdf)
+- [HONEUR Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/HONEUR%20local%20installation%20instructions.docx)
 
 ### PHEDERATION - Remote setup with Docker
-- [PHederation Remote setup PDF](https://github.com/solventrix/Honeur-Setup/releases/latest/download/PHEDERATION.local.installation.instructions.pdf)
-- [PHederation Remote setup docx](https://github.com/solventrix/Honeur-Setup/releases/latest/download/PHEDERATION.local.installation.instructions.docx)
+- [PHederation Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/PHederation%20local%20installation%20instructions.pdf)
+- [PHederation Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/PHederation%20local%20installation%20instructions.docx)
