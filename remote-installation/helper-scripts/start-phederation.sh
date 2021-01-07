@@ -45,12 +45,12 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     HONEUR_USERMGMT_ADMIN_PASSWORD=${HONEUR_USERMGMT_ADMIN_PASSWORD:-admin}
 fi
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/start-postgres-honeur.sh --output start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-honeur.sh --output start-postgres.sh
 chmod +x start-postgres.sh
 ./start-postgres.sh
 rm -rf start-postgres.sh
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/start-atlas-webapi.sh --output start-atlas-webapi.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh
 chmod +x start-atlas-webapi.sh
 {
   echo "$HONEUR_HOST_MACHINE";
@@ -63,7 +63,7 @@ chmod +x start-atlas-webapi.sh
 } | ./start-atlas-webapi.sh
 rm -rf start-atlas-webapi.sh
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/start-zeppelin.sh --output start-zeppelin.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh
 chmod +x start-zeppelin.sh
 {
   echo "$HONEUR_ZEPPELIN_LOGS";
@@ -79,7 +79,7 @@ chmod +x start-zeppelin.sh
 rm -rf start-zeppelin.sh
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
-    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/start-user-management.sh --output user-management.sh
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output user-management.sh
     chmod +x start-user-management.sh
     {
         echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
