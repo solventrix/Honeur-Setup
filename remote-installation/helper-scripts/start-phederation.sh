@@ -79,7 +79,7 @@ chmod +x start-zeppelin.sh
 rm -rf start-zeppelin.sh
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
-    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output user-management.sh
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
     chmod +x start-user-management.sh
     {
         echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
