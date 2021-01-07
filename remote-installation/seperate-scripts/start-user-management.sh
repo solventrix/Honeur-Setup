@@ -4,9 +4,9 @@ set -e
 VERSION=2.0.0
 TAG=$VERSION
 
-read -p "usermgmt admin username [admin]: " HONEUR_USERMGMT_ADMIN_USERNAME
+read -p "User Management administrator username [admin]: " HONEUR_USERMGMT_ADMIN_USERNAME
 HONEUR_USERMGMT_ADMIN_USERNAME=${HONEUR_USERMGMT_ADMIN_USERNAME:-admin}
-read -p "usermgmt admin password [admin]: " HONEUR_USERMGMT_ADMIN_PASSWORD
+read -p "User Management administrator password [admin]: " HONEUR_USERMGMT_ADMIN_PASSWORD
 HONEUR_USERMGMT_ADMIN_PASSWORD=${HONEUR_USERMGMT_ADMIN_PASSWORD:-admin}
 
 touch user-mgmt.env

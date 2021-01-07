@@ -1,7 +1,12 @@
-# Installation Scripts
+# Seperate scripts
+
 Table of Contents
 =================
-
+  * [Requirements](#requirements)
+    * [Hardware](#hardware)
+    * [Operating system](#operating-system)
+    * [Docker](#docker)
+    * [Docker images for HONEUR](#docker-images-for-honeur)
   * [Important Note](#important-note)
   * [Postgres installation instructions](#postgres-installation-instructions)
     * [HONEUR](#honeur)
@@ -12,6 +17,28 @@ Table of Contents
   * [Distributed Analytics installation instructions](#distributed-analytics-installation-instructions)
   * [HONEUR Studio installation instructions](#honeur-studio-installation-instructions)
   * [HONEUR Proxy](#honeur-proxy)
+
+## Requirements
+
+### Hardware
+Modern 64 bit AMD dual core processor (or better)
+8 GB RAM, 16 GB RAM recommended
+100 GB free disk space (or more)
+
+### Operating system
+Windows 10, MacOS or Linux (Ubuntu, CentOS, Debian, …)
+
+### Docker
+Windows: https://docs.docker.com/docker-for-windows/install/
+MacOS: https://docs.docker.com/docker-for-mac/install/
+Linux: https://docs.docker.com/install/linux/docker-ce/ubuntu/
+Assign 2 or more CPU’s, 8 GB of RAM and 100 GB of disk space to Docker in Docker Desktop.
+On Linux Docker compose (v1.24 or higher) should be installed separately.
+
+### Docker images for HONEUR
+A Docker Hub account with read access on the HONEUR Docker image repository (https://hub.docker.com/u/honeur) is required.
+
+Please create a Docker hub account or use an existing account and request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
 ## Important Note
 Components like [Atlas/WebAPI](#atlas/webapi-installation-instructions), [Zeppelin](#zeppelin-installation-instructions), [User Management](#user-management-installation-instructions) and [HONEUR Studio](#honeur-studio-installation-instructions) are only accessible through a web browser when installing the [HONEUR Proxy](#honeur-proxy). Please run the installation script of the [HONEUR Proxy](#honeur-proxy) after installing or updating one of the previous mentioned components.
