@@ -4,17 +4,7 @@ Table of Contents
 =================
   * [Installation Methods](#installation-methods)
   * [Helper scripts](#helper-scripts)
-  * [Installation Scripts](#installation-scripts)
-    * [Important Note](#important-note)
-    * [Postgres installation instructions](#postgres-installation-instructions)
-      * [HONEUR](#honeur)
-      * [PHederation](#phederation)
-    * [Atlas/WebAPI installation instructions](#atlas/webapi-installation-instructions)
-    * [Zeppelin installation instructions](#zeppelin-installation-instructions)
-    * [User Management installation instructions](#user-management-installation-instructions)
-    * [Distributed Analytics installation instructions](#distributed-analytics-installation-instructions)
-    * [HONEUR Studio installation instructions](#honeur-studio-installation-instructions)
-    * [HONEUR Proxy](#honeur-proxy)
+  * [Separate Scripts](#separate-scripts)
   * [More info](#more-info)
 ## Installation Methods
 Remote installation can be installed using the following methods:
@@ -26,8 +16,8 @@ Helper scripts combines the installation of HONEUR Components. You can choose to
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/helper-scripts)
 
-## Seperate Scripts
-Seperate installation scripts are created for each HONEUR Component.
+## Separate Scripts
+Separate installation scripts are created for each HONEUR Component.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/seperate-scripts)
 
