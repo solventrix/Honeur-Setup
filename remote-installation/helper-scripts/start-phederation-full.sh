@@ -49,7 +49,7 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     HONEUR_USERMGMT_ADMIN_PASSWORD=${HONEUR_USERMGMT_ADMIN_PASSWORD:-admin}
 fi
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-honeur.sh --output start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-phederation.sh --output start-postgres.sh
 chmod +x start-postgres.sh
 ./start-postgres.sh
 rm -rf start-postgres.sh
