@@ -29,7 +29,7 @@ if [ "$HONEUR_SECURITY_METHOD" = "ldap" ]; then
     read -p "security.ldap.baseDn [dc=example,dc=com]: " HONEUR_SECURITY_LDAP_BASE_DN
     HONEUR_SECURITY_LDAP_BASE_DN=${HONEUR_SECURITY_LDAP_BASE_DN:-dc=example,dc=com}
     read -p "security.ldap.dn [uid={0},dc=example,dc=com]: " HONEUR_SECURITY_LDAP_DN
-    HONEUR_SECURITY_LDAP_DN=${honeur_security_ldap_dn:-uid=\{0\},dc=example,dc=com}
+    HONEUR_SECURITY_LDAP_DN=${HONEUR_SECURITY_LDAP_DN:-uid=\{0\},dc=example,dc=com}
 fi
 
 touch zeppelin.env
