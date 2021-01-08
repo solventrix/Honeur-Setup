@@ -3,6 +3,13 @@ set -eu
 
 CURRENT_DIRECTORY=$(pwd)
 
+echo "Docker login, Make sure to use an account with access to the honeur docker hub images."
+docker login
+if [ ! $? -eq 0 ]
+    echo "Docker login failed."
+    exit 1
+fi
+
 read -p "Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
 while [[ "$HONEUR_SECURITY_METHOD" != "none" && "$HONEUR_SECURITY_METHOD" != "ldap" && "$HONEUR_SECURITY_METHOD" != "jdbc" && "$HONEUR_SECURITY_METHOD" != "" ]]; do
     echo "enter \"none\", \"jdbc\", \"ldap\" or empty for default \"none\" value"
