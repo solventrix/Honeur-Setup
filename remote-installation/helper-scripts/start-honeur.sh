@@ -5,7 +5,7 @@ CURRENT_DIRECTORY=$(pwd)
 
 echo "Docker login, Make sure to use an account with access to the honeur docker hub images."
 docker login
-if [ ! $? -eq 0 ]
+if [ ! $? -eq 0 ]; then
     echo "Docker login failed."
     exit 1
 fi
