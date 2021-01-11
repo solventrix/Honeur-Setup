@@ -2,8 +2,38 @@
 
 SET VERSION=2.0.0
 SET TAG=0.8.2-%VERSION%
-SET CURRENT_DIRECTORY=%CD%
 
+set argumentCount=0
+for %%x in (%*) do (
+    set /A argumentCount+=1
+    set "argVec[!argumentCount!]=%%~x"
+)
+
+if "%~1" NEQ "" (
+    if "%argumentCount%" LSS "4" (
+        echo Give all arguments or none to use the interactive script.
+        EXIT 1
+    )
+    SET /A HONEUR_ZEPPELIN_LOGS="%~1"
+    SET /A HONEUR_ZEPPELIN_NOTEBOOKS="%~2"
+    SET /A HONEUR_ANALYTICS_SHARED_FOLDER="%~3"
+    SET /A HONEUR_SECURITY_METHOD="%~4"
+    if "%~4" EQU "ldap" (
+        if "%argumentCount%" LSS "9" (
+            echo When LDAP is chosen as security option, please provide ldap properties.
+            EXIT 1
+        ) else (
+            SET /A HONEUR_SECURITY_LDAP_URL="%~5"
+            SET /A HONEUR_SECURITY_LDAP_SYSTEM_USERNAME="%~6"
+            SET /A HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD="%~7"
+            SET /A HONEUR_SECURITY_LDAP_BASE_DN="%~8"
+            SET /A HONEUR_SECURITY_LDAP_DN="%~9"
+        )
+    )
+    goto installation
+)
+
+SET CURRENT_DIRECTORY=%CD%
 SET /p HONEUR_ZEPPELIN_LOGS="Enter the directory where the zeppelin logs will kept on the host machine [%CURRENT_DIRECTORY%\zeppelin\logs]: " || SET HONEUR_ZEPPELIN_LOGS=%CURRENT_DIRECTORY%\zeppelin\logs
 SET /p HONEUR_ZEPPELIN_NOTEBOOKS="Enter the directory where the zeppelin notebooks will kept on the host machine [%CURRENT_DIRECTORY%\zeppelin\notebook]: " || SET HONEUR_ZEPPELIN_NOTEBOOKS=%CURRENT_DIRECTORY%\zeppelin\notebook
 SET /p HONEUR_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin will save the prepared distributed analytics data [%CURRENT_DIRECTORY%\distributed-analytics]: " || SET HONEUR_ANALYTICS_SHARED_FOLDER=%CURRENT_DIRECTORY%\distributed-analytics
@@ -24,6 +54,7 @@ if "%HONEUR_SECURITY_METHOD%" == "ldap" (
     set /p HONEUR_SECURITY_LDAP_DN="security.ldap.dn [uid={0},dc=example,dc=com]: " || SET "HONEUR_SECURITY_LDAP_DN=uid={0},dc=example,dc=com"
 )
 
+:installation
 echo. 2>zeppelin.env
 
 echo ZEPPELIN_NOTEBOOK_DIR=/notebook> zeppelin.env

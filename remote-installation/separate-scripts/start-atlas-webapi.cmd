@@ -3,6 +3,39 @@
 SET VERSION=2.0.0
 SET TAG=2.7.1-%VERSION%
 
+set argumentCount=0
+for %%x in (%*) do (
+    set /A argumentCount+=1
+    set "argVec[!argumentCount!]=%%~x"
+)
+
+if "%~1" NEQ "" (
+    if "%argumentCount%" LSS "2" (
+        echo Give all arguments or none to use the interactive script.
+        EXIT 1
+    )
+    SET /A HONEUR_HOST_MACHINE="%~1"
+    SET /A HONEUR_SECURITY_METHOD="%~2"
+    SET "HONEUR_SECURITY_LDAP_URL=ldap://localhost:389"
+    SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=username"
+    SET "HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=password"
+    SET "HONEUR_SECURITY_LDAP_BASE_DN=dc=example,dc=org"
+    SET "HONEUR_SECURITY_LDAP_DN=cn={0},dc=example,dc=org"
+    if "%~2" EQU "ldap" (
+        if "%argumentCount%" LSS "7" (
+            echo When LDAP is chosen as security option, please provide ldap properties.
+            EXIT 1
+        ) else (
+            SET /A HONEUR_SECURITY_LDAP_URL="%~3"
+            SET /A HONEUR_SECURITY_LDAP_SYSTEM_USERNAME="%~4"
+            SET /A HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD="%~5"
+            SET /A HONEUR_SECURITY_LDAP_BASE_DN="%~6"
+            SET /A HONEUR_SECURITY_LDAP_DN="%~7"
+        )
+    )
+    goto installation
+)
+
 SET /p HONEUR_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET HONEUR_HOST_MACHINE=localhost
 
 SET /p HONEUR_SECURITY_METHOD="Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " || SET HONEUR_SECURITY_METHOD=none
@@ -27,6 +60,7 @@ if "%HONEUR_SECURITY_METHOD%" == "jdbc" (
     SET "HONEUR_SECURITY_LDAP_DN=cn={0},dc=example,dc=org"
 )
 
+:installation
 echo. 2>atlas-webapi.env
 
 echo OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI> atlas-webapi.env

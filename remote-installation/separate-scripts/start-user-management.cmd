@@ -3,9 +3,26 @@
 SET VERSION=2.0.0
 SET TAG=%VERSION%
 
+set argumentCount=0
+for %%x in (%*) do (
+    set /A argumentCount+=1
+    set "argVec[!argumentCount!]=%%~x"
+)
+
+if "%~1" NEQ "" (
+    if "%argumentCount%" LSS "2" (
+        echo Give all arguments or none to use the interactive script.
+        EXIT 1
+    )
+    SET /A HONEUR_USERMGMT_ADMIN_USERNAME="%~1"
+    SET /A HONEUR_USERMGMT_ADMIN_PASSWORD="%~2"
+    goto installation
+)
+
 SET /p HONEUR_USERMGMT_ADMIN_USERNAME="usermgmt admin username [admin]: " || SET HONEUR_USERMGMT_ADMIN_USERNAME=admin
 SET /p HONEUR_USERMGMT_ADMIN_PASSWORD="usermgmt admin password [admin]: " || SET HONEUR_USERMGMT_ADMIN_PASSWORD=admin
 
+:installation
 echo. 2>user-mgmt.env
 
 echo HONEUR_USERMGMT_USERNAME=%HONEUR_USERMGMT_ADMIN_USERNAME%> user-mgmt.env

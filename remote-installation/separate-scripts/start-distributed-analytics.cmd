@@ -3,10 +3,28 @@
 SET VERSION=2.0.0
 SET CURRENT_DIRECTORY=%CD%
 
+set argumentCount=0
+for %%x in (%*) do (
+    set /A argumentCount+=1
+    set "argVec[!argumentCount!]=%%~x"
+)
+
+if "%~1" NEQ "" (
+    if "%argumentCount%" LSS "2" (
+        echo Give all arguments or none to use the interactive script.
+        EXIT 1
+    ) else (
+        SET /A HONEUR_ANALYTICS_SHARED_FOLDER="%~1"
+        SET /A HONEUR_ANALYTICS_ORGANIZATION="%~2"
+    )
+    goto installation
+)
+
 SET /p HONEUR_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin will save the prepared distributed analytics data [%CURRENT_DIRECTORY%\distributed-analytics]: " || SET HONEUR_ANALYTICS_SHARED_FOLDER=%CURRENT_DIRECTORY%\distributed-analytics
 
 SET /p HONEUR_ANALYTICS_ORGANIZATION="Enter your HONEUR organization [Janssen]: " || SET HONEUR_ANALYTICS_ORGANIZATION=Janssen
 
+:installation
 echo. 2>distributed-analytics.env
 
 echo DISTRIBUTED_SERVICE_CLIENT_SCHEME=https> distributed-analytics.env

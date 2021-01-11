@@ -2,8 +2,38 @@
 
 SET VERSION=2.0.0
 SET TAG=%VERSION%
-SET CURRENT_DIRECTORY=%CD%
 
+set argumentCount=0
+for %%x in (%*) do (
+    set /A argumentCount+=1
+    set "argVec[!argumentCount!]=%%~x"
+)
+
+if "%~1" NEQ "" (
+    if "%argumentCount%" LSS "3" (
+        echo Give all arguments or none to use the interactive script.
+        EXIT 1
+    )
+    SET /A HONEUR_HOST_MACHINE="%~1"
+    SET /A HONEUR_HONEUR_STUDIO_FOLDER="%~2"
+    SET /A HONEUR_SECURITY_METHOD="%~3"
+    SET USERID=1000
+    if "%~3" EQU "ldap" (
+        if "%argumentCount%" LSS "8" (
+            echo When LDAP is chosen as security option, please provide ldap properties.
+            EXIT 1
+        ) else (
+            SET /A HONEUR_SECURITY_LDAP_URL="%~4"
+            SET /A HONEUR_SECURITY_LDAP_SYSTEM_USERNAME="%~5"
+            SET /A HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD="%~6"
+            SET /A HONEUR_SECURITY_LDAP_BASE_DN="%~7"
+            SET /A HONEUR_SECURITY_LDAP_DN="%~8"
+        )
+    )
+    goto installation
+)
+
+SET CURRENT_DIRECTORY=%CD%
 SET /p HONEUR_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET HONEUR_HOST_MACHINE=localhost
 
 SET /p HONEUR_HONEUR_STUDIO_FOLDER="Enter the directory where HONEUR Studio will store its data [%CURRENT_DIRECTORY%\honeurstudio]: " || SET HONEUR_HONEUR_STUDIO_FOLDER=%CURRENT_DIRECTORY%\honeurstudio
@@ -25,6 +55,7 @@ if "%HONEUR_SECURITY_METHOD%" == "ldap" (
 
 SET USERID=1000
 
+:installation
 echo. 2>honeur-studio.env
 
 echo TAG=%TAG%> honeur-studio.env
