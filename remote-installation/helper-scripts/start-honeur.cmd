@@ -52,7 +52,7 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remo
 CALL .\start-zeppelin.cmd "%HONEUR_ZEPPELIN_LOGS%" "%HONEUR_ZEPPELIN_NOTEBOOKS%" "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-zeppelin.cmd
 
-if "%HONEUR_SECURITY_METHOD%" EQU "none" (
+if "%HONEUR_SECURITY_METHOD%" NEQ "none" (
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
     CALL .\start-user-management.cmd "%HONEUR_USERMGMT_ADMIN_USERNAME%" "%HONEUR_USERMGMT_ADMIN_PASSWORD%"
     DEL start-user-management.cmd
@@ -67,4 +67,4 @@ echo Atlas/WebAPI is available on http://%HONEUR_HOST_MACHINE%/atlas and http://
 echo Zeppelin is available on http://%HONEUR_HOST_MACHINE%/zeppelin
 echo Zeppelin logs are available in directory %HONEUR_ZEPPELIN_LOGS%
 echo Zeppelin notebooks are available in directory %HONEUR_ZEPPELIN_NOTEBOOKS%
-IF "%HONEUR_SECURITY_METHOD%" EQU "none" echo User Management is available on http://%HONEUR_HOST_MACHINE%/user-mgmt
+IF "%HONEUR_SECURITY_METHOD%" NEQ "none" echo User Management is available on http://%HONEUR_HOST_MACHINE%/user-mgmt
