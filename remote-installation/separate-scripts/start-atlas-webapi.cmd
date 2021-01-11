@@ -14,8 +14,8 @@ if "%~1" NEQ "" (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
-    SET /A HONEUR_HOST_MACHINE="%~1"
-    SET /A HONEUR_SECURITY_METHOD="%~2"
+    SET "HONEUR_HOST_MACHINE=%~1"
+    SET "HONEUR_SECURITY_METHOD=%~2"
     SET "HONEUR_SECURITY_LDAP_URL=ldap://localhost:389"
     SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=username"
     SET "HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=password"
@@ -26,11 +26,11 @@ if "%~1" NEQ "" (
             echo When LDAP is chosen as security option, please provide ldap properties.
             EXIT 1
         ) else (
-            SET /A HONEUR_SECURITY_LDAP_URL="%~3"
-            SET /A HONEUR_SECURITY_LDAP_SYSTEM_USERNAME="%~4"
-            SET /A HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD="%~5"
-            SET /A HONEUR_SECURITY_LDAP_BASE_DN="%~6"
-            SET /A HONEUR_SECURITY_LDAP_DN="%~7"
+            SET "HONEUR_SECURITY_LDAP_URL=%~3"
+            SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=%~4"
+            SET "HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=%~5"
+            SET "HONEUR_SECURITY_LDAP_BASE_DN=%~6"
+            SET "HONEUR_SECURITY_LDAP_DN=%~7"
         )
     )
     goto installation

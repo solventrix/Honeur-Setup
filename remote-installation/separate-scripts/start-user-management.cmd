@@ -14,8 +14,8 @@ if "%~1" NEQ "" (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
-    SET /A HONEUR_USERMGMT_ADMIN_USERNAME="%~1"
-    SET /A HONEUR_USERMGMT_ADMIN_PASSWORD="%~2"
+    SET "HONEUR_USERMGMT_ADMIN_USERNAME=%~1"
+    SET "HONEUR_USERMGMT_ADMIN_PASSWORD=%~2"
     goto installation
 )
 

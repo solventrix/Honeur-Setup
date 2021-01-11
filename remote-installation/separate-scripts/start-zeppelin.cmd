@@ -14,20 +14,20 @@ if "%~1" NEQ "" (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
-    SET /A HONEUR_ZEPPELIN_LOGS="%~1"
-    SET /A HONEUR_ZEPPELIN_NOTEBOOKS="%~2"
-    SET /A HONEUR_ANALYTICS_SHARED_FOLDER="%~3"
-    SET /A HONEUR_SECURITY_METHOD="%~4"
+    SET "HONEUR_ZEPPELIN_LOGS=%~1"
+    SET "HONEUR_ZEPPELIN_NOTEBOOKS=%~2"
+    SET "HONEUR_ANALYTICS_SHARED_FOLDER=%~3"
+    SET "HONEUR_SECURITY_METHOD=%~4"
     if "%~4" EQU "ldap" (
         if "%argumentCount%" LSS "9" (
             echo When LDAP is chosen as security option, please provide ldap properties.
             EXIT 1
         ) else (
-            SET /A HONEUR_SECURITY_LDAP_URL="%~5"
-            SET /A HONEUR_SECURITY_LDAP_SYSTEM_USERNAME="%~6"
-            SET /A HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD="%~7"
-            SET /A HONEUR_SECURITY_LDAP_BASE_DN="%~8"
-            SET /A HONEUR_SECURITY_LDAP_DN="%~9"
+            SET "HONEUR_SECURITY_LDAP_URL=%~5"
+            SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=%~6"
+            SET "HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=%~7"
+            SET "HONEUR_SECURITY_LDAP_BASE_DN=%~8"
+            SET "HONEUR_SECURITY_LDAP_DN=%~9"
         )
     )
     goto installation

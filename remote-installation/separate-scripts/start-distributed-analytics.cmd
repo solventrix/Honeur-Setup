@@ -14,8 +14,8 @@ if "%~1" NEQ "" (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     ) else (
-        SET /A HONEUR_ANALYTICS_SHARED_FOLDER="%~1"
-        SET /A HONEUR_ANALYTICS_ORGANIZATION="%~2"
+        SET "HONEUR_ANALYTICS_SHARED_FOLDER=%~1"
+        SET "HONEUR_ANALYTICS_ORGANIZATION=%~2"
     )
     goto installation
 )
