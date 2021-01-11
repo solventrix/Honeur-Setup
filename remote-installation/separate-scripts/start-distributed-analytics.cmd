@@ -64,6 +64,13 @@ docker run ^
 --restart always ^
 --security-opt no-new-privileges ^
 -v "%HONEUR_ANALYTICS_SHARED_FOLDER%:/usr/local/src/datafiles" ^
+-m "1g" ^
+--cpus "1" ^
+--read-only ^
+--pids-limit 100 ^
+--cpu-shares 1024 ^
+--tmpfs /tmp ^
+--ulimit nofile=1024:1024 ^
 -d ^
 honeur/distributed-analytics:r-server-%VERSION% >nul 2>&1
 
@@ -78,6 +85,13 @@ docker run ^
 --restart always ^
 --security-opt no-new-privileges ^
 --env-file distributed-analytics.env ^
+-m "1g" ^
+--cpus "1" ^
+--read-only ^
+--pids-limit 100 ^
+--cpu-shares 1024 ^
+--tmpfs /tmp ^
+--ulimit nofile=1024:1024 ^
 -d ^
 honeur/distributed-analytics:remote-%VERSION% >nul 2>&1
 

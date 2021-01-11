@@ -24,10 +24,18 @@ echo Run honeur/postgres:%TAG% container. This could take a while...
 docker run ^
 --name "postgres" ^
 -p "5444:5432" ^
---restart always ^
+--restart on-failure:5 ^
 --security-opt no-new-privileges ^
 -v "pgdata:/var/lib/postgresql/data" ^
 -v "shared:/var/lib/postgresql/envfileshared" ^
+-m "200m" ^
+--cpus ".5" ^
+--read-only ^
+--pids-limit 100 ^
+--cpu-shares 1024 ^
+--tmpfs /run/postgresql ^
+--tmpfs /tmp ^
+--ulimit nofile=1024:1024 ^
 -d ^
 honeur/postgres:%TAG% >nul 2>&1
 
