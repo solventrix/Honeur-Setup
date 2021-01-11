@@ -10,7 +10,7 @@ if [ ! $? -eq 0 ]; then
     exit 1
 fi
 
-read -p "Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
+read -p "Use JDBC users or LDAP or No authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
 while [[ "$HONEUR_SECURITY_METHOD" != "none" && "$HONEUR_SECURITY_METHOD" != "ldap" && "$HONEUR_SECURITY_METHOD" != "jdbc" && "$HONEUR_SECURITY_METHOD" != "" ]]; do
     echo "enter \"none\", \"jdbc\", \"ldap\" or empty for default \"none\" value"
     read -p "Use JDBC users, LDAP or No authentication? Enter none/jdbc/ldap. [none]: " HONEUR_SECURITY_METHOD
@@ -95,6 +95,7 @@ chmod +x start-distributed-analytics.sh
   echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
   echo "$HONEUR_ANALYTICS_ORGANIZATION"
 } | ./start-distributed-analytics.sh
+rm -rf start-distributed-analytics.sh
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-honeur-studio.sh --output start-honeur-studio.sh
 chmod +x start-honeur-studio.sh
@@ -108,6 +109,7 @@ chmod +x start-honeur-studio.sh
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_BASE_DN";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_DN"
 } | ./start-honeur-studio.sh
+rm -rf start-honeur-studio.sh
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
