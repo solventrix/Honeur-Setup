@@ -49,12 +49,12 @@ CALL .\start-atlas-webapi.cmd "%HONEUR_HOST_MACHINE%" "%HONEUR_SECURITY_METHOD%"
 DEL start-atlas-webapi.cmd
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
-CALL .\start-zeppelin.cmd %HONEUR_ZEPPELIN_LOGS% %HONEUR_ZEPPELIN_NOTEBOOKS% %HONEUR_ANALYTICS_SHARED_FOLDER% %HONEUR_SECURITY_METHOD% %HONEUR_SECURITY_LDAP_URL% %HONEUR_SECURITY_LDAP_SYSTEM_USERNAME% %HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD% %HONEUR_SECURITY_LDAP_BASE_DN% %HONEUR_SECURITY_LDAP_DN%
+CALL .\start-zeppelin.cmd "%HONEUR_ZEPPELIN_LOGS%" "%HONEUR_ZEPPELIN_NOTEBOOKS%" "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-zeppelin.cmd
 
 if "%HONEUR_SECURITY_METHOD%" EQU "none" (
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
-    CALL .\start-user-management.cmd %HONEUR_USERMGMT_ADMIN_USERNAME% %HONEUR_USERMGMT_ADMIN_PASSWORD%
+    CALL .\start-user-management.cmd "%HONEUR_USERMGMT_ADMIN_USERNAME%" "%HONEUR_USERMGMT_ADMIN_PASSWORD%"
     DEL start-user-management.cmd
 )
 
