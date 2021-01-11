@@ -44,7 +44,6 @@ CALL .\start-postgres.cmd
 DEL start-postgres.cmd
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
-timeout /t 30
 CALL .\start-atlas-webapi.cmd "%HONEUR_HOST_MACHINE%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-atlas-webapi.cmd
 
