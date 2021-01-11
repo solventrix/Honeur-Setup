@@ -71,10 +71,8 @@ docker run \
 --env-file distributed-analytics.env \
 -m "1g" \
 --cpus "1" \
---read-only \
 --pids-limit 100 \
 --cpu-shares 1024 \
---tmpfs /tmp \
 --ulimit nofile=1024:1024 \
 -d \
 honeur/distributed-analytics:remote-$VERSION > /dev/null 2>&1

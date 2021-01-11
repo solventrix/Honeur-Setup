@@ -50,10 +50,8 @@ docker run ^
 -v "shared:/var/lib/shared:ro" ^
 -m "400m" ^
 --cpus ".5" ^
---read-only ^
 --pids-limit 100 ^
 --cpu-shares 1024 ^
---tmpfs /tmp ^
 --ulimit nofile=1024:1024 ^
 -d ^
 honeur/user-mgmt:%TAG% >nul 2>&1
