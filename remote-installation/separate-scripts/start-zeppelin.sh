@@ -72,10 +72,8 @@ docker run \
 -v $HONEUR_ZEPPELIN_NOTEBOOKS:/notebook \
 -m "1.5g" \
 --cpus "1" \
---read-only \
 --pids-limit 100 \
 --cpu-shares 1024 \
---tmpfs /tmp \
 --ulimit nofile=1024:1024 \
 -d \
 honeur/zeppelin:$TAG > /dev/null 2>&1
