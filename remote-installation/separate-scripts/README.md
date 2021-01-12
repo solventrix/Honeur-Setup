@@ -127,7 +127,7 @@ Windows
 
 3. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing HONEUR Components like Postgres/Zeppelin or HONEUR studio. Please use the same security settings as with these previous installation.
-6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server.
+6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 
 Once done, the script will download the Atlas/WebAPI docker image and will create the docker container.
 
@@ -162,7 +162,7 @@ Windows
 
 3. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 4. The script will prompt you to enter the security options for Zeppelin. If you have existing HONEUR Components like Postgres/Atlas/WebAPI or HONEUR studio. Please use the same security settings as with these previous installation.
-6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server.
+6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 
 Once done, the script will download the Zeppelin docker image and will create the docker container.
 
@@ -267,7 +267,7 @@ Windows
 3. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. HONEUR Studio will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 4. The script will prompt you to enter the directory of where the HONEUR Studio will store its working directory files.
 5. The script will prompt you to enter the security options for HONEUR Studio. If you have existing HONEUR Components like postgres/webapi and zeppelin. Please use the same security settings as with this previous installation.
-6. (OPTIONAL) when **_ldap_** is chosen for the installation security, additional connections details will be asked to connect to the existing LDAP Server
+6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server
 
 Once done, the script will download the HONEUR Studio docker image and will create the docker container.
 
@@ -300,4 +300,4 @@ Windows
 .\start-nginx.cmd
 ```
 
-Once done, the script will download the HONEUR Studio docker image and will create the docker container.
+Once done, the script will download the HONEUR Proxy docker image and will create the docker container.
