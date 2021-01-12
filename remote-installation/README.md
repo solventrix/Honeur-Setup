@@ -9,7 +9,7 @@ Table of Contents
 ## Installation Methods
 Remote installation can be installed using the following methods:
 1. [Helper scripts](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/helper-scripts) (recommended)
-2. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/seperate-scripts).
+2. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/separate-scripts).
 
 ## Helper scripts
 Helper scripts combines the installation of HONEUR Components. You can choose to fully install all components or only install the essential components.
@@ -19,7 +19,7 @@ Installation instructions can be found [here](https://github.com/solventrix/Hone
 ## Separate Scripts
 Separate installation scripts are created for each HONEUR Component.
 
-Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/seperate-scripts)
+Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/separate-scripts)
 
 ## More info
 

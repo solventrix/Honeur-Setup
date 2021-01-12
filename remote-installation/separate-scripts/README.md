@@ -1,4 +1,4 @@
-# Seperate scripts
+# Separate scripts
 
 Table of Contents
 =================
