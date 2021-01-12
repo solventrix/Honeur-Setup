@@ -100,7 +100,7 @@ docker pull honeur/honeur-studio:%TAG%
 echo Run honeur/honeur-studio:%TAG% container. This could take a while...
 docker run ^
 --name "honeur-studio-chronicle" ^
---restart always ^
+--restart on-failure:5 ^
 --env-file honeur-studio-chronicle.env ^
 --hostname "cronicle" ^
 -v "%HONEUR_HONEUR_STUDIO_FOLDER%:/home/honeurstudio/__HONEURStudio__:z" ^
@@ -121,7 +121,7 @@ docker network connect honeur-studio-net honeur-studio-chronicle >nul 2>&1
 echo Run honeur/honeur-studio:%TAG% container. This could take a while...
 docker run ^
 --name "honeur-studio" ^
---restart always ^
+--restart on-failure:5 ^
 --env-file honeur-studio.env ^
 -v "shared:/var/lib/shared:ro" ^
 -v "/var/run/docker.sock:/var/run/docker.sock" ^

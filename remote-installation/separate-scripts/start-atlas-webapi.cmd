@@ -96,7 +96,7 @@ docker pull honeur/webapi-atlas:%TAG%
 echo Run honeur/webapi-atlas:%TAG% container. This could take a while...
 docker run ^
 --name "webapi" ^
---restart always ^
+--restart on-failure:5 ^
 --security-opt no-new-privileges ^
 --env-file atlas-webapi.env ^
 -v "shared:/var/lib/shared:ro" ^

@@ -63,7 +63,7 @@ docker pull honeur/zeppelin:$TAG
 echo "Run honeur/zeppelin:$TAG container. This could take a while..."
 docker run \
 --name "zeppelin" \
---restart always \
+--restart on-failure:5 \
 --security-opt no-new-privileges \
 --env-file zeppelin.env \
 -v "shared:/var/lib/shared:ro" \

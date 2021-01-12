@@ -51,7 +51,7 @@ echo Run honeur/nginx:%TAG% container. This could take a while...
 docker run ^
 --name "nginx" ^
 -p "80:80" ^
---restart always ^
+--restart on-failure:5 ^
 --security-opt no-new-privileges ^
 --env-file nginx.env ^
 --network honeur-net ^

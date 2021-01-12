@@ -44,7 +44,7 @@ docker pull honeur/user-mgmt:%TAG%
 echo Run honeur/user-mgmt:%TAG% container. This could take a while...
 docker run ^
 --name "user-mgmt" ^
---restart always ^
+--restart on-failure:5 ^
 --security-opt no-new-privileges ^
 --env-file user-mgmt.env ^
 -v "shared:/var/lib/shared:ro" ^

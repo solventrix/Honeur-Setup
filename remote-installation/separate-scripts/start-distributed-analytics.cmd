@@ -61,7 +61,7 @@ docker pull honeur/distributed-analytics:remote-%VERSION%
 echo Run honeur/distributed-analytics:r-server-%VERSION% container. This could take a while...
 docker run ^
 --name "distributed-analytics-r-server" ^
---restart always ^
+--restart on-failure:5 ^
 --security-opt no-new-privileges ^
 -v "%HONEUR_ANALYTICS_SHARED_FOLDER%:/usr/local/src/datafiles" ^
 -m "1g" ^
@@ -80,7 +80,7 @@ docker network connect honeur-distributed-analytics-net distributed-analytics-r-
 echo Run honeur/distributed-analytics:remote-%VERSION% container. This could take a while...
 docker run ^
 --name "distributed-analytics-remote" ^
---restart always ^
+--restart on-failure:5 ^
 --security-opt no-new-privileges ^
 --env-file distributed-analytics.env ^
 -m "1g" ^
