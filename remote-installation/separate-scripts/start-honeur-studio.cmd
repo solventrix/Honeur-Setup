@@ -108,6 +108,11 @@ docker run ^
 -v "py_environment:/conda" ^
 -v "cronicle_data:/opt/cronicle" ^
 -v "pwsh_modules:/home/honeurstudio/.local/share/powershell/Modules" ^
+-m "500m" ^
+--cpus "1" ^
+--pids-limit 100 ^
+--cpu-shares 1024 ^
+--ulimit nofile=1024:1024 ^
 -d ^
 honeur/honeur-studio:%TAG% cronicle >nul 2>&1
 
@@ -125,6 +130,11 @@ docker run ^
 --env-file honeur-studio.env ^
 -v "shared:/var/lib/shared:ro" ^
 -v "/var/run/docker.sock:/var/run/docker.sock" ^
+-m "1g" ^
+--cpus "2" ^
+--pids-limit 100 ^
+--cpu-shares 1024 ^
+--ulimit nofile=1024:1024 ^
 -d ^
 honeur/honeur-studio:%TAG% shinyproxy >nul 2>&1
 
