@@ -93,7 +93,7 @@ docker run ^
 -v "%HONEUR_ZEPPELIN_LOGS%:/logs" ^
 -v "%HONEUR_ZEPPELIN_NOTEBOOKS%:/notebook" ^
 -m "1.5g" ^
---cpus "1" ^
+--cpus "3" ^
 --pids-limit 100 ^
 --cpu-shares 1024 ^
 --ulimit nofile=1024:1024 ^

@@ -49,7 +49,7 @@ docker run \
 --security-opt no-new-privileges \
 -v "$HONEUR_ANALYTICS_SHARED_FOLDER:/usr/local/src/datafiles" \
 -m "1g" \
---cpus "1" \
+--cpus "2" \
 --read-only \
 --pids-limit 100 \
 --cpu-shares 1024 \
@@ -70,7 +70,7 @@ docker run \
 --security-opt no-new-privileges \
 --env-file distributed-analytics.env \
 -m "1g" \
---cpus "1" \
+--cpus "2" \
 --pids-limit 100 \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \

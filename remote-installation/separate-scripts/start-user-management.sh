@@ -34,8 +34,8 @@ docker run \
 --security-opt no-new-privileges \
 --env-file user-mgmt.env \
 -v "shared:/var/lib/shared:ro" \
--m "400m" \
---cpus ".5" \
+-m "600m" \
+--cpus "1" \
 --pids-limit 100 \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \

@@ -55,8 +55,8 @@ docker run ^
 --security-opt no-new-privileges ^
 --env-file nginx.env ^
 --network honeur-net ^
--m "250m" ^
---cpus ".5" ^
+-m "500m" ^
+--cpus "1" ^
 --pids-limit 100 ^
 --cpu-shares 1024 ^
 --ulimit nofile=1024:1024 ^
