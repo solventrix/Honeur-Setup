@@ -88,7 +88,6 @@ docker run ^
 --read-only ^
 --pids-limit 100 ^
 --cpu-shares 1024 ^
---tmpfs /tmp ^
 --ulimit nofile=1024:1024 ^
 -d ^
 honeur/distributed-analytics:remote-%VERSION% >nul 2>&1

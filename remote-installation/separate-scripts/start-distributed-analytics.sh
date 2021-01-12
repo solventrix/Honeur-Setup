@@ -53,7 +53,6 @@ docker run \
 --read-only \
 --pids-limit 100 \
 --cpu-shares 1024 \
---tmpfs /tmp \
 --ulimit nofile=1024:1024 \
 -d \
 honeur/distributed-analytics:r-server-$VERSION > /dev/null 2>&1
