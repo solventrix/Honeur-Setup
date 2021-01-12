@@ -77,6 +77,7 @@ echo "Run honeur/honeur-studio:$TAG container. This could take a while..."
 docker run \
 --name "honeur-studio-chronicle" \
 --restart on-failure:5 \
+--security-opt no-new-privileges \
 --env-file honeur-studio-chronicle.env \
 --hostname "cronicle" \
 -v "${HONEUR_HONEUR_STUDIO_FOLDER}:/home/honeurstudio/__HONEURStudio__:z" \
@@ -104,6 +105,7 @@ echo "Run honeur/honeur-studio:$TAG container. This could take a while..."
 docker run \
 --name "honeur-studio" \
 --restart on-failure:5 \
+--security-opt no-new-privileges \
 --env-file honeur-studio.env \
 -v "shared:/var/lib/shared:ro" \
 -v "/var/run/docker.sock:/var/run/docker.sock" \
