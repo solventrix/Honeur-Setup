@@ -50,7 +50,6 @@ docker run \
 -v "$HONEUR_ANALYTICS_SHARED_FOLDER:/usr/local/src/datafiles" \
 -m "1g" \
 --cpus "2" \
---read-only \
 --pids-limit 100 \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
