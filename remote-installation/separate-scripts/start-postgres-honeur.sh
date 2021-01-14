@@ -30,7 +30,7 @@ docker run \
 -v "pgdata:/var/lib/postgresql/data" \
 -v "shared:/var/lib/postgresql/envfileshared" \
 -m "800m" \
---cpus "3" \
+--cpus "2" \
 --pids-limit 100 \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
