@@ -102,7 +102,7 @@ docker run ^
 -v "shared:/var/lib/shared:ro" ^
 -m "1g" ^
 --cpus "2" ^
---pids-limit 100 ^
+--pids-limit 150 ^
 --cpu-shares 1024 ^
 --ulimit nofile=1024:1024 ^
 -d ^
