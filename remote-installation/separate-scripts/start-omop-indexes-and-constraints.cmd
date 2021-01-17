@@ -23,7 +23,6 @@ docker run ^
 --env-file omop-indexes-and-constraints.env ^
 -v "shared:/var/lib/shared:ro" ^
 --network honeur-net ^
--d ^
 honeur/postgres:%TAG% >nul 2>&1
 
 echo Clean up helper files
