@@ -71,7 +71,7 @@ docker run \
 --security-opt no-new-privileges \
 --env-file atlas-webapi.env \
 -v "shared:/var/lib/shared:ro" \
--m "1g" \
+-m "2g" \
 --cpus "2" \
 --pids-limit 150 \
 --cpu-shares 1024 \

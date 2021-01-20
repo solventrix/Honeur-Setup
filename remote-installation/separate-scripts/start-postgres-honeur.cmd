@@ -28,7 +28,7 @@ docker run ^
 --security-opt no-new-privileges ^
 -v "pgdata:/var/lib/postgresql/data" ^
 -v "shared:/var/lib/postgresql/envfileshared" ^
--m "800m" ^
+-m "2g" ^
 --cpus "2" ^
 --pids-limit 100 ^
 --cpu-shares 1024 ^
