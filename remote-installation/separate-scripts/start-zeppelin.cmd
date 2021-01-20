@@ -92,7 +92,7 @@ docker run ^
 -v "%HONEUR_ANALYTICS_SHARED_FOLDER%:/usr/local/src/datafiles" ^
 -v "%HONEUR_ZEPPELIN_LOGS%:/logs" ^
 -v "%HONEUR_ZEPPELIN_NOTEBOOKS%:/notebook" ^
--m "1.5g" ^
+-m "4g" ^
 --cpus "2" ^
 --pids-limit 200 ^
 --cpu-shares 1024 ^
