@@ -11,7 +11,7 @@ Table of Contents
   * [Postgres installation instructions](#postgres-installation-instructions)
     * [HONEUR](#honeur)
     * [PHederation](#phederation)
-  * [Atlas/WebAPI installation instructions](#atlas/webapi-installation-instructions)
+  * [Atlas/WebAPI installation instructions](#atlas-webapi-separate)
   * [Zeppelin installation instructions](#zeppelin-installation-instructions)
   * [User Management installation instructions](#user-management-installation-instructions)
   * [Distributed Analytics installation instructions](#distributed-analytics-installation-instructions)
@@ -96,7 +96,7 @@ Windows
 .\start-postgres-phederation.cmd
 ```
 
-## Atlas/WebAPI installation instructions
+## <a id="atlas-webapi-separate"></a>Atlas/WebAPI installation instructions
 The Postgres database installed in the previous step is required for Atlas/WebAPI to function.
 
 Atlas/WebAPI can be installed by running the installation script.
