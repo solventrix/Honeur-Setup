@@ -1,6 +1,6 @@
 @echo off
 
-SET VERSION=2.0.0
+SET VERSION=2.0.2
 SET TAG=%VERSION%
 
 set argumentCount=0
@@ -10,16 +10,17 @@ for %%x in (%*) do (
 )
 
 if "%~1" NEQ "" (
-    if "%argumentCount%" LSS "3" (
+    if "%argumentCount%" LSS "4" (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
     SET "HONEUR_HOST_MACHINE=%~1"
     SET "HONEUR_HONEUR_STUDIO_FOLDER=%~2"
+    SET "HONEUR_ANALYTICS_SHARED_FOLDER=%~3"
     SET "HONEUR_SECURITY_METHOD=%~3"
     SET USERID=1000
     if "%~3" EQU "ldap" (
-        if "%argumentCount%" LSS "8" (
+        if "%argumentCount%" LSS "9" (
             echo When LDAP is chosen as security option, please provide ldap properties.
             EXIT 1
         ) else (
@@ -37,6 +38,8 @@ SET CURRENT_DIRECTORY=%CD%
 SET /p HONEUR_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET HONEUR_HOST_MACHINE=localhost
 
 SET /p HONEUR_HONEUR_STUDIO_FOLDER="Enter the directory where HONEUR Studio will store its data [%CURRENT_DIRECTORY%\honeurstudio]: " || SET HONEUR_HONEUR_STUDIO_FOLDER=%CURRENT_DIRECTORY%\honeurstudio
+
+SET /p HONEUR_ANALYTICS_SHARED_FOLDER="Enter the directory where HONEUR Studio will save the prepared distributed analytics data [%CURRENT_DIRECTORY%\distributed-analytics]: " || SET HONEUR_ANALYTICS_SHARED_FOLDER=%CURRENT_DIRECTORY%\distributed-analytics
 
 SET /p HONEUR_SECURITY_METHOD="Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " || SET HONEUR_SECURITY_METHOD=none
 :while-security-mode-not-correct
@@ -64,6 +67,7 @@ echo SITE_NAME=honeurstudio>> honeur-studio.env
 echo CONTENT_PATH=%HONEUR_HONEUR_STUDIO_FOLDER%>> honeur-studio.env
 echo USERID=%USERID%>> honeur-studio.env
 echo DOMAIN_NAME=%HONEUR_HOST_MACHINE%>> honeur-studio.env
+echo HONEUR_ANALYTICS_SHARED_FOLDER=%HONEUR_ANALYTICS_SHARED_FOLDER%>> honeur-studio.env
 echo AUTHENTICATION_METHOD=%HONEUR_SECURITY_METHOD%>> honeur-studio.env
 if "%HONEUR_SECURITY_METHOD%" == "jdbc" (
     echo DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver>> honeur-studio.env

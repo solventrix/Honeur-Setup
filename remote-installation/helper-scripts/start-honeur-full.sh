@@ -102,6 +102,7 @@ chmod +x start-honeur-studio.sh
 {
   echo "$HONEUR_HOST_MACHINE";
   echo "$HONEUR_HONEUR_STUDIO_FOLDER";
+  echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
   echo "$HONEUR_SECURITY_METHOD";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_URL";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_SYSTEM_USERNAME";

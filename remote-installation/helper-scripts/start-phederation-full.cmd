@@ -58,7 +58,7 @@ CALL .\start-distributed-analytics.cmd "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONE
 DEL start-distributed-analytics.cmd
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-honeur-studio.cmd --output start-honeur-studio.cmd
-CALL .\start-honeur-studio.cmd "%HONEUR_HOST_MACHINE%" "%HONEUR_HONEUR_STUDIO_FOLDER%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
+CALL .\start-honeur-studio.cmd "%HONEUR_HOST_MACHINE%" "%HONEUR_HONEUR_STUDIO_FOLDER%" "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-honeur-studio.cmd
 
 if "%HONEUR_SECURITY_METHOD%" NEQ "none" (

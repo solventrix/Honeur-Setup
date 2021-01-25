@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.0
+VERSION=2.0.2
 TAG=$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
@@ -10,6 +10,9 @@ HONEUR_HOST_MACHINE=${HONEUR_HOST_MACHINE:-localhost}
 
 read -p "Enter the directory where HONEUR Studio will store its data [$CURRENT_DIRECTORY/honeurstudio]: " HONEUR_HONEUR_STUDIO_FOLDER
 HONEUR_HONEUR_STUDIO_FOLDER=${HONEUR_HONEUR_STUDIO_FOLDER:-$CURRENT_DIRECTORY/honeurstudio}
+
+read -p "Enter the directory where HONEUR Studio will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
+HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
 
 read -p "Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
 while [[ "$HONEUR_SECURITY_METHOD" != "none" && "$HONEUR_SECURITY_METHOD" != "ldap" && "$HONEUR_SECURITY_METHOD" != "jdbc" && "$HONEUR_SECURITY_METHOD" != "" ]]; do
@@ -41,6 +44,7 @@ echo "SITE_NAME=honeurstudio" >> honeur-studio.env
 echo "CONTENT_PATH=$HONEUR_HONEUR_STUDIO_FOLDER" >> honeur-studio.env
 echo "USERID=$USERID" >> honeur-studio.env
 echo "DOMAIN_NAME=$HONEUR_HOST_MACHINE" >> honeur-studio.env
+echo "HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER=$HONEUR_ANALYTICS_SHARED_FOLDER" >> honeur-studio.env
 echo "AUTHENTICATION_METHOD=$HONEUR_SECURITY_METHOD" >> honeur-studio.env
 if [ "$HONEUR_SECURITY_METHOD" = "jdbc" ]; then
     #JDBC
