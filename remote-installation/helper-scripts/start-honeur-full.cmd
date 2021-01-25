@@ -32,7 +32,7 @@ if "%HONEUR_SECURITY_METHOD%" EQU "jdbc" (
 set /p HONEUR_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET HONEUR_HOST_MACHINE=localhost
 set /p HONEUR_ZEPPELIN_LOGS="Enter the directory where the zeppelin logs will kept on the host machine [%CD%\zeppelin\logs]: " || SET HONEUR_ZEPPELIN_LOGS=%CD%\zeppelin\logs
 set /p HONEUR_ZEPPELIN_NOTEBOOKS="Enter the directory where the zeppelin notebooks will kept on the host machine [%CD%\zeppelin\notebook]: " || SET HONEUR_ZEPPELIN_NOTEBOOKS=%CD%\zeppelin\notebook
-set /p HONEUR_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin will save the prepared distributed analytics data [%CD%\distributed-analytics]: " || SET HONEUR_ANALYTICS_SHARED_FOLDER=%CD%\distributed-analytics
+set /p HONEUR_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin/HONEUR Studio will save the prepared distributed analytics data [%CD%\distributed-analytics]: " || SET HONEUR_ANALYTICS_SHARED_FOLDER=%CD%\distributed-analytics
 set /p HONEUR_ANALYTICS_ORGANIZATION="Enter your HONEUR organization [Janssen]: " || SET HONEUR_ANALYTICS_ORGANIZATION=Janssen
 set /p HONEUR_HONEUR_STUDIO_FOLDER="Enter the directory where HONEUR Studio will store its data [%CD%\honeurstudio]: " || SET HONEUR_HONEUR_STUDIO_FOLDER=%CD%\honeurstudio
 

@@ -17,18 +17,18 @@ if "%~1" NEQ "" (
     SET "HONEUR_HOST_MACHINE=%~1"
     SET "HONEUR_HONEUR_STUDIO_FOLDER=%~2"
     SET "HONEUR_ANALYTICS_SHARED_FOLDER=%~3"
-    SET "HONEUR_SECURITY_METHOD=%~3"
+    SET "HONEUR_SECURITY_METHOD=%~4"
     SET USERID=1000
-    if "%~3" EQU "ldap" (
+    if "%~4" EQU "ldap" (
         if "%argumentCount%" LSS "9" (
             echo When LDAP is chosen as security option, please provide ldap properties.
             EXIT 1
         ) else (
-            SET "HONEUR_SECURITY_LDAP_URL=%~4"
-            SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=%~5"
-            SET "HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=%~6"
-            SET "HONEUR_SECURITY_LDAP_BASE_DN=%~7"
-            SET "HONEUR_SECURITY_LDAP_DN=%~8"
+            SET "HONEUR_SECURITY_LDAP_URL=%~5"
+            SET "HONEUR_SECURITY_LDAP_SYSTEM_USERNAME=%~6"
+            SET "HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD=%~7"
+            SET "HONEUR_SECURITY_LDAP_BASE_DN=%~8"
+            SET "HONEUR_SECURITY_LDAP_DN=%~9"
         )
     )
     goto installation
@@ -67,7 +67,7 @@ echo SITE_NAME=honeurstudio>> honeur-studio.env
 echo CONTENT_PATH=%HONEUR_HONEUR_STUDIO_FOLDER%>> honeur-studio.env
 echo USERID=%USERID%>> honeur-studio.env
 echo DOMAIN_NAME=%HONEUR_HOST_MACHINE%>> honeur-studio.env
-echo HONEUR_ANALYTICS_SHARED_FOLDER=%HONEUR_ANALYTICS_SHARED_FOLDER%>> honeur-studio.env
+echo HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER=%HONEUR_ANALYTICS_SHARED_FOLDER%>> honeur-studio.env
 echo AUTHENTICATION_METHOD=%HONEUR_SECURITY_METHOD%>> honeur-studio.env
 if "%HONEUR_SECURITY_METHOD%" == "jdbc" (
     echo DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver>> honeur-studio.env

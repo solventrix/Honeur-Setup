@@ -42,7 +42,7 @@ read -p "Enter the directory where the zeppelin logs will kept on the host machi
 HONEUR_ZEPPELIN_LOGS=${HONEUR_ZEPPELIN_LOGS:-$CURRENT_DIRECTORY/zeppelin/logs}
 read -p "Enter the directory where the zeppelin notebooks will kept on the host machine [$CURRENT_DIRECTORY/zeppelin/notebook]: " HONEUR_ZEPPELIN_NOTEBOOKS
 HONEUR_ZEPPELIN_NOTEBOOKS=${HONEUR_ZEPPELIN_NOTEBOOKS:-$CURRENT_DIRECTORY/zeppelin/notebook}
-read -p "Enter the directory where Zeppelin will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
+read -p "Enter the directory where Zeppelin/HONEUR Studio will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
 HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
 read -p 'Enter your HONEUR organization [Janssen]: ' HONEUR_ANALYTICS_ORGANIZATION
 HONEUR_ANALYTICS_ORGANIZATION=${HONEUR_ANALYTICS_ORGANIZATION:-Janssen}
