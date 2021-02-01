@@ -1,6 +1,6 @@
 @echo off
 
-SET VERSION=2.0.0
+SET VERSION=2.0.1
 SET TAG=2.7.1-%VERSION%
 
 set argumentCount=0
