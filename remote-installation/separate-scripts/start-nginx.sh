@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.0
+VERSION=2.0.1
 TAG=$VERSION
 
 touch nginx.env

@@ -1,6 +1,6 @@
 @echo off
 
-SET VERSION=2.0.0
+SET VERSION=2.0.1
 SET TAG=%VERSION%
 
 echo. 2>nginx.env
