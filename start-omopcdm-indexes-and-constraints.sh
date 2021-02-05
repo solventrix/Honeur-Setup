@@ -19,7 +19,7 @@ then
     read -p "Press [Enter] key to continue"
 
     echo Downloading docker-compose.yml file.
-    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/v2.0.0/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
 
     docker-compose pull
     docker-compose up
