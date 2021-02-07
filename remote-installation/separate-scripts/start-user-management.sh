@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.0
+VERSION=2.0.1
 TAG=$VERSION
 
 read -p "User Management administrator username [admin]: " HONEUR_USERMGMT_ADMIN_USERNAME
@@ -34,7 +34,7 @@ docker run \
 --security-opt no-new-privileges \
 --env-file user-mgmt.env \
 -v "shared:/var/lib/shared:ro" \
--m "600m" \
+-m "800m" \
 --cpus "1" \
 --pids-limit 100 \
 --cpu-shares 1024 \

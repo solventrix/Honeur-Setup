@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.0
+VERSION_REMOTE=2.0.1
+TAG_REMOTE=remote-$VERSION_REMOTE
+
+VERSION_R_SERVER=2.0.1
+TAG_R_SERVER=r-server-$VERSION_R_SERVER
+
 CURRENT_DIRECTORY=$(pwd)
 
 read -p "Enter the directory where Zeppelin will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
@@ -37,12 +42,12 @@ docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 echo "Create honeur-distributed-analytics-net network if it does not exists"
 docker network create --driver bridge honeur-distributed-analytics-net > /dev/null 2>&1 || true
 
-echo "Pull honeur/distributed-analytics:r-server-$VERSION from docker hub. This could take a while if not present on machine"
-docker pull honeur/distributed-analytics:r-server-$VERSION
-echo "Pull honeur/distributed-analytics:remote-$VERSION from docker hub. This could take a while if not present on machine"
-docker pull honeur/distributed-analytics:remote-$VERSION
+echo "Pull honeur/distributed-analytics:r-server-$TAG_R_SERVER from docker hub. This could take a while if not present on machine"
+docker pull honeur/distributed-analytics:r-server-$TAG_R_SERVER
+echo "Pull honeur/distributed-analytics:remote-$TAG_REMOTE from docker hub. This could take a while if not present on machine"
+docker pull honeur/distributed-analytics:remote-$TAG_REMOTE
 
-echo "Run honeur/distributed-analytics:r-server-$VERSION container. This could take a while..."
+echo "Run honeur/distributed-analytics:r-server-$TAG_R_SERVER container. This could take a while..."
 docker run \
 --name "distributed-analytics-r-server" \
 --restart on-failure:5 \
@@ -54,14 +59,14 @@ docker run \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
 -d \
-honeur/distributed-analytics:r-server-$VERSION > /dev/null 2>&1
+honeur/distributed-analytics:r-server-$TAG_R_SERVER > /dev/null 2>&1
 
 echo "Connect distributed-analytics-r-server to honeur-net network"
 docker network connect honeur-net distributed-analytics-r-server > /dev/null 2>&1
 echo "Connect distributed-analytics-r-server to honeur-distributed-analytics-net network"
 docker network connect honeur-distributed-analytics-net distributed-analytics-r-server > /dev/null 2>&1
 
-echo "Run honeur/distributed-analytics:remote-$VERSION container. This could take a while..."
+echo "Run honeur/distributed-analytics:remote-$TAG_REMOTE container. This could take a while..."
 docker run \
 --name "distributed-analytics-remote" \
 --restart on-failure:5 \
@@ -73,7 +78,7 @@ docker run \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
 -d \
-honeur/distributed-analytics:remote-$VERSION > /dev/null 2>&1
+honeur/distributed-analytics:remote-$TAG_REMOTE > /dev/null 2>&1
 
 echo "Connect distributed-analytics-remote to honeur-net network"
 docker network connect honeur-net distributed-analytics-remote > /dev/null 2>&1

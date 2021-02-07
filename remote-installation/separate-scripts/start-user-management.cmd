@@ -1,6 +1,6 @@
 @echo off
 
-SET VERSION=2.0.0
+SET VERSION=2.0.1
 SET TAG=%VERSION%
 
 set argumentCount=0
@@ -48,7 +48,7 @@ docker run ^
 --security-opt no-new-privileges ^
 --env-file user-mgmt.env ^
 -v "shared:/var/lib/shared:ro" ^
--m "600m" ^
+-m "800m" ^
 --cpus "1" ^
 --pids-limit 100 ^
 --cpu-shares 1024 ^

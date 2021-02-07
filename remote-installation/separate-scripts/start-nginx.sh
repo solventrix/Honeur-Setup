@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.1
+VERSION=2.0.2
 TAG=$VERSION
 
 touch nginx.env
@@ -43,7 +43,7 @@ docker pull honeur/nginx:$TAG
 echo "Run honeur/nginx:$TAG container. This could take a while..."
 docker run \
 --name "nginx" \
--p "80:80" \
+-p "80:8080" \
 --restart on-failure:5 \
 --security-opt no-new-privileges \
 --env-file nginx.env \
