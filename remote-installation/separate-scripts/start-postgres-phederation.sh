@@ -7,6 +7,8 @@ TAG=PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-$VERSION
 HONEUR_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 HONEUR_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 
+echo "This script will install version 2.0.1 of the PHederation database. All Phederation docker containers will be restarted after running this script."
+
 read -p "Enter password for phederation database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
 read -p "Enter password for phederation admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
 
@@ -58,3 +60,10 @@ echo "Clean up helper files"
 rm -rf postgres.env
 
 echo "Done"
+
+echo "Restarting PHederation Components"
+docker restart webapi > /dev/null 2>&1
+docker restart user-mgmt > /dev/null 2>&1
+docker restart zeppelin > /dev/null 2>&1
+docker restart honeur-studio > /dev/null 2>&1
+docker restart honeur-studio-chronicle > /dev/null 2>&1

@@ -4,6 +4,8 @@ Setlocal EnableDelayedExpansion
 SET VERSION=2.0.1
 SET TAG=PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-%VERSION%
 
+echo This script will install version 2.0.1 of the PHederation database. All Phederation docker containers will be restarted after running this script.
+
 set argumentCount=0
 for %%x in (%*) do (
     set /A argumentCount+=1
@@ -75,6 +77,13 @@ echo Clean up helper files
 DEL /Q postgres.env
 
 echo Done
+
+echo Restarting PHederation Components
+docker restart webapi >nul 2>&1
+docker restart user-mgmt >nul 2>&1
+docker restart zeppelin >nul 2>&1
+docker restart honeur-studio >nul 2>&1
+docker restart honeur-studio-chronicle >nul 2>&1
 EXIT /B %ERRORLEVEL%
 
 :generate-random-password
