@@ -42,12 +42,12 @@ docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
 echo "Create honeur-distributed-analytics-net network if it does not exists"
 docker network create --driver bridge honeur-distributed-analytics-net > /dev/null 2>&1 || true
 
-echo "Pull honeur/distributed-analytics:r-server-$TAG_R_SERVER from docker hub. This could take a while if not present on machine"
-docker pull honeur/distributed-analytics:r-server-$TAG_R_SERVER
-echo "Pull honeur/distributed-analytics:remote-$TAG_REMOTE from docker hub. This could take a while if not present on machine"
-docker pull honeur/distributed-analytics:remote-$TAG_REMOTE
+echo "Pull honeur/distributed-analytics:$TAG_R_SERVER from docker hub. This could take a while if not present on machine"
+docker pull honeur/distributed-analytics:$TAG_R_SERVER
+echo "Pull honeur/distributed-analytics:$TAG_REMOTE from docker hub. This could take a while if not present on machine"
+docker pull honeur/distributed-analytics:$TAG_REMOTE
 
-echo "Run honeur/distributed-analytics:r-server-$TAG_R_SERVER container. This could take a while..."
+echo "Run honeur/distributed-analytics:$TAG_R_SERVER container. This could take a while..."
 docker run \
 --name "distributed-analytics-r-server" \
 --restart on-failure:5 \
@@ -59,14 +59,14 @@ docker run \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
 -d \
-honeur/distributed-analytics:r-server-$TAG_R_SERVER > /dev/null 2>&1
+honeur/distributed-analytics:$TAG_R_SERVER > /dev/null 2>&1
 
 echo "Connect distributed-analytics-r-server to honeur-net network"
 docker network connect honeur-net distributed-analytics-r-server > /dev/null 2>&1
 echo "Connect distributed-analytics-r-server to honeur-distributed-analytics-net network"
 docker network connect honeur-distributed-analytics-net distributed-analytics-r-server > /dev/null 2>&1
 
-echo "Run honeur/distributed-analytics:remote-$TAG_REMOTE container. This could take a while..."
+echo "Run honeur/distributed-analytics:$TAG_REMOTE container. This could take a while..."
 docker run \
 --name "distributed-analytics-remote" \
 --restart on-failure:5 \
@@ -78,7 +78,7 @@ docker run \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
 -d \
-honeur/distributed-analytics:remote-$TAG_REMOTE > /dev/null 2>&1
+honeur/distributed-analytics:$TAG_REMOTE > /dev/null 2>&1
 
 echo "Connect distributed-analytics-remote to honeur-net network"
 docker network connect honeur-net distributed-analytics-remote > /dev/null 2>&1
