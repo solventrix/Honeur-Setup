@@ -62,8 +62,8 @@ rm -rf postgres.env
 echo "Done"
 
 echo "Restarting HONEUR Components"
-docker restart webapi > /dev/null 2>&1
-docker restart user-mgmt > /dev/null 2>&1
-docker restart zeppelin > /dev/null 2>&1
-docker restart honeur-studio > /dev/null 2>&1
-docker restart honeur-studio-chronicle > /dev/null 2>&1
+docker restart webapi > /dev/null 2>&1 || true
+docker restart user-mgmt > /dev/null 2>&1 || true
+docker restart zeppelin > /dev/null 2>&1 || true
+docker restart honeur-studio > /dev/null 2>&1 || true
+docker restart honeur-studio-chronicle > /dev/null 2>&1 || true
