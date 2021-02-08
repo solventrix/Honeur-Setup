@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.2
+VERSION=2.0.3
 TAG=$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
@@ -34,7 +34,7 @@ if [ "$HONEUR_SECURITY_METHOD" = "ldap" ]; then
     HONEUR_SECURITY_LDAP_DN=${honeur_security_ldap_dn:-uid=\{0\},dc=example,dc=com}
 fi
 
-USERID=${UID:-1000}
+USERID=1000
 
 touch honeur-studio.env
 

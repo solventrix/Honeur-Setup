@@ -1,6 +1,6 @@
 @echo off
 
-SET VERSION=2.0.1
+SET VERSION=2.0.2
 SET TAG=%VERSION%
 
 echo. 2>nginx.env
@@ -50,7 +50,7 @@ docker pull honeur/nginx:%TAG%
 echo Run honeur/nginx:%TAG% container. This could take a while...
 docker run ^
 --name "nginx" ^
--p "80:80" ^
+-p "80:8080" ^
 --restart on-failure:5 ^
 --security-opt no-new-privileges ^
 --env-file nginx.env ^

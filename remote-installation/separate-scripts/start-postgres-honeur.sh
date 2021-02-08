@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.0.0
+VERSION=2.0.1
 TAG=HONEUR-9.6-omopcdm-5.3.1-webapi-2.7.1-$VERSION
+
+HONEUR_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+HONEUR_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+
+echo "This script will install version 2.0.1 of the HONEUR database. All HONEUR docker containers will be restarted after running this script."
+
+read -p "Enter password for honeur database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
+read -p "Enter password for honeur admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
+
+touch postgres.env
+
+echo "HONEUR_USER_USERNAME=honeur" > postgres.env
+echo "HONEUR_USER_PW=$HONEUR_PASSWORD" >> postgres.env
+echo "HONEUR_ADMIN_USER_USERNAME=honeur_admin" >> postgres.env
+echo "HONEUR_ADMIN_USER_PW=$HONEUR_ADMIN_PASSWORD" >> postgres.env
 
 echo "Stop and remove postgres container if exists"
 docker stop postgres > /dev/null 2>&1 || true
@@ -26,6 +41,7 @@ docker run \
 --name "postgres" \
 --restart on-failure:5 \
 --security-opt no-new-privileges \
+--env-file postgres.env \
 -p "5444:5432" \
 -v "pgdata:/var/lib/postgresql/data" \
 -v "shared:/var/lib/postgresql/envfileshared" \
@@ -40,4 +56,14 @@ honeur/postgres:$TAG > /dev/null 2>&1
 echo "Connect postgres to honeur-net network"
 docker network connect honeur-net postgres > /dev/null 2>&1
 
+echo "Clean up helper files"
+rm -rf postgres.env
+
 echo "Done"
+
+echo "Restarting HONEUR Components"
+docker restart webapi > /dev/null 2>&1
+docker restart user-mgmt > /dev/null 2>&1
+docker restart zeppelin > /dev/null 2>&1
+docker restart honeur-studio > /dev/null 2>&1
+docker restart honeur-studio-chronicle > /dev/null 2>&1

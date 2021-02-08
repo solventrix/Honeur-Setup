@@ -39,8 +39,14 @@ if "%HONEUR_SECURITY_METHOD%" NEQ "none" (
     set /p HONEUR_USERMGMT_ADMIN_PASSWORD="User Management administrator password [admin]: " || SET HONEUR_USERMGMT_ADMIN_PASSWORD=admin
 )
 
+CALL :generate-random-password HONEUR_USER_PW
+CALL :generate-random-password HONEUR_ADMIN_USER_PW
+
+SET /p HONEUR_USER_PW="Enter password for honeur database user [%HONEUR_USER_PW%]: " || SET HONEUR_USER_PW=!HONEUR_USER_PW!
+SET /p HONEUR_ADMIN_USER_PW="Enter password for honeur admin database user [%HONEUR_ADMIN_USER_PW%]: " || SET HONEUR_ADMIN_USER_PW=!HONEUR_ADMIN_USER_PW!
+
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-phederation.cmd --output start-postgres.cmd
-CALL .\start-postgres.cmd
+CALL .\start-postgres.cmd "%HONEUR_USER_PW%" "%HONEUR_ADMIN_USER_PW%"
 DEL start-postgres.cmd
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
@@ -67,3 +73,25 @@ echo Zeppelin is available on http://%HONEUR_HOST_MACHINE%/zeppelin
 echo Zeppelin logs are available in directory %HONEUR_ZEPPELIN_LOGS%
 echo Zeppelin notebooks are available in directory %HONEUR_ZEPPELIN_NOTEBOOKS%
 IF "%HONEUR_SECURITY_METHOD%" NEQ "none" echo User Management is available on http://%HONEUR_HOST_MACHINE%/user-mgmt
+EXIT /B %ERRORLEVEL%
+
+:generate-random-password
+@echo off
+Setlocal EnableDelayedExpansion
+Set _RNDLength=16
+Set _Alphanumeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+Set _Str=%_Alphanumeric%987654321
+:_LenLoop
+IF NOT "%_Str:~18%"=="" SET _Str=%_Str:~9%& SET /A _Len+=9& GOTO :_LenLoop
+SET _tmp=%_Str:~9,1%
+SET /A _Len=_Len+_tmp
+Set _count=0
+SET _RndAlphaNum=
+:_loop
+Set /a _count+=1
+SET _RND=%Random%
+Set /A _RND=_RND%%%_Len%
+SET _RndAlphaNum=!_RndAlphaNum!!_Alphanumeric:~%_RND%,1!
+If !_count! lss %_RNDLength% goto _loop
+ENDLOCAL & SET %~1=%_RndAlphaNum%
+EXIT /B 0
