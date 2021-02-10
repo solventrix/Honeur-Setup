@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+export LC_CTYPE=C
+
 VERSION=2.0.1
 TAG=PHEDERATION-9.6-omopcdm-5.3.1-webapi-2.7.1-$VERSION
 
