@@ -5,6 +5,30 @@ VERSION=2.0.3
 TAG=$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
+read -p "Enter the folder containing the certificates [$CURRENT_DIRECTORY/certificates]: " CERTIFICATE_FOLDER
+CERTIFICATE_FOLDER=${CERTIFICATE_FOLDER:-$CURRENT_DIRECTORY/certificates}
+if [ -d "$CERTIFICATE_FOLDER" ]; then
+    mkdir -p $CERTIFICATE_FOLDER/honeur-studio
+    rm -rf $CERTIFICATE_FOLDER/honeur-studio/*
+    if [ -f "$CERTIFICATE_FOLDER/honeur-studio-client-key.pem" ]; then
+        cp -v $CERTIFICATE_FOLDER/honeur-studio-client-key.pem $CERTIFICATE_FOLDER/honeur-studio/key.pem
+        cp -v $CERTIFICATE_FOLDER/honeur-studio-client-cert.pem $CERTIFICATE_FOLDER/honeur-studio/cert.pem
+        cp -v $CERTIFICATE_FOLDER/ca.pem $CERTIFICATE_FOLDER/honeur-studio/ca.pem
+        chmod -v 0400 $CERTIFICATE_FOLDER/honeur-studio/key.pem
+        chmod -v 0444 $CERTIFICATE_FOLDER/honeur-studio/cert.pem
+    elif [ -f "$CERTIFICATE_FOLDER/key.pem" ]; then
+        cp -v $CERTIFICATE_FOLDER/key.pem $CERTIFICATE_FOLDER/honeur-studio/key.pem
+        cp -v $CERTIFICATE_FOLDER/cert.pem $CERTIFICATE_FOLDER/honeur-studio/cert.pem
+        cp -v $CERTIFICATE_FOLDER/ca.pem $CERTIFICATE_FOLDER/honeur-studio/ca.pem
+    else
+        echo "Warning: '$CERTIFICATE_FOLDER' doesn't contain a client certificate for HONEUR Studio.  Abort."
+        exit
+    fi
+else
+    echo "Warning: '$CERTIFICATE_FOLDER' NOT found.  Abort."
+    exit
+fi
+
 read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' HONEUR_HOST_MACHINE
 HONEUR_HOST_MACHINE=${HONEUR_HOST_MACHINE:-localhost}
 
@@ -46,6 +70,9 @@ echo "USERID=$USERID" >> honeur-studio.env
 echo "DOMAIN_NAME=$HONEUR_HOST_MACHINE" >> honeur-studio.env
 echo "HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER=$HONEUR_ANALYTICS_SHARED_FOLDER" >> honeur-studio.env
 echo "AUTHENTICATION_METHOD=$HONEUR_SECURITY_METHOD" >> honeur-studio.env
+echo "PROXY_DOCKER_URL=https://172.17.0.1:2376" >> honeur-studio.env
+echo "PROXY_DOCKER_CERT_PATH=/home/certs" >> honeur-studio.env
+
 if [ "$HONEUR_SECURITY_METHOD" = "jdbc" ]; then
     #JDBC
     echo "DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver" >> honeur-studio.env
@@ -112,7 +139,7 @@ docker run \
 --security-opt no-new-privileges \
 --env-file honeur-studio.env \
 -v "shared:/var/lib/shared:ro" \
--v "/var/run/docker.sock:/var/run/docker.sock" \
+-v "$CERTIFICATE_FOLDER/honeur-studio:/home/certs" \
 -m "1g" \
 --cpus "2" \
 --pids-limit 100 \
