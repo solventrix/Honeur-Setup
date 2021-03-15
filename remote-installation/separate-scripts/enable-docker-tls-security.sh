@@ -1,5 +1,5 @@
 DOCKER_HOST_IP=172.17.0.1
-DOCKER_SERVICE_DIR="/etc/systemd/system/docker.service.d/"
+DOCKER_SERVICE_DIR="/etc/systemd/system/docker.service.d"
 
 read -p "Enter the folder containing the certificates [$PWD/certificates]: " CERTIFICATE_FOLDER
 CERTIFICATE_FOLDER=${CERTIFICATE_FOLDER:-$PWD/certificates}
@@ -30,7 +30,7 @@ then
 fi
 
 if [[ ! -d "$DOCKER_SERVICE_DIR" ]] ; then
-    mkdir -p $DOCKER_SERVICE_DIR
+    sudo mkdir -p $DOCKER_SERVICE_DIR
 fi
 
 # Edit Docker service
@@ -39,7 +39,7 @@ echo -n "" > override.conf
 echo "[Service]" >> override.conf
 echo "ExecStart=" >> override.conf
 echo "ExecStart=/usr/bin/dockerd --tlsverify --tlscacert=$CERTIFICATE_FOLDER/ca.pem --tlscert=$CERTIFICATE_FOLDER/server-cert.pem --tlskey=$CERTIFICATE_FOLDER/server-key.pem -H=$DOCKER_HOST_IP:2376 -H fd:// --containerd=/run/containerd/containerd.sock --authorization-plugin=authz-broker \$OPTIONS \$DOCKER_STORAGE_OPTIONS \$DOCKER_ADD_RUNTIMES" >> override.conf
-sudo cp override.conf $DOCKER_SERVICE_DIR"override.conf"
+sudo cp override.conf $DOCKER_SERVICE_DIR"/override.conf"
 echo "Restarting Docker..."
 sudo systemctl daemon-reload
 sudo systemctl restart docker
