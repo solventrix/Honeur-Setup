@@ -6,7 +6,7 @@ CERTIFICATE_FOLDER=${CERTIFICATE_FOLDER:-$PWD/certificates}
 
 if [ ! -d "$CERTIFICATE_FOLDER" ]; then
     echo "Warning: '$CERTIFICATE_FOLDER' NOT found.  Abort."
-    exit    
+    exit
 fi
 
 # Run authorization broker with Docker
@@ -23,9 +23,13 @@ docker rm authz-broker > /dev/null 2>&1 || true
 echo "01c. Start authorization broker container"
 docker run -d  --name "authz-broker" --restart=always -v $CERTIFICATE_FOLDER/policy.json:/var/lib/authz-broker/policy.json -v /run/docker/plugins/:/run/docker/plugins twistlock/authz-broker
 
-if [[ ! -d "$DOCKER_SERVICE_DIR" ]] ; then
-    echo "Warning: '$DOCKER_SERVICE_DIR' NOT found.  TLS security cannot be enabled automatically."
+if ! command -v systemctl &> /dev/null
+    echo "Warning: 'systemctl' command NOT found.  TLS security cannot be enabled automatically."
     exit
+fi
+
+if [[ ! -d "$DOCKER_SERVICE_DIR" ]] ; then
+    mkdir -p $DOCKER_SERVICE_DIR
 fi
 
 # Edit Docker service
