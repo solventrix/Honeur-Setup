@@ -46,10 +46,10 @@ sudo systemctl restart docker
 
 # Secure Docker client
 echo "03. Secure Docker client"
-sudo mkdir -pv ~/.docker
-sudo cp -v $CERTIFICATE_FOLDER/host-client-key.pem ~/.docker/key.pem
-sudo cp -v $CERTIFICATE_FOLDER/host-client-cert.pem ~/.docker/cert.pem
-sudo cp -v $CERTIFICATE_FOLDER/ca.pem ~/.docker
+mkdir -pv ~/.docker
+cp -v $CERTIFICATE_FOLDER/host-client-key.pem ~/.docker/key.pem
+cp -v $CERTIFICATE_FOLDER/host-client-cert.pem ~/.docker/cert.pem
+cp -v $CERTIFICATE_FOLDER/ca.pem ~/.docker
 export DOCKER_HOST_IP=172.17.0.1
 export DOCKER_HOST=tcp://$DOCKER_HOST_IP:2376 DOCKER_TLS_VERIFY=1
 #echo "export DOCKER_HOST=tcp://$DOCKER_HOST_IP:2376 DOCKER_TLS_VERIFY=1" >> ~/.bashrc
