@@ -24,6 +24,7 @@ echo "01c. Start authorization broker container"
 docker run -d  --name "authz-broker" --restart=always -v $CERTIFICATE_FOLDER/policy.json:/var/lib/authz-broker/policy.json -v /run/docker/plugins/:/run/docker/plugins twistlock/authz-broker
 
 if ! command -v systemctl &> /dev/null
+then
     echo "Warning: 'systemctl' command NOT found.  TLS security cannot be enabled automatically."
     exit
 fi
