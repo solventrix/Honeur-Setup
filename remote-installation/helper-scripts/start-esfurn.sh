@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -eu
 
+export LC_CTYPE=C
+
 CURRENT_DIRECTORY=$(pwd)
 
 FEDER8_THERAPEUTIC_AREA=esfurn
