@@ -11,6 +11,7 @@ while [[ "$HONEUR_THERAPEUTIC_AREA" != "honeur" && "$HONEUR_THERAPEUTIC_AREA" !=
     read -p "Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " HONEUR_THERAPEUTIC_AREA
 done
 HONEUR_THERAPEUTIC_AREA=${HONEUR_THERAPEUTIC_AREA:-honeur}
+FEDER8_THERAPEUTIC_AREA_UPPERCASE=$(echo "$HONEUR_THERAPEUTIC_AREA" |  tr '[:lower:]' '[:upper:]' )
 
 if [ "$HONEUR_THERAPEUTIC_AREA" = "honeur" ]; then
     HONEUR_THERAPEUTIC_AREA_DOMAIN=honeur.org
@@ -54,7 +55,7 @@ if [ -d "$CERTIFICATE_FOLDER" ]; then
         cp -v $CERTIFICATE_FOLDER/cert.pem $CERTIFICATE_FOLDER/$HONEUR_THERAPEUTIC_AREA-studio/cert.pem
         cp -v $CERTIFICATE_FOLDER/ca.pem $CERTIFICATE_FOLDER/$HONEUR_THERAPEUTIC_AREA-studio/ca.pem
     else
-        echo "Warning: '$CERTIFICATE_FOLDER' doesn't contain a client certificate for ${HONEUR_THERAPEUTIC_AREA^^} Studio.  Abort."
+        echo "Warning: '$CERTIFICATE_FOLDER' doesn't contain a client certificate for ${HONEUR_THERAPEUTIC_AREA_UPPERCASE} Studio.  Abort."
         exit
     fi
 else
@@ -65,10 +66,10 @@ fi
 read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' HONEUR_HOST_MACHINE
 HONEUR_HOST_MACHINE=${HONEUR_HOST_MACHINE:-localhost}
 
-read -p "Enter the directory where ${HONEUR_THERAPEUTIC_AREA^^} Studio will store its data [$CURRENT_DIRECTORY/${HONEUR_THERAPEUTIC_AREA}studio]: " HONEUR_HONEUR_STUDIO_FOLDER
+read -p "Enter the directory where ${HONEUR_THERAPEUTIC_AREA_UPPERCASE} Studio will store its data [$CURRENT_DIRECTORY/${HONEUR_THERAPEUTIC_AREA}studio]: " HONEUR_HONEUR_STUDIO_FOLDER
 HONEUR_HONEUR_STUDIO_FOLDER=${HONEUR_HONEUR_STUDIO_FOLDER:-$CURRENT_DIRECTORY/${HONEUR_THERAPEUTIC_AREA}studio}
 
-read -p "Enter the directory where ${HONEUR_THERAPEUTIC_AREA^^} Studio will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
+read -p "Enter the directory where ${HONEUR_THERAPEUTIC_AREA_UPPERCASE} Studio will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
 HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
 
 read -p "Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
@@ -105,7 +106,7 @@ echo "HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER=$HONEUR_ANALYTICS_SHARED_FOLDER" 
 echo "AUTHENTICATION_METHOD=$HONEUR_SECURITY_METHOD" >> honeur-studio.env
 echo "HONEUR_THERAPEUTIC_AREA=$HONEUR_THERAPEUTIC_AREA" >> honeur-studio.env
 echo "HONEUR_THERAPEUTIC_AREA_URL=${HONEUR_THERAPEUTIC_AREA_URL}" >> honeur-studio.env
-echo "HONEUR_THERAPEUTIC_AREA_UPPERCASE=${HONEUR_THERAPEUTIC_AREA^^}" >> honeur-studio.env
+echo "HONEUR_THERAPEUTIC_AREA_UPPERCASE=${HONEUR_THERAPEUTIC_AREA_UPPERCASE}" >> honeur-studio.env
 echo "PROXY_DOCKER_URL=https://172.17.0.1:2376" >> honeur-studio.env
 echo "PROXY_DOCKER_CERT_PATH=/home/certs" >> honeur-studio.env
 
@@ -148,7 +149,7 @@ docker run \
 --security-opt no-new-privileges \
 --env-file honeur-studio-chronicle.env \
 --hostname "cronicle" \
--v "${HONEUR_HONEUR_STUDIO_FOLDER}:/home/${HONEUR_THERAPEUTIC_AREA}studio/__${HONEUR_THERAPEUTIC_AREA^^}Studio__:z" \
+-v "${HONEUR_HONEUR_STUDIO_FOLDER}:/home/${HONEUR_THERAPEUTIC_AREA}studio/__${HONEUR_THERAPEUTIC_AREA_UPPERCASE}Studio__:z" \
 -v "r_libraries:/r-libs" \
 -v "py_environment:/conda" \
 -v "cronicle_data:/opt/cronicle" \

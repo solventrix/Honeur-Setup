@@ -6,6 +6,7 @@ export LC_CTYPE=C
 CURRENT_DIRECTORY=$(pwd)
 
 FEDER8_THERAPEUTIC_AREA=honeur
+FEDER8_THERAPEUTIC_AREA_UPPERCASE=$(echo "$FEDER8_THERAPEUTIC_AREA" |  tr '[:lower:]' '[:upper:]' )
 FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
 FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.honeur.org
 
@@ -57,7 +58,7 @@ read -p "Enter the directory where Zeppelin/HONEUR Studio will save the prepared
 HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
 read -p 'Enter your HONEUR organization [Janssen]: ' HONEUR_ANALYTICS_ORGANIZATION
 HONEUR_ANALYTICS_ORGANIZATION=${HONEUR_ANALYTICS_ORGANIZATION:-Janssen}
-read -p "Enter the directory where ${FEDER8_THERAPEUTIC_AREA^^} Studio will store its data [$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio]: " HONEUR_HONEUR_STUDIO_FOLDER
+read -p "Enter the directory where ${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio will store its data [$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio]: " HONEUR_HONEUR_STUDIO_FOLDER
 HONEUR_HONEUR_STUDIO_FOLDER=${HONEUR_HONEUR_STUDIO_FOLDER:-$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio}
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
@@ -175,8 +176,8 @@ echo "Zeppelin is available on http://$HONEUR_HOST_MACHINE/zeppelin"
 echo "Zeppelin logs are available in directory $HONEUR_ZEPPELIN_LOGS"
 echo "Zeppelin notebooks are available in directory $HONEUR_ZEPPELIN_NOTEBOOKS"
 [ ! "$HONEUR_SECURITY_METHOD" = "none" ] && echo "User Management is available on http://$HONEUR_HOST_MACHINE/user-mgmt"
-echo "${FEDER8_THERAPEUTIC_AREA^^} Studio VSCode is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/vscode"
-echo "${FEDER8_THERAPEUTIC_AREA^^} Studio RStudio is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/rstudio"
-echo "${FEDER8_THERAPEUTIC_AREA^^} Studio local Shiny apps are available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/reports"
-echo "${FEDER8_THERAPEUTIC_AREA^^} Studio documents is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/documents"
-echo "${FEDER8_THERAPEUTIC_AREA^^} Studio personal space is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/personal"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio VSCode is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/vscode"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio RStudio is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/rstudio"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio local Shiny apps are available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/reports"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio documents is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/documents"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio personal space is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/personal"
