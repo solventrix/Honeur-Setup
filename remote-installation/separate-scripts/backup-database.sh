@@ -32,6 +32,12 @@ tar_dump() {
   rm $DB_NAME.sql
 }
 
-read -p "Enter the name of the database to backup: " DATABASE_NAME
+if [ -z "$1" ]
+then
+  read -p "Enter the name of the database to backup: " DATABASE_NAME
+else
+  DATABASE_NAME=$1
+fi
+
 create_db_dump $DATABASE_NAME
 tar_dump $DATABASE_NAME

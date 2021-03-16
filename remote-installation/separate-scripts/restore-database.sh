@@ -15,3 +15,5 @@ for sql_script in ${RESTORE_FOLDER}/*.sql; do
     echo "Restore database $DB_NAME"
     cat $sql_script | docker exec -i postgres bash -c "source /var/lib/postgresql/envfile/honeur.env; export PGPASSWORD=${POSTGRES_PW}; psql $DB_NAME -U postgres"
 done
+
+rm -rf ${RESTORE_FOLDER}
