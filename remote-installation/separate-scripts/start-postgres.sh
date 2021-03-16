@@ -44,15 +44,17 @@ done
 
 echo "This script will install version 2.0.1 of the $HONEUR_THERAPEUTIC_AREA database. All $HONEUR_THERAPEUTIC_AREA docker containers will be restarted after running this script."
 
-read -p "Enter password for $HONEUR_THERAPEUTIC_AREA database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
-read -p "Enter password for ${HONEUR_THERAPEUTIC_AREA}_admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
+read -p "Enter password for $HONEUR_THERAPEUTIC_AREA database user [$HONEUR_PASSWORD]: " HONEUR_NEW_PASSWORD
+HONEUR_NEW_PASSWORD=${HONEUR_NEW_PASSWORD:-$HONEUR_PASSWORD}
+read -p "Enter password for ${HONEUR_THERAPEUTIC_AREA}_admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_NEW_ADMIN_PASSWORD
+HONEUR_NEW_ADMIN_PASSWORD=${HONEUR_NEW_ADMIN_PASSWORD:-HONEUR_ADMIN_PASSWORD}
 
 touch postgres.env
 
 echo "HONEUR_USER_USERNAME=$HONEUR_THERAPEUTIC_AREA" > postgres.env
-echo "HONEUR_USER_PW=$HONEUR_PASSWORD" >> postgres.env
+echo "HONEUR_USER_PW=$HONEUR_NEW_PASSWORD" >> postgres.env
 echo "HONEUR_ADMIN_USER_USERNAME=${HONEUR_THERAPEUTIC_AREA}_admin" >> postgres.env
-echo "HONEUR_ADMIN_USER_PW=$HONEUR_ADMIN_PASSWORD" >> postgres.env
+echo "HONEUR_ADMIN_USER_PW=$HONEUR_NEW_ADMIN_PASSWORD" >> postgres.env
 
 echo "Stop and remove postgres container if exists"
 docker stop postgres > /dev/null 2>&1 || true
