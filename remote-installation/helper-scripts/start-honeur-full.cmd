@@ -47,33 +47,33 @@ CALL :generate-random-password HONEUR_ADMIN_USER_PW
 SET /p HONEUR_USER_PW="Enter password for honeur database user [%HONEUR_USER_PW%]: " || SET HONEUR_USER_PW=!HONEUR_USER_PW!
 SET /p HONEUR_ADMIN_USER_PW="Enter password for honeur admin database user [%HONEUR_ADMIN_USER_PW%]: " || SET HONEUR_ADMIN_USER_PW=!HONEUR_ADMIN_USER_PW!
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-honeur.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres-honeur.cmd --output start-postgres.cmd
 CALL .\start-postgres.cmd "%HONEUR_USER_PW%" "%HONEUR_ADMIN_USER_PW%"
 DEL start-postgres.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
 CALL .\start-atlas-webapi.cmd "%HONEUR_HOST_MACHINE%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-atlas-webapi.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
 CALL .\start-zeppelin.cmd "%HONEUR_ZEPPELIN_LOGS%" "%HONEUR_ZEPPELIN_NOTEBOOKS%" "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-zeppelin.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-distributed-analytics.cmd --output start-distributed-analytics.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-distributed-analytics.cmd --output start-distributed-analytics.cmd
 CALL .\start-distributed-analytics.cmd "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONEUR_ANALYTICS_ORGANIZATION%"
 DEL start-distributed-analytics.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-honeur-studio.cmd --output start-honeur-studio.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-honeur-studio.cmd --output start-honeur-studio.cmd
 CALL .\start-honeur-studio.cmd "%HONEUR_HOST_MACHINE%" "%HONEUR_HONEUR_STUDIO_FOLDER%" "%HONEUR_ANALYTICS_SHARED_FOLDER%" "%HONEUR_SECURITY_METHOD%" "%HONEUR_SECURITY_LDAP_URL%" "%HONEUR_SECURITY_LDAP_SYSTEM_USERNAME%" "%HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD%" "%HONEUR_SECURITY_LDAP_BASE_DN%" "%HONEUR_SECURITY_LDAP_DN%"
 DEL start-honeur-studio.cmd
 
 if "%HONEUR_SECURITY_METHOD%" NEQ "none" (
-    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
     CALL .\start-user-management.cmd "%HONEUR_USERMGMT_ADMIN_USERNAME%" "%HONEUR_USERMGMT_ADMIN_PASSWORD%"
     DEL start-user-management.cmd
 )
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
 CALL .\start-nginx.cmd
 DEL start-nginx.cmd
 
