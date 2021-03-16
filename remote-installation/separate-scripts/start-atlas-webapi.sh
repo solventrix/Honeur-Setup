@@ -5,6 +5,38 @@ VERSION=2.0.1
 TAG=2.7.1-$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
+read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' HONEUR_THERAPEUTIC_AREA
+while [[ "$HONEUR_THERAPEUTIC_AREA" != "honeur" && "$HONEUR_THERAPEUTIC_AREA" != "phederation" && "$HONEUR_THERAPEUTIC_AREA" != "esfurn" && "$HONEUR_THERAPEUTIC_AREA" != "athena" && "$HONEUR_THERAPEUTIC_AREA" != "" ]]; do
+    echo "Enter \"honeur\", \"phederation\", \"esfurn\", \"athena\" or empty for default \"honeur\" value"
+    read -p "Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " HONEUR_THERAPEUTIC_AREA
+done
+HONEUR_THERAPEUTIC_AREA=${HONEUR_THERAPEUTIC_AREA:-honeur}
+
+if [ "$HONEUR_THERAPEUTIC_AREA" = "honeur" ]; then
+    HONEUR_THERAPEUTIC_AREA_DOMAIN=honeur.org
+    HONEUR_THERAPEUTIC_AREA_URL=harbor-uat.$HONEUR_THERAPEUTIC_AREA_DOMAIN
+elif [ "$HONEUR_THERAPEUTIC_AREA" = "phederation" ]; then
+    HONEUR_THERAPEUTIC_AREA_DOMAIN=phederation.org
+    HONEUR_THERAPEUTIC_AREA_URL=harbor-uat.$HONEUR_THERAPEUTIC_AREA_DOMAIN
+elif [ "$HONEUR_THERAPEUTIC_AREA" = "esfurn" ]; then
+    HONEUR_THERAPEUTIC_AREA_DOMAIN=esfurn.org
+    HONEUR_THERAPEUTIC_AREA_URL=harbor-uat.$HONEUR_THERAPEUTIC_AREA_DOMAIN
+elif [ "$HONEUR_THERAPEUTIC_AREA" = "athena" ]; then
+    HONEUR_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
+    HONEUR_THERAPEUTIC_AREA_URL=harbor-uat.$HONEUR_THERAPEUTIC_AREA_DOMAIN
+fi
+
+read -p "Enter email address used to login to https://portal-uat.${HONEUR_THERAPEUTIC_AREA_DOMAIN}: " HONEUR_EMAIL_ADDRESS
+while [[ "$HONEUR_EMAIL_ADDRESS" == "" ]]; do
+    echo "Email address can not be empty"
+    read -p "Enter email address used to login to https://portal-uat.$HONEUR_THERAPEUTIC_AREA_DOMAIN: " HONEUR_EMAIL_ADDRESS
+done
+echo "Surf to https://$HONEUR_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field."
+read -p 'Enter the CLI Secret: ' HONEUR_CLI_SECRET
+while [[ "$HONEUR_CLI_SECRET" == "" ]]; do
+    echo "CLI Secret can not be empty"
+    read -p "Enter the CLI Secret: " HONEUR_CLI_SECRET
+done
 
 read -p 'Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: ' HONEUR_HOST_MACHINE
 HONEUR_HOST_MACHINE=${HONEUR_HOST_MACHINE:-localhost}
@@ -58,13 +90,14 @@ else
     TAG=$TAG-standard
 fi
 
-echo "Create honeur-net network if it does not exists"
-docker network create --driver bridge honeur-net > /dev/null 2>&1 || true
+echo "Create $HONEUR_THERAPEUTIC_AREA-net network if it does not exists"
+docker network create --driver bridge $HONEUR_THERAPEUTIC_AREA-net > /dev/null 2>&1 || true
 
-echo "Pull honeur/webapi-atlas:$TAG from docker hub. This could take a while if not present on machine"
-docker pull honeur/webapi-atlas:$TAG
+echo "Pull $HONEUR_THERAPEUTIC_AREA/webapi-atlas:$TAG from https://$HONEUR_THERAPEUTIC_AREA_URL. This could take a while if not present on machine"
+echo "$HONEUR_CLI_SECRET" | docker login https://$HONEUR_THERAPEUTIC_AREA_URL --username $HONEUR_EMAIL_ADDRESS --password-stdin
+docker pull $HONEUR_THERAPEUTIC_AREA_URL/$HONEUR_THERAPEUTIC_AREA/webapi-atlas:$TAG
 
-echo "Run honeur/webapi-atlas:$TAG container. This could take a while..."
+echo "Run $HONEUR_THERAPEUTIC_AREA/webapi-atlas:$TAG container. This could take a while..."
 docker run \
 --name "webapi" \
 --restart on-failure:5 \
@@ -77,10 +110,10 @@ docker run \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
 -d \
-honeur/webapi-atlas:$TAG > /dev/null 2>&1
+$HONEUR_THERAPEUTIC_AREA_URL/$HONEUR_THERAPEUTIC_AREA/webapi-atlas:$TAG > /dev/null 2>&1
 
-echo "Connect webapi to honeur-net network"
-docker network connect honeur-net webapi > /dev/null 2>&1
+echo "Connect webapi to $HONEUR_THERAPEUTIC_AREA-net network"
+docker network connect $HONEUR_THERAPEUTIC_AREA-net webapi > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf atlas-webapi.env

@@ -3,8 +3,8 @@ set -eu
 
 CURRENT_DIRECTORY=$(pwd)
 
-FEDER8_THERAPEUTIC_AREA=honeur
-FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
+FEDER8_THERAPEUTIC_AREA=athena
+FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
 
 read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do

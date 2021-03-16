@@ -3,12 +3,20 @@ set -eu
 
 CURRENT_DIRECTORY=$(pwd)
 
-echo "Docker login, Make sure to use an account with access to the honeur docker hub images."
-docker login
-if [ ! $? -eq 0 ]; then
-    echo "Docker login failed."
-    exit 1
-fi
+FEDER8_THERAPEUTIC_AREA=phederation
+FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
+
+read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
+    echo "Email address can not be empty"
+    read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+done
+echo "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field."
+read -p 'Enter the CLI Secret: ' FEDER8_CLI_SECRET
+while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
+    echo "CLI Secret can not be empty"
+    read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
+done
 
 read -p "Use JDBC users or LDAP or No authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
 while [[ "$HONEUR_SECURITY_METHOD" != "none" && "$HONEUR_SECURITY_METHOD" != "ldap" && "$HONEUR_SECURITY_METHOD" != "jdbc" && "$HONEUR_SECURITY_METHOD" != "" ]]; do
@@ -55,12 +63,15 @@ fi
 HONEUR_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 HONEUR_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 
-read -p "Enter password for phederation database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
-read -p "Enter password for phederation admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
+read -p "Enter password for $FEDER8_THERAPEUTIC_AREA database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
+read -p "Enter password for $FEDER8_THERAPEUTIC_AREA admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-phederation.sh --output start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
 chmod +x start-postgres.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_PASSWORD";
   echo "$HONEUR_ADMIN_PASSWORD"
 } | ./start-postgres.sh
@@ -69,6 +80,9 @@ rm -rf start-postgres.sh
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh
 chmod +x start-atlas-webapi.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_HOST_MACHINE";
   echo "$HONEUR_SECURITY_METHOD";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_URL";
@@ -82,6 +96,9 @@ rm -rf start-atlas-webapi.sh
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh
 chmod +x start-zeppelin.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_ZEPPELIN_LOGS";
   echo "$HONEUR_ZEPPELIN_NOTEBOOKS";
   echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
@@ -98,15 +115,22 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
     chmod +x start-user-management.sh
     {
-        echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
-        echo "$HONEUR_USERMGMT_ADMIN_PASSWORD"
+      echo "$FEDER8_THERAPEUTIC_AREA";
+      echo "$FEDER8_EMAIL_ADDRESS";
+      echo "$FEDER8_CLI_SECRET";
+      echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
+      echo "$HONEUR_USERMGMT_ADMIN_PASSWORD"
     } | ./start-user-management.sh
     rm -rf start-user-management.sh
 fi
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh
 chmod +x start-nginx.sh
-./start-nginx.sh
+{
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
+} | ./start-nginx.sh
 rm -rf start-nginx.sh
 
 echo "postgresql is available on $HONEUR_HOST_MACHINE:5444"
