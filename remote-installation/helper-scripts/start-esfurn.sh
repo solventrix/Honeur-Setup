@@ -5,6 +5,7 @@ CURRENT_DIRECTORY=$(pwd)
 
 FEDER8_THERAPEUTIC_AREA=esfurn
 FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
+FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.esfurn.org
 
 read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
