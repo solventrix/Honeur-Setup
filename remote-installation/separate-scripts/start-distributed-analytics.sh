@@ -44,7 +44,7 @@ done
 
 read -p "Enter the directory where Zeppelin will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
 HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
-read -p 'Enter your $HONEUR_THERAPEUTIC_AREA organization [Janssen]: ' HONEUR_ANALYTICS_ORGANIZATION
+read -p "Enter your $HONEUR_THERAPEUTIC_AREA organization [Janssen]: " HONEUR_ANALYTICS_ORGANIZATION
 HONEUR_ANALYTICS_ORGANIZATION=${HONEUR_ANALYTICS_ORGANIZATION:-Janssen}
 
 touch distributed-analytics.env
