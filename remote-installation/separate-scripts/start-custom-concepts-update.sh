@@ -39,7 +39,7 @@ done
 
 touch omop-cdm-custom-concepts-update.env
 
-echo "FEDER8_THERAPEUTIC_AREA=$FEDER8_THERAPEUTIC_AREA" >> omop-cdm-custom-concepts-update.env
+echo "FEDER8_THERAPEUTIC_AREA=$FEDER8_THERAPEUTIC_AREA" > omop-cdm-custom-concepts-update.env
 echo "DB_HOST=postgres" >> omop-cdm-custom-concepts-update.env
 
 echo "Stop and remove omop-cdm-custom-concepts-update container if exists"
@@ -50,6 +50,7 @@ echo "Create $FEDER8_THERAPEUTIC_AREA-net network if it does not exists"
 docker network create --driver bridge $FEDER8_THERAPEUTIC_AREA-net > /dev/null 2>&1 || true
 
 echo "Pull $FEDER8_THERAPEUTIC_AREA/postgres:$TAG from https://$FEDER8_THERAPEUTIC_AREA_URL. This could take a while if not present on machine"
+echo "$FEDER8_CLI_SECRET" | docker login https://$FEDER8_THERAPEUTIC_AREA_URL --username $FEDER8_EMAIL_ADDRESS --password-stdin
 docker pull $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
 
 echo "Run ${FEDER8_THERAPEUTIC_AREA}/postgres:$TAG container. This could take a while..."

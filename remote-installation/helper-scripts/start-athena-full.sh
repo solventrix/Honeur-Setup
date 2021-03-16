@@ -72,7 +72,7 @@ HONEUR_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1
 HONEUR_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 
 read -p "Enter password for $FEDER8_THERAPEUTIC_AREA database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
-read -p "Enter password for $FEDER8_THERAPEUTIC_AREA admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
+read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
 chmod +x start-postgres.sh

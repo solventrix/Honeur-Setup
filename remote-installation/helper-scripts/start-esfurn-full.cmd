@@ -1,9 +1,9 @@
 @echo off
 
-SET "FEDER8_THERAPEUTIC_AREA=phederation"
+SET "FEDER8_THERAPEUTIC_AREA=esfurn"
 for /f "usebackq delims=" %%I in (`powershell "\"%str%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
-SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org"
-SET "FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.phederation.org"
+SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org"
+SET "FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.esfurn.org"
 
 SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
 :while-email-address-not-correct
