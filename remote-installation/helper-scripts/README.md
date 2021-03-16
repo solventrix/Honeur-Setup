@@ -90,6 +90,8 @@ Windows
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
+9. The script will prompt you to enter a new password for honeur database user.
+10. The script will prompt you to enter a new password for honeur_admin database user.
 
 Once done, the script will download all essential docker images and will create the docker containers.
 
@@ -124,6 +126,8 @@ Windows
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
+9. The script will prompt you to enter a new password for phederation database user.
+10. The script will prompt you to enter a new password for phederation_admin database user.
 
 Once done, the script will download all essential docker images and will create the docker containers.
 
@@ -158,6 +162,8 @@ Windows
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
+9. The script will prompt you to enter a new password for esfurn database user.
+10. The script will prompt you to enter a new password for esfurn_admin database user.
 
 Once done, the script will download all essential docker images and will create the docker containers.
 
@@ -192,6 +198,8 @@ Windows
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
+9. The script will prompt you to enter a new password for athena database user.
+10. The script will prompt you to enter a new password for athena_admin database user.
 
 Once done, the script will download all essential docker images and will create the docker containers.
 
@@ -240,6 +248,8 @@ Windows
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 9. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the HONEUR Team.
 10. The script will prompt you to enter the directory of where the HONEUR Studio will store its working directory files.
+11. The script will prompt you to enter a new password for honeur database user.
+12. The script will prompt you to enter a new password for honeur_admin database user.
 
 Once done, the script will download all docker images and will create the docker containers.
 
@@ -275,6 +285,8 @@ Windows
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 9. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the PHederation Team.
 10. The script will prompt you to enter the directory of where the PHEDERATION Studio will store its working directory files.
+11. The script will prompt you to enter a new password for phederation database user.
+12. The script will prompt you to enter a new password for phederation_admin database user.
 
 Once done, the script will download all docker images and will create the docker containers.
 
@@ -310,6 +322,8 @@ Windows
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 9. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the Esfurn Team.
 10. The script will prompt you to enter the directory of where the ESFURN Studio will store its working directory files.
+11. The script will prompt you to enter a new password for esfurn database user.
+12. The script will prompt you to enter a new password for esfurn_admin database user.
 
 Once done, the script will download all docker images and will create the docker containers.
 
@@ -345,5 +359,7 @@ Windows
 8. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 9. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the Athena Team.
 10. The script will prompt you to enter the directory of where the ATHENA Studio will store its working directory files.
+11. The script will prompt you to enter a new password for athena database user.
+12. The script will prompt you to enter a new password for athena_admin database user.
 
 Once done, the script will download all docker images and will create the docker containers.

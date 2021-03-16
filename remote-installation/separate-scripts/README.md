@@ -68,6 +68,19 @@ Windows
 .\start-postgres.cmd
 ```
 
+3. The script will prompt you to enter the therapeutic area.
+4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
+5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
+6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
+7. The script will prompt you to enter a new password for standard database user.
+8. The script will prompt you to enter a new password for admin database user.
+
+Once done, the script will download the Postgres docker image and will create the docker container.
+
 ## <a id="atlas-webapi-separate"></a>Atlas/WebAPI installation instructions
 The Postgres database installed in the previous step is required for Atlas/WebAPI to function.
 
