@@ -78,10 +78,10 @@ docker network create --driver bridge $HONEUR_THERAPEUTIC_AREA-distributed-analy
 
 echo "Pull $HONEUR_THERAPEUTIC_AREA/distributed-analytics:$TAG_R_SERVER from docker hub. This could take a while if not present on machine"
 echo "$HONEUR_CLI_SECRET" | docker login https://$HONEUR_THERAPEUTIC_AREA_URL --username $HONEUR_EMAIL_ADDRESS --password-stdin
-docker pull honeur/distributed-analytics:$TAG_R_SERVER
+docker pull $HONEUR_THERAPEUTIC_AREA_URL/$HONEUR_THERAPEUTIC_AREA/distributed-analytics:$TAG_R_SERVER
 echo "Pull $HONEUR_THERAPEUTIC_AREA/distributed-analytics:$TAG_REMOTE from docker hub. This could take a while if not present on machine"
 echo "$HONEUR_CLI_SECRET" | docker login https://$HONEUR_THERAPEUTIC_AREA_URL --username $HONEUR_EMAIL_ADDRESS --password-stdin
-docker pull honeur/distributed-analytics:$TAG_REMOTE
+docker pull $HONEUR_THERAPEUTIC_AREA_URL/$HONEUR_THERAPEUTIC_AREA/distributed-analytics:$TAG_REMOTE
 
 echo "Run $HONEUR_THERAPEUTIC_AREA/distributed-analytics:$TAG_R_SERVER container. This could take a while..."
 docker run \
