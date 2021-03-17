@@ -89,7 +89,7 @@ docker restart zeppelin >nul 2>&1
 docker restart %FEDER8_THERAPEUTIC_AREA%-studio >nul 2>&1
 docker restart %FEDER8_THERAPEUTIC_AREA%-studio-chronicle >nul 2>&1
 
-EXIT /B %ERRORLEVEL%
+EXIT /B 0
 
 :generate-random-password
 @echo off
