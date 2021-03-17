@@ -50,6 +50,8 @@ if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%
    goto :while-therapeutic-area-not-correct
 )
 
+for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
+
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
