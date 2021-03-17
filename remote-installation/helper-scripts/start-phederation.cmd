@@ -1,7 +1,6 @@
 @echo off
 
 SET "FEDER8_THERAPEUTIC_AREA=phederation"
-for /f "usebackq delims=" %%I in (`powershell "\"%str%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org"
 SET "FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.phederation.org"
 
