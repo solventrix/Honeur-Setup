@@ -2,6 +2,7 @@
 Setlocal EnableDelayedExpansion
 
 SET "FEDER8_THERAPEUTIC_AREA=honeur"
+for /f "usebackq delims=" %%I in (`powershell "\"%str%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org"
 SET "FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.honeur.org"
 
@@ -47,9 +48,9 @@ if "%FEDER8_SECURITY_METHOD%" EQU "jdbc" (
 set /p FEDER8_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET FEDER8_HOST_MACHINE=localhost
 set /p FEDER8_ZEPPELIN_LOGS="Enter the directory where the zeppelin logs will kept on the host machine [%CD%\zeppelin\logs]: " || SET FEDER8_ZEPPELIN_LOGS=%CD%\zeppelin\logs
 set /p FEDER8_ZEPPELIN_NOTEBOOKS="Enter the directory where the zeppelin notebooks will kept on the host machine [%CD%\zeppelin\notebook]: " || SET FEDER8_ZEPPELIN_NOTEBOOKS=%CD%\zeppelin\notebook
-set /p FEDER8_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin/HONEUR Studio will save the prepared distributed analytics data [%CD%\distributed-analytics]: " || SET FEDER8_ANALYTICS_SHARED_FOLDER=%CD%\distributed-analytics
-set /p FEDER8_ANALYTICS_ORGANIZATION="Enter your HONEUR organization [Janssen]: " || SET FEDER8_ANALYTICS_ORGANIZATION=Janssen
-set /p FEDER8_STUDIO_FOLDER="Enter the directory where HONEUR Studio will store its data [%CD%\%FEDER8_THERAPEUTIC_AREA%studio]: " || SET FEDER8_STUDIO_FOLDER=%CD%\%FEDER8_THERAPEUTIC_AREA%studio
+set /p FEDER8_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin/%FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio will save the prepared distributed analytics data [%CD%\distributed-analytics]: " || SET FEDER8_ANALYTICS_SHARED_FOLDER=%CD%\distributed-analytics
+set /p FEDER8_ANALYTICS_ORGANIZATION="Enter your %FEDER8_THERAPEUTIC_AREA_UPPERCASE% organization [Janssen]: " || SET FEDER8_ANALYTICS_ORGANIZATION=Janssen
+set /p FEDER8_STUDIO_FOLDER="Enter the directory where %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio will store its data [%CD%\%FEDER8_THERAPEUTIC_AREA%studio]: " || SET FEDER8_STUDIO_FOLDER=%CD%\%FEDER8_THERAPEUTIC_AREA%studio
 
 if "%FEDER8_SECURITY_METHOD%" NEQ "none" (
     set /p FEDER8_USERMGMT_ADMIN_USERNAME="User Management administrator username [admin]: " || SET FEDER8_USERMGMT_ADMIN_USERNAME=admin
@@ -98,11 +99,11 @@ echo Zeppelin is available on http://%FEDER8_HOST_MACHINE%/zeppelin
 echo Zeppelin logs are available in directory %FEDER8_ZEPPELIN_LOGS%
 echo Zeppelin notebooks are available in directory %FEDER8_ZEPPELIN_NOTEBOOKS%
 IF "%FEDER8_SECURITY_METHOD%" NEQ "none" echo User Management is available on http://%FEDER8_HOST_MACHINE%/user-mgmt
-echo HONEUR Studio VSCode is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/vscode
-echo HONEUR Studio RStudio is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/rstudio
-echo HONEUR Studio local Shiny apps are available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/reports
-echo HONEUR Studio documents is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/documents
-echo HONEUR Studio personal space is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/personal
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio VSCode is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/vscode
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio RStudio is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/rstudio
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio local Shiny apps are available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/reports
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio documents is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/documents
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio personal space is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/personal
 EXIT /B %ERRORLEVEL%
 
 :generate-random-password
