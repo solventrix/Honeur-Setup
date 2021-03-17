@@ -153,6 +153,9 @@ echo USERID=%USERID%>> honeur-studio.env
 echo DOMAIN_NAME=%FEDER8_HOST_MACHINE%>> honeur-studio.env
 echo HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER=%FEDER8_ANALYTICS_SHARED_FOLDER%>> honeur-studio.env
 echo AUTHENTICATION_METHOD=%FEDER8_SECURITY_METHOD%>> honeur-studio.env
+echo HONEUR_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA%>> honeur-studio.env
+echo HONEUR_THERAPEUTIC_AREA_URL=%FEDER8_THERAPEUTIC_AREA_URL%>> honeur-studio.env
+echo HONEUR_THERAPEUTIC_AREA_UPPERCASE=%FEDER8_THERAPEUTIC_AREA_UPPERCASE%>> honeur-studio.env
 if "%FEDER8_SECURITY_METHOD%" == "jdbc" (
     echo DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver>> honeur-studio.env
     echo DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi>> honeur-studio.env
