@@ -16,7 +16,7 @@ if "%~1" NEQ "" (
         EXIT 1
     )
     SET "FEDER8_THERAPEUTIC_AREA=%~1"
-    for /f "usebackq delims=" %I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%~I"
+    for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
     SET "FEDER8_EMAIL_ADDRESS=%~2"
     SET "FEDER8_CLI_SECRET=%~3"
     SET "FEDER8_HOST_MACHINE=%~4"
