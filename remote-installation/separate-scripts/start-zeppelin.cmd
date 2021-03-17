@@ -10,7 +10,7 @@ for %%x in (%*) do (
 )
 
 if "%~1" NEQ "" (
-    if "%argumentCount%" LSS "7" (
+    if %argumentCount% LSS 7 (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
@@ -22,7 +22,7 @@ if "%~1" NEQ "" (
     SET "FEDER8_ANALYTICS_SHARED_FOLDER=%~6"
     SET "FEDER8_SECURITY_METHOD=%~7"
     if "%~7" EQU "ldap" (
-        if "%argumentCount%" LSS "12" (
+        if %argumentCount% LSS 12 (
             echo When LDAP is chosen as security option, please provide ldap properties.
             EXIT 1
         ) else (

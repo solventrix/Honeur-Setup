@@ -10,7 +10,7 @@ for %%x in (%*) do (
 )
 
 if "%~1" NEQ "" (
-    if "%argumentCount%" LSS "3" (
+    if %argumentCount% LSS 3 (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
