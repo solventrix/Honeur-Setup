@@ -1,4 +1,5 @@
 @echo off
+Setlocal EnableDelayedExpansion
 
 SET "FEDER8_THERAPEUTIC_AREA=athena"
 SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org"

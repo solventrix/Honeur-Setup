@@ -1,4 +1,5 @@
 @echo off
+Setlocal EnableDelayedExpansion
 
 SET VERSION=2.0.1
 SET TAG=2.7.1-%VERSION%

@@ -1,4 +1,5 @@
 @echo off
+Setlocal EnableDelayedExpansion
 
 SET VERSION_REMOTE=2.0.1
 SET TAG_REMOTE=remote-%VERSION_REMOTE%
