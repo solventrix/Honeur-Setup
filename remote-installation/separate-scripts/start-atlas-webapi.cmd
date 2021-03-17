@@ -147,7 +147,7 @@ echo. 2>atlas-webapi.env
 echo OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI> atlas-webapi.env
 echo WEBAPI_URL=/webapi/>> atlas-webapi.env
 echo JAVA_OPTS=-Xms512m -Xmx512m>> atlas-webapi.env
-echo STORAGE_SERVER_BASE_URL=storage-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%>> atlas-webapi.env
+echo STORAGE_SERVER_BASE_URL=https://storage-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%>> atlas-webapi.env
 if NOT "%FEDER8_SECURITY_METHOD%" == "none" (
     echo USER_AUTHENTICATION_ENABLED=true>> atlas-webapi.env
     echo LDAP_URL=%FEDER8_SECURITY_LDAP_URL%>> atlas-webapi.env
