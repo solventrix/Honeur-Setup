@@ -3,6 +3,9 @@ set -e
 
 export LC_CTYPE=C
 
+cr=$(echo $'\n.')
+cr=${cr%.}
+
 VERSION=2.0.1
 TAG=9.6-omopcdm-5.3.1-webapi-2.7.1-$VERSION
 
@@ -35,19 +38,18 @@ while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
     read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 done
-echo "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field."
-read -p 'Enter the CLI Secret: ' FEDER8_CLI_SECRET
+read -p "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.${cr}Enter the CLI Secret: " FEDER8_CLI_SECRET
 while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
     echo "CLI Secret can not be empty"
     read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
 done
 
-echo "This script will install version 2.0.1 of the $FEDER8_THERAPEUTIC_AREA database. All $FEDER8_THERAPEUTIC_AREA docker containers will be restarted after running this script."
-
 read -p "Enter password for $FEDER8_THERAPEUTIC_AREA database user [$FEDER8_PASSWORD]: " FEDER8_NEW_PASSWORD
 FEDER8_NEW_PASSWORD=${FEDER8_NEW_PASSWORD:-$FEDER8_PASSWORD}
 read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$FEDER8_ADMIN_PASSWORD]: " FEDER8_NEW_ADMIN_PASSWORD
-FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-FEDER8_ADMIN_PASSWORD}
+FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-$FEDER8_ADMIN_PASSWORD}
+
+echo "This script will install version 2.0.1 of the $FEDER8_THERAPEUTIC_AREA database. All $FEDER8_THERAPEUTIC_AREA docker containers will be restarted after running this script."
 
 touch postgres.env
 
