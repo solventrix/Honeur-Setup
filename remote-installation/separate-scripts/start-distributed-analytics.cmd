@@ -112,7 +112,7 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
 echo. 2>distributed-analytics.env
 
 echo DISTRIBUTED_SERVICE_CLIENT_SCHEME=https> distributed-analytics.env
-echo DISTRIBUTED_SERVICE_CLIENT_HOST=distributed-analytics-uat.%FEDER8_THERAPEUTIC_AREA%.org>> distributed-analytics.env
+echo DISTRIBUTED_SERVICE_CLIENT_HOST=distributed-analytics-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%>> distributed-analytics.env
 echo DISTRIBUTED_SERVICE_CLIENT_PORT=443>> distributed-analytics.env
 echo DISTRIBUTED_SERVICE_CLIENT_BIND=distributed-service>> distributed-analytics.env
 echo DISTRIBUTED_SERVICE_CLIENT_API=api>> distributed-analytics.env
