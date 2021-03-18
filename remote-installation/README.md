@@ -12,12 +12,12 @@ Remote installation can be installed using the following methods:
 2. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/separate-scripts).
 
 ## Helper scripts
-Helper scripts combines the installation of HONEUR Components. You can choose to fully install all components or only install the essential components.
+Helper scripts combines the installation of FEDER8 Components. You can choose to fully install all components or only install the essential components.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/helper-scripts)
 
 ## Separate Scripts
-Separate installation scripts are created for each HONEUR Component.
+Separate installation scripts are created for each FEDER8 Component.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/separate-scripts)
 
