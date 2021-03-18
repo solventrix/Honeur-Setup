@@ -68,11 +68,13 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     HONEUR_USERMGMT_ADMIN_PASSWORD=${HONEUR_USERMGMT_ADMIN_PASSWORD:-admin}
 fi
 
-HONEUR_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-HONEUR_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+FEDER8_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+FEDER8_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 
-read -p "Enter password for $FEDER8_THERAPEUTIC_AREA database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
-read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
+read -p "Enter password for $FEDER8_THERAPEUTIC_AREA database user [$FEDER8_PASSWORD]: " FEDER8_NEW_PASSWORD
+FEDER8_NEW_PASSWORD=${FEDER8_NEW_PASSWORD:-$FEDER8_PASSWORD}
+read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$FEDER8_ADMIN_PASSWORD]: " FEDER8_NEW_ADMIN_PASSWORD
+FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-FEDER8_ADMIN_PASSWORD}
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
 chmod +x start-postgres.sh
@@ -80,8 +82,8 @@ chmod +x start-postgres.sh
   echo "$FEDER8_THERAPEUTIC_AREA";
   echo "$FEDER8_EMAIL_ADDRESS";
   echo "$FEDER8_CLI_SECRET";
-  echo "$HONEUR_PASSWORD";
-  echo "$HONEUR_ADMIN_PASSWORD"
+  echo "$FEDER8_NEW_PASSWORD";
+  echo "$FEDER8_NEW_ADMIN_PASSWORD"
 } | ./start-postgres.sh
 rm -rf start-postgres.sh
 
