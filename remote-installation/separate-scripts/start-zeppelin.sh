@@ -72,7 +72,6 @@ docker run \
 -v $HONEUR_ZEPPELIN_NOTEBOOKS:/notebook \
 -m "4g" \
 --cpus "2" \
---pids-limit 200 \
 --cpu-shares 1024 \
 --ulimit nofile=1024:1024 \
 -d \
