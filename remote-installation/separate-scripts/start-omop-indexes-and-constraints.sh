@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+cr=$(echo $'\n.')
+cr=${cr%.}
+
 VERSION=2.0.0
 TAG=omop-cdm-constraints-and-indexes-$VERSION
 
@@ -30,8 +33,7 @@ while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
     read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 done
-echo "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field."
-read -p 'Enter the CLI Secret: ' FEDER8_CLI_SECRET
+read -p "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.${cr}Enter the CLI Secret: " FEDER8_CLI_SECRET
 while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
     echo "CLI Secret can not be empty"
     read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
