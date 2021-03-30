@@ -8,8 +8,7 @@ VERSION=2.0.3
 TAG=$VERSION
 CURRENT_DIRECTORY=$(pwd)
 
-if command -v systemctl &> /dev/null
-then
+if systemctl show --property ActiveState docker &> /dev/null; then
     LINUX=true
 else
     LINUX=false
