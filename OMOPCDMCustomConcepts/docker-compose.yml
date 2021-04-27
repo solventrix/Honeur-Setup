@@ -10,6 +10,7 @@ services:
     networks:
       - honeur-net
     environment:
+      - "FEDER8_THERAPEUTIC_AREA=honeur"
       - "DB_HOST=postgres"
 
 networks:
