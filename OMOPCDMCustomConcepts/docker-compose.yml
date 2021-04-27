@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   omop-cdm-custom-concepts:
-    image: honeur/postgres:omop-cdm-custom-concepts-update-2.1
+    image: honeur/postgres:omop-cdm-custom-concepts-update-2.2-RC1
     container_name: omop-cdm-custom-concepts
     volumes:
       - shared:/var/lib/shared
