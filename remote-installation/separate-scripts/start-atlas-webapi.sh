@@ -17,22 +17,22 @@ FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA:-honeur}
 
 if [ "$FEDER8_THERAPEUTIC_AREA" = "honeur" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "phederation" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "esfurn" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "athena" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 fi
 
-read -p "Enter email address used to login to https://portal-uat.${FEDER8_THERAPEUTIC_AREA_DOMAIN}: " FEDER8_EMAIL_ADDRESS
+read -p "Enter email address used to login to https://portal.${FEDER8_THERAPEUTIC_AREA_DOMAIN}: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
-    read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+    read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 done
 read -p "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.${cr}Enter the CLI Secret: " FEDER8_CLI_SECRET
 while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
@@ -73,7 +73,7 @@ touch atlas-webapi.env
 echo "OHDSI_DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI" > atlas-webapi.env
 echo "WEBAPI_URL=/webapi/" >> atlas-webapi.env
 echo "JAVA_OPTS=-Xms512m -Xmx512m" >> atlas-webapi.env
-echo "STORAGE_SERVER_BASE_URL=https://storage-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN" >> atlas-webapi.env
+echo "STORAGE_SERVER_BASE_URL=https://storage.$FEDER8_THERAPEUTIC_AREA_DOMAIN" >> atlas-webapi.env
 if [ ! "$FEDER8_SECURITY_METHOD" = "none" ]; then
     echo "USER_AUTHENTICATION_ENABLED=true" >> atlas-webapi.env
     echo "LDAP_URL=$FEDER8_SECURITY_LDAP_URL" >> atlas-webapi.env

@@ -36,7 +36,3 @@ You can find the more information about the installation in pdf and docx format.
 ### Esfurn - Remote setup with Docker
 - [Esfurn Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Esfurn%20local%20installation%20instructions.pdf)
 - [Esfurn Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Esfurn%20local%20installation%20instructions.docx)
-
-### Athena - Remote setup with Docker
-- [Athena Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Athena%20local%20installation%20instructions.pdf)
-- [Athena Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Athena%20local%20installation%20instructions.docx)

@@ -4,13 +4,13 @@ Setlocal EnableDelayedExpansion
 SET "FEDER8_THERAPEUTIC_AREA=honeur"
 for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org"
-SET "FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.honeur.org"
+SET "FEDER8_THERAPEUTIC_AREA_URL=harbor.honeur.org"
 
-SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
 :while-email-address-not-correct
 if "%FEDER8_EMAIL_ADDRESS%" == "" (
    echo Email address can not be empty
-   SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+   SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
    goto :while-email-address-not-correct
 )
 
@@ -19,7 +19,7 @@ SET /p FEDER8_CLI_SECRET="Enter the CLI Secret: "
 :while-cli-secret-not-correct
 if "%FEDER8_CLI_SECRET%" == "" (
    echo Email address can not be empty
-   SET /p FEDER8_CLI_SECRET="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+   SET /p FEDER8_CLI_SECRET="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
    goto :while-cli-secret-not-correct
 )
 
