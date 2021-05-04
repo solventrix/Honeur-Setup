@@ -48,12 +48,12 @@ Postgres database can be installed by running the installation script..
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 ```
 
 2. You can run this script using the following command:
@@ -90,12 +90,12 @@ Atlas/WebAPI can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
 ```
 
 2. You can run this script using the following command:
@@ -133,12 +133,12 @@ Zeppelin can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
 ```
 
 2. You can run this script using the following command:
@@ -178,12 +178,12 @@ User Management can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
 ```
 
 2. You can run this script using the following command:
@@ -221,12 +221,12 @@ Distributed Analytics can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
 ```
 
 2. You can run this script using the following command:
@@ -261,12 +261,12 @@ FEDER8 Studio can be downloaded right next to an existing installation. Please f
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
 ```
 
 2. You can run this script using the following command:
@@ -305,12 +305,12 @@ Proxy can be downloaded right next to an existing installation. Please follow th
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
 ```
 
 2. You can run this script using the following command:

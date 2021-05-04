@@ -71,7 +71,7 @@ FEDER8_NEW_PASSWORD=${FEDER8_NEW_PASSWORD:-$FEDER8_PASSWORD}
 read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$FEDER8_ADMIN_PASSWORD]: " FEDER8_NEW_ADMIN_PASSWORD
 FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-$FEDER8_ADMIN_PASSWORD}
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
 chmod +x start-postgres.sh
 {
   echo "$FEDER8_THERAPEUTIC_AREA";
@@ -82,7 +82,7 @@ chmod +x start-postgres.sh
 } | ./start-postgres.sh
 rm -rf start-postgres.sh
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh
 chmod +x start-atlas-webapi.sh
 {
   echo "$FEDER8_THERAPEUTIC_AREA";
@@ -98,7 +98,7 @@ chmod +x start-atlas-webapi.sh
 } | ./start-atlas-webapi.sh
 rm -rf start-atlas-webapi.sh
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh
 chmod +x start-zeppelin.sh
 {
   echo "$FEDER8_THERAPEUTIC_AREA";
@@ -117,7 +117,7 @@ chmod +x start-zeppelin.sh
 rm -rf start-zeppelin.sh
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
-    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
     chmod +x start-user-management.sh
     {
       echo "$FEDER8_THERAPEUTIC_AREA";
@@ -129,7 +129,7 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     rm -rf start-user-management.sh
 fi
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh
 chmod +x start-nginx.sh
 {
   echo "$FEDER8_THERAPEUTIC_AREA";
