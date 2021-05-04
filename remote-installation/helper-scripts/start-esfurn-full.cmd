@@ -1,10 +1,10 @@
 @echo off
 Setlocal EnableDelayedExpansion
 
-SET "FEDER8_THERAPEUTIC_AREA=phederation"
+SET "FEDER8_THERAPEUTIC_AREA=esfurn"
 for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
-SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org"
-SET "FEDER8_THERAPEUTIC_AREA_URL=harbor.phederation.org"
+SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org"
+SET "FEDER8_THERAPEUTIC_AREA_URL=harbor.esfurn.org"
 
 SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
 :while-email-address-not-correct
@@ -48,7 +48,9 @@ if "%FEDER8_SECURITY_METHOD%" EQU "jdbc" (
 set /p FEDER8_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET FEDER8_HOST_MACHINE=localhost
 set /p FEDER8_ZEPPELIN_LOGS="Enter the directory where the zeppelin logs will kept on the host machine [%CD%\zeppelin\logs]: " || SET FEDER8_ZEPPELIN_LOGS=%CD%\zeppelin\logs
 set /p FEDER8_ZEPPELIN_NOTEBOOKS="Enter the directory where the zeppelin notebooks will kept on the host machine [%CD%\zeppelin\notebook]: " || SET FEDER8_ZEPPELIN_NOTEBOOKS=%CD%\zeppelin\notebook
-set /p FEDER8_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin will save the prepared distributed analytics data [%CD%\distributed-analytics]: " || SET FEDER8_ANALYTICS_SHARED_FOLDER=%CD%\distributed-analytics
+set /p FEDER8_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin/%FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio will save the prepared distributed analytics data [%CD%\distributed-analytics]: " || SET FEDER8_ANALYTICS_SHARED_FOLDER=%CD%\distributed-analytics
+set /p FEDER8_ANALYTICS_ORGANIZATION="Enter your %FEDER8_THERAPEUTIC_AREA_UPPERCASE% organization [Janssen]: " || SET FEDER8_ANALYTICS_ORGANIZATION=Janssen
+set /p FEDER8_STUDIO_FOLDER="Enter the directory where %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio will store its data [%CD%\%FEDER8_THERAPEUTIC_AREA%studio]: " || SET FEDER8_STUDIO_FOLDER=%CD%\%FEDER8_THERAPEUTIC_AREA%studio
 
 if "%FEDER8_SECURITY_METHOD%" NEQ "none" (
     set /p FEDER8_USERMGMT_ADMIN_USERNAME="User Management administrator username [admin]: " || SET FEDER8_USERMGMT_ADMIN_USERNAME=admin
@@ -73,6 +75,14 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remo
 CALL .\start-zeppelin.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_ZEPPELIN_LOGS%" "%FEDER8_ZEPPELIN_NOTEBOOKS%" "%FEDER8_ANALYTICS_SHARED_FOLDER%" "%FEDER8_SECURITY_METHOD%" "%FEDER8_SECURITY_LDAP_URL%" "%FEDER8_SECURITY_LDAP_SYSTEM_USERNAME%" "%FEDER8_SECURITY_LDAP_SYSTEM_PASSWORD%" "%FEDER8_SECURITY_LDAP_BASE_DN%" "%FEDER8_SECURITY_LDAP_DN%"
 DEL start-zeppelin.cmd
 
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-distributed-analytics.cmd --output start-distributed-analytics.cmd
+CALL .\start-distributed-analytics.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_ANALYTICS_SHARED_FOLDER%" "%FEDER8_ANALYTICS_ORGANIZATION%"
+DEL start-distributed-analytics.cmd
+
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
+CALL .\start-feder8-studio.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_HOST_MACHINE%" "%FEDER8_STUDIO_FOLDER%" "%FEDER8_ANALYTICS_SHARED_FOLDER%" "%FEDER8_SECURITY_METHOD%" "%FEDER8_SECURITY_LDAP_URL%" "%FEDER8_SECURITY_LDAP_SYSTEM_USERNAME%" "%FEDER8_SECURITY_LDAP_SYSTEM_PASSWORD%" "%FEDER8_SECURITY_LDAP_BASE_DN%" "%FEDER8_SECURITY_LDAP_DN%"
+DEL start-feder8-studio.cmd
+
 if "%FEDER8_SECURITY_METHOD%" NEQ "none" (
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
     CALL .\start-user-management.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_USERMGMT_ADMIN_USERNAME%" "%FEDER8_USERMGMT_ADMIN_PASSWORD%"
@@ -89,6 +99,11 @@ echo Zeppelin is available on http://%FEDER8_HOST_MACHINE%/zeppelin
 echo Zeppelin logs are available in directory %FEDER8_ZEPPELIN_LOGS%
 echo Zeppelin notebooks are available in directory %FEDER8_ZEPPELIN_NOTEBOOKS%
 IF "%FEDER8_SECURITY_METHOD%" NEQ "none" echo User Management is available on http://%FEDER8_HOST_MACHINE%/user-mgmt
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio VSCode is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/vscode
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio RStudio is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/rstudio
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio local Shiny apps are available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/reports
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio documents is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/documents
+echo %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio personal space is available on http://%FEDER8_HOST_MACHINE%/%FEDER8_THERAPEUTIC_AREA%-studio/app/personal
 EXIT /B %ERRORLEVEL%
 
 :generate-random-password

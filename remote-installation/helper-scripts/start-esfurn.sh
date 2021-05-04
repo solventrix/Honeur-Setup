@@ -5,9 +5,9 @@ export LC_CTYPE=C
 
 CURRENT_DIRECTORY=$(pwd)
 
-FEDER8_THERAPEUTIC_AREA=honeur
-FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-FEDER8_THERAPEUTIC_AREA_URL=harbor.honeur.org
+FEDER8_THERAPEUTIC_AREA=esfurn
+FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
+FEDER8_THERAPEUTIC_AREA_URL=harbor.esfurn.org
 
 read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do

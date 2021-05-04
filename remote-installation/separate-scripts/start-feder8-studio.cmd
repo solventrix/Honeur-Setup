@@ -1,8 +1,8 @@
 @echo off
 Setlocal EnableDelayedExpansion
 
-SET VERSION=2.0.0
-SET TAG=0.8.2-%VERSION%
+SET VERSION=2.0.3
+SET TAG=%VERSION%
 
 set argumentCount=0
 for %%x in (%*) do (
@@ -16,12 +16,14 @@ if "%~1" NEQ "" (
         EXIT 1
     )
     SET "FEDER8_THERAPEUTIC_AREA=%~1"
+    for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
     SET "FEDER8_EMAIL_ADDRESS=%~2"
     SET "FEDER8_CLI_SECRET=%~3"
-    SET "FEDER8_ZEPPELIN_LOGS=%~4"
-    SET "FEDER8_ZEPPELIN_NOTEBOOKS=%~5"
+    SET "FEDER8_HOST_MACHINE=%~4"
+    SET "FEDER8_STUDIO_FOLDER=%~5"
     SET "FEDER8_ANALYTICS_SHARED_FOLDER=%~6"
     SET "FEDER8_SECURITY_METHOD=%~7"
+    SET USERID=1000
     if "%~7" EQU "ldap" (
         if %argumentCount% LSS 12 (
             echo When LDAP is chosen as security option, please provide ldap properties.
@@ -47,6 +49,8 @@ if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%
    SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
    goto :while-therapeutic-area-not-correct
 )
+
+for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
@@ -91,9 +95,11 @@ if "%FEDER8_CLI_SECRET%" == "" (
 )
 
 SET CURRENT_DIRECTORY=%CD%
-SET /p FEDER8_ZEPPELIN_LOGS="Enter the directory where the zeppelin logs will kept on the host machine [%CURRENT_DIRECTORY%\zeppelin\logs]: " || SET FEDER8_ZEPPELIN_LOGS=%CURRENT_DIRECTORY%\zeppelin\logs
-SET /p FEDER8_ZEPPELIN_NOTEBOOKS="Enter the directory where the zeppelin notebooks will kept on the host machine [%CURRENT_DIRECTORY%\zeppelin\notebook]: " || SET FEDER8_ZEPPELIN_NOTEBOOKS=%CURRENT_DIRECTORY%\zeppelin\notebook
-SET /p FEDER8_ANALYTICS_SHARED_FOLDER="Enter the directory where Zeppelin will save the prepared distributed analytics data [%CURRENT_DIRECTORY%\distributed-analytics]: " || SET FEDER8_ANALYTICS_SHARED_FOLDER=%CURRENT_DIRECTORY%\distributed-analytics
+SET /p FEDER8_HOST_MACHINE="Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing [localhost]: " || SET FEDER8_HOST_MACHINE=localhost
+
+SET /p FEDER8_STUDIO_FOLDER="Enter the directory where %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio will store its data [%CURRENT_DIRECTORY%\%FEDER8_THERAPEUTIC_AREA%studio]: " || SET FEDER8_STUDIO_FOLDER=%CURRENT_DIRECTORY%\%FEDER8_THERAPEUTIC_AREA%studio
+
+SET /p FEDER8_ANALYTICS_SHARED_FOLDER="Enter the directory where %FEDER8_THERAPEUTIC_AREA_UPPERCASE% Studio will save the prepared distributed analytics data [%CURRENT_DIRECTORY%\distributed-analytics]: " || SET FEDER8_ANALYTICS_SHARED_FOLDER=%CURRENT_DIRECTORY%\distributed-analytics
 
 SET /p FEDER8_SECURITY_METHOD="Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " || SET FEDER8_SECURITY_METHOD=none
 :while-security-mode-not-correct
@@ -102,7 +108,6 @@ if NOT "%FEDER8_SECURITY_METHOD%" == "none" if NOT "%FEDER8_SECURITY_METHOD%" ==
    SET /p FEDER8_SECURITY_METHOD="Use jdbc users or LDAP or No for authentication? Enter jdbc/ldap/none. [none]: " || SET FEDER8_SECURITY_METHOD=none
    goto :while-security-mode-not-correct
 )
-
 if "%FEDER8_SECURITY_METHOD%" == "ldap" (
     set /p FEDER8_SECURITY_LDAP_URL="security.ldap.url [ldap://ldap.forumsys.com:389]: " || SET "FEDER8_SECURITY_LDAP_URL=ldap://ldap.forumsys.com:389"
     set /p FEDER8_SECURITY_LDAP_SYSTEM_USERNAME="security.ldap.system.username [cn=read-only-admin,dc=example,dc=com]: " || SET "FEDER8_SECURITY_LDAP_SYSTEM_USERNAME=cn=read-only-admin,dc=example,dc=com"
@@ -110,6 +115,8 @@ if "%FEDER8_SECURITY_METHOD%" == "ldap" (
     set /p FEDER8_SECURITY_LDAP_BASE_DN="security.ldap.baseDn [dc=example,dc=com]: " || SET "FEDER8_SECURITY_LDAP_BASE_DN=dc=example,dc=com"
     set /p FEDER8_SECURITY_LDAP_DN="security.ldap.dn [uid={0},dc=example,dc=com]: " || SET "FEDER8_SECURITY_LDAP_DN=uid={0},dc=example,dc=com"
 )
+
+SET USERID=1000
 
 :installation
 
@@ -138,55 +145,104 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#002562
 )
 
-echo. 2>zeppelin.env
+echo. 2>honeur-studio.env
 
-echo ZEPPELIN_NOTEBOOK_DIR=/notebook> zeppelin.env
-echo ZEPPELIN_LOG_DIR=/logs>> zeppelin.env
+echo TAG=%TAG%> honeur-studio.env
+echo APPLICATION_LOGS_TO_STDOUT=false>> honeur-studio.env
+echo SITE_NAME=%FEDER8_THERAPEUTIC_AREA%studio>> honeur-studio.env
+echo CONTENT_PATH=%FEDER8_STUDIO_FOLDER%>> honeur-studio.env
+echo USERID=%USERID%>> honeur-studio.env
+echo DOMAIN_NAME=%FEDER8_HOST_MACHINE%>> honeur-studio.env
+echo HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER=%FEDER8_ANALYTICS_SHARED_FOLDER%>> honeur-studio.env
+echo AUTHENTICATION_METHOD=%FEDER8_SECURITY_METHOD%>> honeur-studio.env
+echo HONEUR_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA%>> honeur-studio.env
+echo HONEUR_THERAPEUTIC_AREA_URL=%FEDER8_THERAPEUTIC_AREA_URL%>> honeur-studio.env
+echo HONEUR_THERAPEUTIC_AREA_UPPERCASE=%FEDER8_THERAPEUTIC_AREA_UPPERCASE%>> honeur-studio.env
 if "%FEDER8_SECURITY_METHOD%" == "jdbc" (
-    echo ZEPPELIN_SECURITY=%FEDER8_SECURITY_METHOD%>> zeppelin.env
-    echo LDAP_URL=ldap://localhost:389>> zeppelin.env
-    echo LDAP_BASE_DN=dc=example,dc=org>> zeppelin.env
-    echo LDAP_DN=cn={0},dc=example,dc=org>> zeppelin.env
+    echo DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver>> honeur-studio.env
+    echo DATASOURCE_URL=jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi>> honeur-studio.env
+    echo WEBAPI_ADMIN_USERNAME=ohdsi_admin_user>> honeur-studio.env
 )
 if "%FEDER8_SECURITY_METHOD%" == "ldap" (
-    echo ZEPPELIN_SECURITY=%FEDER8_SECURITY_METHOD%>> zeppelin.env
-    echo LDAP_URL=%FEDER8_SECURITY_LDAP_URL%>> zeppelin.env
-    echo LDAP_BASE_DN=%FEDER8_SECURITY_LDAP_BASE_DN%>> zeppelin.env
-    echo LDAP_DN=%FEDER8_SECURITY_LDAP_DN%>> zeppelin.env
+    echo HONEUR_STUDIO_LDAP_URL=%FEDER8_SECURITY_LDAP_URL%/%FEDER8_SECURITY_LDAP_BASE_DN%>> honeur-studio.env
+    echo HONEUR_STUDIO_LDAP_DN=uid={0}>> honeur-studio.env
+    echo HONEUR_STUDIO_LDAP_MANAGER_DN=%FEDER8_SECURITY_LDAP_SYSTEM_USERNAME%>> honeur-studio.env
+    echo HONEUR_STUDIO_LDAP_MANAGER_PASSWORD=%FEDER8_SECURITY_LDAP_SYSTEM_PASSWORD%>> honeur-studio.env
 )
 
-echo Stop and remove zeppelin container if exists
-docker stop zeppelin >nul 2>&1
-docker rm zeppelin >nul 2>&1
+echo. 2>honeur-studio-chronicle.env
+
+echo SITE_NAME=%FEDER8_THERAPEUTIC_AREA%studio> honeur-studio-chronicle.env
+echo USERID=%USERID%>> honeur-studio-chronicle.env
+echo USER=%FEDER8_THERAPEUTIC_AREA%studio>> honeur-studio-chronicle.env
+
+echo Stop and remove all %FEDER8_THERAPEUTIC_AREA%-studio containers if exists
+PowerShell -Command "docker stop $(docker ps --filter 'network=%FEDER8_THERAPEUTIC_AREA%-studio-net' -q -a)" >nul 2>&1
+PowerShell -Command "docker rm $(docker ps --filter 'network=%FEDER8_THERAPEUTIC_AREA%-studio-net' -q -a)" >nul 2>&1
 
 echo Create %FEDER8_THERAPEUTIC_AREA%-net network if it does not exists
 docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-net >nul 2>&1
+echo Create %FEDER8_THERAPEUTIC_AREA%-studio-frontend-net network if it does not exists
+docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-studio-frontend-net >nul 2>&1
+echo Create %FEDER8_THERAPEUTIC_AREA%-studio-net network if it does not exists
+docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-studio-net >nul 2>&1
 
-echo Pull %FEDER8_THERAPEUTIC_AREA%/zeppelin:%TAG% from https://%FEDER8_THERAPEUTIC_AREA_URL%. This could take a while if not present on machine
+echo Pull %FEDER8_THERAPEUTIC_AREA%/%FEDER8_THERAPEUTIC_AREA%-studio:%TAG% from https://%FEDER8_THERAPEUTIC_AREA_URL%. This could take a while if not present on machine
 docker login https://%FEDER8_THERAPEUTIC_AREA_URL% --username %FEDER8_EMAIL_ADDRESS% --password %FEDER8_CLI_SECRET%
-docker pull %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/zeppelin:%TAG%
+docker pull %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/%FEDER8_THERAPEUTIC_AREA%-studio:%TAG%
 
-echo Run %FEDER8_THERAPEUTIC_AREA%/zeppelin:%TAG% container. This could take a while...
+echo Run %FEDER8_THERAPEUTIC_AREA%/%FEDER8_THERAPEUTIC_AREA%-studio:%TAG% container. This could take a while...
 docker run ^
---name "zeppelin" ^
+--name "%FEDER8_THERAPEUTIC_AREA%-studio-chronicle" ^
 --restart on-failure:5 ^
 --security-opt no-new-privileges ^
---env-file zeppelin.env ^
--v "shared:/var/lib/shared:ro" ^
--v "%FEDER8_ANALYTICS_SHARED_FOLDER%:/usr/local/src/datafiles" ^
--v "%FEDER8_ZEPPELIN_LOGS%:/logs" ^
--v "%FEDER8_ZEPPELIN_NOTEBOOKS%:/notebook" ^
--m "4g" ^
---cpus "2" ^
+--env-file honeur-studio-chronicle.env ^
+--hostname "cronicle" ^
+-v "%FEDER8_STUDIO_FOLDER%:/home/%FEDER8_THERAPEUTIC_AREA%studio/__%FEDER8_THERAPEUTIC_AREA_UPPERCASE%Studio__:z" ^
+-v "r_libraries:/r-libs" ^
+-v "py_environment:/conda" ^
+-v "cronicle_data:/opt/cronicle" ^
+-v "pwsh_modules:/home/%FEDER8_THERAPEUTIC_AREA%studio/.local/share/powershell/Modules" ^
+-m "500m" ^
+--cpus "1" ^
+--pids-limit 100 ^
 --cpu-shares 1024 ^
 --ulimit nofile=1024:1024 ^
 -d ^
-%FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/zeppelin:%TAG% >nul 2>&1
+%FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/%FEDER8_THERAPEUTIC_AREA%-studio:%TAG% cronicle >nul 2>&1
 
-echo Connect zeppelin to %FEDER8_THERAPEUTIC_AREA%-net network
-docker network connect %FEDER8_THERAPEUTIC_AREA%-net zeppelin >nul 2>&1
+echo Connect %FEDER8_THERAPEUTIC_AREA%-studio-chronicle to %FEDER8_THERAPEUTIC_AREA%-net network
+docker network connect %FEDER8_THERAPEUTIC_AREA%-net %FEDER8_THERAPEUTIC_AREA%-studio-chronicle >nul 2>&1
+echo Connect %FEDER8_THERAPEUTIC_AREA%-studio-chronicle to %FEDER8_THERAPEUTIC_AREA%-studio-frontend-net network
+docker network connect %FEDER8_THERAPEUTIC_AREA%-studio-frontend-net %FEDER8_THERAPEUTIC_AREA%-studio-chronicle >nul 2>&1
+echo Connect %FEDER8_THERAPEUTIC_AREA%-studio-chronicle to %FEDER8_THERAPEUTIC_AREA%-studio-net network
+docker network connect %FEDER8_THERAPEUTIC_AREA%-studio-net %FEDER8_THERAPEUTIC_AREA%-studio-chronicle >nul 2>&1
+
+echo Run %FEDER8_THERAPEUTIC_AREA%/%FEDER8_THERAPEUTIC_AREA%-studio:%TAG% container. This could take a while...
+docker run ^
+--name "%FEDER8_THERAPEUTIC_AREA%-studio" ^
+--restart on-failure:5 ^
+--security-opt no-new-privileges ^
+--env-file honeur-studio.env ^
+-v "shared:/var/lib/shared:ro" ^
+-v "/var/run/docker.sock:/var/run/docker.sock" ^
+-m "1g" ^
+--cpus "2" ^
+--pids-limit 100 ^
+--cpu-shares 1024 ^
+--ulimit nofile=1024:1024 ^
+-d ^
+%FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/%FEDER8_THERAPEUTIC_AREA%-studio:%TAG% shinyproxy >nul 2>&1
+
+echo Connect %FEDER8_THERAPEUTIC_AREA%-studio to %FEDER8_THERAPEUTIC_AREA%-net network
+docker network connect %FEDER8_THERAPEUTIC_AREA%-net %FEDER8_THERAPEUTIC_AREA%-studio >nul 2>&1
+echo Connect %FEDER8_THERAPEUTIC_AREA%-studio to %FEDER8_THERAPEUTIC_AREA%-studio-frontend-net network
+docker network connect %FEDER8_THERAPEUTIC_AREA%-studio-frontend-net %FEDER8_THERAPEUTIC_AREA%-studio >nul 2>&1
+echo Connect %FEDER8_THERAPEUTIC_AREA%-studio to %FEDER8_THERAPEUTIC_AREA%-studio-net network
+docker network connect %FEDER8_THERAPEUTIC_AREA%-studio-net %FEDER8_THERAPEUTIC_AREA%-studio >nul 2>&1
 
 echo Clean up helper files
-DEL /Q zeppelin.env
+DEL /Q honeur-studio.env
+DEL /Q honeur-studio-chronicle.env
 
 echo Done

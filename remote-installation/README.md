@@ -12,12 +12,12 @@ Remote installation can be installed using the following methods:
 2. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/separate-scripts).
 
 ## Helper scripts
-Helper scripts combines the installation of HONEUR Components. You can choose to fully install all components or only install the essential components.
+Helper scripts combines the installation of FEDER8 Components. You can choose to fully install all components or only install the essential components.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/helper-scripts)
 
 ## Separate Scripts
-Separate installation scripts are created for each HONEUR Component.
+Separate installation scripts are created for each FEDER8 Component.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/separate-scripts)
 
@@ -32,3 +32,7 @@ You can find the more information about the installation in pdf and docx format.
 ### PHEDERATION - Remote setup with Docker
 - [PHederation Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/PHederation%20local%20installation%20instructions.pdf)
 - [PHederation Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/PHederation%20local%20installation%20instructions.docx)
+
+### Esfurn - Remote setup with Docker
+- [Esfurn Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Esfurn%20local%20installation%20instructions.pdf)
+- [Esfurn Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Esfurn%20local%20installation%20instructions.docx)

@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-cr=$(echo $'\n.')
-cr=${cr%.}
-
 VERSION=2.0.0
-TAG=omop-cdm-constraints-and-indexes-$VERSION
+BACKUP_FOLDER=${PWD}/backup
+
+if [ -z "$1" ]
+then
+  read -p "Enter the name of the database to backup: " DB_NAME
+else
+  DB_NAME=$1
+fi
 
 read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
 while [[ "$FEDER8_THERAPEUTIC_AREA" != "honeur" && "$FEDER8_THERAPEUTIC_AREA" != "phederation" && "$FEDER8_THERAPEUTIC_AREA" != "esfurn" && "$FEDER8_THERAPEUTIC_AREA" != "athena" && "$FEDER8_THERAPEUTIC_AREA" != "" ]]; do
@@ -39,31 +43,27 @@ while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
     read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
 done
 
-touch omop-indexes-and-constraints.env
+echo "Stop and remove backup-$DB_NAME container if exists"
+docker stop backup-$DB_NAME > /dev/null 2>&1 || true
+docker rm backup-$DB_NAME > /dev/null 2>&1 || true
 
-echo "FEDER8_THERAPEUTIC_AREA=$FEDER8_THERAPEUTIC_AREA" >> omop-indexes-and-constraints.env
-echo "DB_HOST=postgres" >> omop-indexes-and-constraints.env
-
-echo "Stop and remove omop-indexes-and-constraints container if exists"
-docker stop omop-indexes-and-constraints > /dev/null 2>&1 || true
-docker rm omop-indexes-and-constraints > /dev/null 2>&1 || true
-
-echo "Create $FEDER8_THERAPEUTIC_AREA-net network if it does not exists"
-docker network create --driver bridge $FEDER8_THERAPEUTIC_AREA-net > /dev/null 2>&1 || true
-
-echo "Pull $FEDER8_THERAPEUTIC_AREA/postgres:$TAG from https://$FEDER8_THERAPEUTIC_AREA_URL. This could take a while if not present on machine"
+echo "Pull $FEDER8_THERAPEUTIC_AREA/scheduled-backup:$VERSION from https://$FEDER8_THERAPEUTIC_AREA_URL. This could take a while if not present on machine"
 echo "$FEDER8_CLI_SECRET" | docker login https://$FEDER8_THERAPEUTIC_AREA_URL --username $FEDER8_EMAIL_ADDRESS --password-stdin
-docker pull $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
+docker pull $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/scheduled-backup:$VERSION
 
-echo "Run ${FEDER8_THERAPEUTIC_AREA}/postgres:$TAG container. This could take a while..."
+echo "Run $FEDER8_THERAPEUTIC_AREA/scheduled-backup:$VERSION container. This could take a while..."
 docker run \
---name "omop-indexes-and-constraints" \
---env-file omop-indexes-and-constraints.env \
--v "shared:/var/lib/shared:ro" \
---network ${FEDER8_THERAPEUTIC_AREA}-net \
-$FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
-
-echo "Clean up helper files"
-rm -rf omop-indexes-and-constraints.env
+  --name "backup-$DB_NAME" \
+  --restart on-failure:5 \
+  --network="$FEDER8_THERAPEUTIC_AREA-net" \
+  -e DB_NAME=$DB_NAME \
+  -v "shared:/var/lib/shared:ro" \
+  -v ${BACKUP_FOLDER}:/backup \
+  -d \
+  honeur/scheduled-backup:$VERSION
 
 echo "Done"
+
+
+
+

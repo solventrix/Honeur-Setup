@@ -1,14 +1,26 @@
 #!/usr/bin/env bash
 set -eu
 
+export LC_CTYPE=C
+
 CURRENT_DIRECTORY=$(pwd)
 
-echo "Docker login, Make sure to use an account with access to the honeur docker hub images."
-docker login
-if [ ! $? -eq 0 ]; then
-    echo "Docker login failed."
-    exit 1
-fi
+FEDER8_THERAPEUTIC_AREA=honeur
+FEDER8_THERAPEUTIC_AREA_UPPERCASE=$(echo "$FEDER8_THERAPEUTIC_AREA" |  tr '[:lower:]' '[:upper:]' )
+FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
+FEDER8_THERAPEUTIC_AREA_URL=harbor.honeur.org
+
+read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
+    echo "Email address can not be empty"
+    read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+done
+echo "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field."
+read -p 'Enter the CLI Secret: ' FEDER8_CLI_SECRET
+while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
+    echo "CLI Secret can not be empty"
+    read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
+done
 
 read -p "Use JDBC users or LDAP or No authentication? Enter jdbc/ldap/none. [none]: " HONEUR_SECURITY_METHOD
 while [[ "$HONEUR_SECURITY_METHOD" != "none" && "$HONEUR_SECURITY_METHOD" != "ldap" && "$HONEUR_SECURITY_METHOD" != "jdbc" && "$HONEUR_SECURITY_METHOD" != "" ]]; do
@@ -46,8 +58,8 @@ read -p "Enter the directory where Zeppelin/HONEUR Studio will save the prepared
 HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
 read -p 'Enter your HONEUR organization [Janssen]: ' HONEUR_ANALYTICS_ORGANIZATION
 HONEUR_ANALYTICS_ORGANIZATION=${HONEUR_ANALYTICS_ORGANIZATION:-Janssen}
-read -p "Enter the directory where HONEUR Studio will store its data [$CURRENT_DIRECTORY/honeurstudio]: " HONEUR_HONEUR_STUDIO_FOLDER
-HONEUR_HONEUR_STUDIO_FOLDER=${HONEUR_HONEUR_STUDIO_FOLDER:-$CURRENT_DIRECTORY/honeurstudio}
+read -p "Enter the directory where ${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio will store its data [$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio]: " HONEUR_HONEUR_STUDIO_FOLDER
+HONEUR_HONEUR_STUDIO_FOLDER=${HONEUR_HONEUR_STUDIO_FOLDER:-$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio}
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     read -p "User Management administrator username [admin]: " HONEUR_USERMGMT_ADMIN_USERNAME
@@ -56,23 +68,31 @@ if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     HONEUR_USERMGMT_ADMIN_PASSWORD=${HONEUR_USERMGMT_ADMIN_PASSWORD:-admin}
 fi
 
-HONEUR_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-HONEUR_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+FEDER8_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+FEDER8_ADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 
-read -p "Enter password for honeur database user [$HONEUR_PASSWORD]: " HONEUR_PASSWORD
-read -p "Enter password for honeur admin database user [$HONEUR_ADMIN_PASSWORD]: " HONEUR_ADMIN_PASSWORD
+read -p "Enter password for $FEDER8_THERAPEUTIC_AREA database user [$FEDER8_PASSWORD]: " FEDER8_NEW_PASSWORD
+FEDER8_NEW_PASSWORD=${FEDER8_NEW_PASSWORD:-$FEDER8_PASSWORD}
+read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$FEDER8_ADMIN_PASSWORD]: " FEDER8_NEW_ADMIN_PASSWORD
+FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-$FEDER8_ADMIN_PASSWORD}
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres-honeur.sh --output start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
 chmod +x start-postgres.sh
 {
-  echo "$HONEUR_PASSWORD";
-  echo "$HONEUR_ADMIN_PASSWORD"
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
+  echo "$FEDER8_NEW_PASSWORD";
+  echo "$FEDER8_NEW_ADMIN_PASSWORD"
 } | ./start-postgres.sh
 rm -rf start-postgres.sh
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh
 chmod +x start-atlas-webapi.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_HOST_MACHINE";
   echo "$HONEUR_SECURITY_METHOD";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_URL";
@@ -86,6 +106,9 @@ rm -rf start-atlas-webapi.sh
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh
 chmod +x start-zeppelin.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_ZEPPELIN_LOGS";
   echo "$HONEUR_ZEPPELIN_NOTEBOOKS";
   echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
@@ -101,14 +124,20 @@ rm -rf start-zeppelin.sh
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh
 chmod +x start-distributed-analytics.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
   echo "$HONEUR_ANALYTICS_ORGANIZATION"
 } | ./start-distributed-analytics.sh
 rm -rf start-distributed-analytics.sh
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-honeur-studio.sh --output start-honeur-studio.sh
-chmod +x start-honeur-studio.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh
+chmod +x start-feder8-studio.sh
 {
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
   echo "$HONEUR_HOST_MACHINE";
   echo "$HONEUR_HONEUR_STUDIO_FOLDER";
   echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
@@ -118,13 +147,16 @@ chmod +x start-honeur-studio.sh
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_BASE_DN";
   [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_DN"
-} | ./start-honeur-studio.sh
-rm -rf start-honeur-studio.sh
+} | ./start-feder8-studio.sh
+rm -rf start-feder8-studio.sh
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
     chmod +x start-user-management.sh
     {
+        echo "$FEDER8_THERAPEUTIC_AREA";
+        echo "$FEDER8_EMAIL_ADDRESS";
+        echo "$FEDER8_CLI_SECRET";
         echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
         echo "$HONEUR_USERMGMT_ADMIN_PASSWORD"
     } | ./start-user-management.sh
@@ -133,7 +165,11 @@ fi
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh
 chmod +x start-nginx.sh
-./start-nginx.sh
+{
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
+} | ./start-nginx.sh
 rm -rf start-nginx.sh
 
 echo "postgresql is available on $HONEUR_HOST_MACHINE:5444"
@@ -142,8 +178,8 @@ echo "Zeppelin is available on http://$HONEUR_HOST_MACHINE/zeppelin"
 echo "Zeppelin logs are available in directory $HONEUR_ZEPPELIN_LOGS"
 echo "Zeppelin notebooks are available in directory $HONEUR_ZEPPELIN_NOTEBOOKS"
 [ ! "$HONEUR_SECURITY_METHOD" = "none" ] && echo "User Management is available on http://$HONEUR_HOST_MACHINE/user-mgmt"
-echo "HONEUR Studio VSCode is available on http://$HONEUR_HOST_MACHINE/honeur-studio/app/vscode"
-echo "HONEUR Studio RStudio is available on http://$HONEUR_HOST_MACHINE/honeur-studio/app/rstudio"
-echo "HONEUR Studio local Shiny apps are available on http://$HONEUR_HOST_MACHINE/honeur-studio/app/reports"
-echo "HONEUR Studio documents is available on http://$HONEUR_HOST_MACHINE/honeur-studio/app/documents"
-echo "HONEUR Studio personal space is available on http://$HONEUR_HOST_MACHINE/honeur-studio/app/personal"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio VSCode is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/vscode"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio RStudio is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/rstudio"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio local Shiny apps are available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/reports"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio documents is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/documents"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio personal space is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/personal"

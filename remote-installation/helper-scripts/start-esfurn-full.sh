@@ -5,9 +5,10 @@ export LC_CTYPE=C
 
 CURRENT_DIRECTORY=$(pwd)
 
-FEDER8_THERAPEUTIC_AREA=honeur
-FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-FEDER8_THERAPEUTIC_AREA_URL=harbor.honeur.org
+FEDER8_THERAPEUTIC_AREA=esfurn
+FEDER8_THERAPEUTIC_AREA_UPPERCASE=$(echo "$FEDER8_THERAPEUTIC_AREA" |  tr '[:lower:]' '[:upper:]' )
+FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
+FEDER8_THERAPEUTIC_AREA_URL=harbor.esfurn.org
 
 read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
@@ -53,8 +54,12 @@ read -p "Enter the directory where the zeppelin logs will kept on the host machi
 HONEUR_ZEPPELIN_LOGS=${HONEUR_ZEPPELIN_LOGS:-$CURRENT_DIRECTORY/zeppelin/logs}
 read -p "Enter the directory where the zeppelin notebooks will kept on the host machine [$CURRENT_DIRECTORY/zeppelin/notebook]: " HONEUR_ZEPPELIN_NOTEBOOKS
 HONEUR_ZEPPELIN_NOTEBOOKS=${HONEUR_ZEPPELIN_NOTEBOOKS:-$CURRENT_DIRECTORY/zeppelin/notebook}
-read -p "Enter the directory where Zeppelin will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
+read -p "Enter the directory where Zeppelin/HONEUR Studio will save the prepared distributed analytics data [$CURRENT_DIRECTORY/distributed-analytics]: " HONEUR_ANALYTICS_SHARED_FOLDER
 HONEUR_ANALYTICS_SHARED_FOLDER=${HONEUR_ANALYTICS_SHARED_FOLDER:-$CURRENT_DIRECTORY/distributed-analytics}
+read -p 'Enter your HONEUR organization [Janssen]: ' HONEUR_ANALYTICS_ORGANIZATION
+HONEUR_ANALYTICS_ORGANIZATION=${HONEUR_ANALYTICS_ORGANIZATION:-Janssen}
+read -p "Enter the directory where ${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio will store its data [$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio]: " HONEUR_HONEUR_STUDIO_FOLDER
+HONEUR_HONEUR_STUDIO_FOLDER=${HONEUR_HONEUR_STUDIO_FOLDER:-$CURRENT_DIRECTORY/${FEDER8_THERAPEUTIC_AREA}studio}
 
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     read -p "User Management administrator username [admin]: " HONEUR_USERMGMT_ADMIN_USERNAME
@@ -116,15 +121,44 @@ chmod +x start-zeppelin.sh
 } | ./start-zeppelin.sh
 rm -rf start-zeppelin.sh
 
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh
+chmod +x start-distributed-analytics.sh
+{
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
+  echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
+  echo "$HONEUR_ANALYTICS_ORGANIZATION"
+} | ./start-distributed-analytics.sh
+rm -rf start-distributed-analytics.sh
+
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh
+chmod +x start-feder8-studio.sh
+{
+  echo "$FEDER8_THERAPEUTIC_AREA";
+  echo "$FEDER8_EMAIL_ADDRESS";
+  echo "$FEDER8_CLI_SECRET";
+  echo "$HONEUR_HOST_MACHINE";
+  echo "$HONEUR_HONEUR_STUDIO_FOLDER";
+  echo "$HONEUR_ANALYTICS_SHARED_FOLDER";
+  echo "$HONEUR_SECURITY_METHOD";
+  [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_URL";
+  [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_SYSTEM_USERNAME";
+  [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_SYSTEM_PASSWORD";
+  [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_BASE_DN";
+  [[ "$HONEUR_SECURITY_METHOD" = "ldap" ]] && echo "$HONEUR_SECURITY_LDAP_DN"
+} | ./start-feder8-studio.sh
+rm -rf start-feder8-studio.sh
+
 if [ ! "$HONEUR_SECURITY_METHOD" = "none" ]; then
     curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh
     chmod +x start-user-management.sh
     {
-      echo "$FEDER8_THERAPEUTIC_AREA";
-      echo "$FEDER8_EMAIL_ADDRESS";
-      echo "$FEDER8_CLI_SECRET";
-      echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
-      echo "$HONEUR_USERMGMT_ADMIN_PASSWORD"
+        echo "$FEDER8_THERAPEUTIC_AREA";
+        echo "$FEDER8_EMAIL_ADDRESS";
+        echo "$FEDER8_CLI_SECRET";
+        echo "$HONEUR_USERMGMT_ADMIN_USERNAME";
+        echo "$HONEUR_USERMGMT_ADMIN_PASSWORD"
     } | ./start-user-management.sh
     rm -rf start-user-management.sh
 fi
@@ -144,3 +178,8 @@ echo "Zeppelin is available on http://$HONEUR_HOST_MACHINE/zeppelin"
 echo "Zeppelin logs are available in directory $HONEUR_ZEPPELIN_LOGS"
 echo "Zeppelin notebooks are available in directory $HONEUR_ZEPPELIN_NOTEBOOKS"
 [ ! "$HONEUR_SECURITY_METHOD" = "none" ] && echo "User Management is available on http://$HONEUR_HOST_MACHINE/user-mgmt"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio VSCode is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/vscode"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio RStudio is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/rstudio"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio local Shiny apps are available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/reports"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio documents is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/documents"
+echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} Studio personal space is available on http://$HONEUR_HOST_MACHINE/$FEDER8_THERAPEUTIC_AREA-studio/app/personal"
