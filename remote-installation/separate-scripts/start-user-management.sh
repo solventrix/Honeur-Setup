@@ -4,7 +4,7 @@ set -e
 cr=$(echo $'\n.')
 cr=${cr%.}
 
-VERSION=2.0.1
+VERSION=2.0.2
 TAG=$VERSION
 
 read -p "Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " FEDER8_THERAPEUTIC_AREA
@@ -16,30 +16,30 @@ FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA:-honeur}
 
 if [ "$FEDER8_THERAPEUTIC_AREA" = "honeur" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
     FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=\#0794e0
     FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=\#002562
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "phederation" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
     FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=\#3590d5
     FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=\#0741ad
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "esfurn" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
     FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=\#668772
     FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=\#44594c
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "athena" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
     FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=\#0794e0
     FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=\#002562
 fi
 
-read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
-    read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+    read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 done
 read -p "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.${cr}Enter the CLI Secret: " FEDER8_CLI_SECRET
 while [[ "$FEDER8_CLI_SECRET" == "" ]]; do

@@ -21,22 +21,22 @@ FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA:-honeur}
 
 if [ "$FEDER8_THERAPEUTIC_AREA" = "honeur" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "phederation" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "esfurn" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "athena" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN
+    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 fi
 
-read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
-    read -p "Enter email address used to login to https://portal-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
+    read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 done
 read -p "Surf to https://$FEDER8_THERAPEUTIC_AREA_URL and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.${cr}Enter the CLI Secret: " FEDER8_CLI_SECRET
 while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
@@ -52,7 +52,7 @@ FEDER8_ANALYTICS_ORGANIZATION=${FEDER8_ANALYTICS_ORGANIZATION:-Janssen}
 touch distributed-analytics.env
 
 echo "DISTRIBUTED_SERVICE_CLIENT_SCHEME=https" >> distributed-analytics.env
-echo "DISTRIBUTED_SERVICE_CLIENT_HOST=distributed-analytics-uat.$FEDER8_THERAPEUTIC_AREA_DOMAIN" >> distributed-analytics.env
+echo "DISTRIBUTED_SERVICE_CLIENT_HOST=distributed-analytics.$FEDER8_THERAPEUTIC_AREA_DOMAIN" >> distributed-analytics.env
 echo "DISTRIBUTED_SERVICE_CLIENT_PORT=443" >> distributed-analytics.env
 echo "DISTRIBUTED_SERVICE_CLIENT_BIND=distributed-service" >> distributed-analytics.env
 echo "DISTRIBUTED_SERVICE_CLIENT_API=api" >> distributed-analytics.env

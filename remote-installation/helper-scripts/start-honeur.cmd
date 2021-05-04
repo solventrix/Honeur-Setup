@@ -4,13 +4,13 @@ Setlocal EnableDelayedExpansion
 SET "FEDER8_THERAPEUTIC_AREA=honeur"
 for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 SET "FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org"
-SET "FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.honeur.org"
+SET "FEDER8_THERAPEUTIC_AREA_URL=harbor.honeur.org"
 
-SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
 :while-email-address-not-correct
 if "%FEDER8_EMAIL_ADDRESS%" == "" (
    echo Email address can not be empty
-   SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+   SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
    goto :while-email-address-not-correct
 )
 
@@ -19,7 +19,7 @@ SET /p FEDER8_CLI_SECRET="Enter the CLI Secret: "
 :while-cli-secret-not-correct
 if "%FEDER8_CLI_SECRET%" == "" (
    echo Email address can not be empty
-   SET /p FEDER8_CLI_SECRET="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+   SET /p FEDER8_CLI_SECRET="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
    goto :while-cli-secret-not-correct
 )
 
@@ -61,25 +61,25 @@ CALL :generate-random-password FEDER8_ADMIN_USER_PW
 SET /p FEDER8_USER_PW="Enter password for %FEDER8_THERAPEUTIC_AREA% database user [%FEDER8_USER_PW%]: " || SET FEDER8_USER_PW=%FEDER8_USER_PW%
 SET /p FEDER8_ADMIN_USER_PW="Enter password for %FEDER8_THERAPEUTIC_AREA%_admin database user [%FEDER8_ADMIN_USER_PW%]: " || SET FEDER8_ADMIN_USER_PW=%FEDER8_ADMIN_USER_PW%
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 CALL .\start-postgres.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_USER_PW%" "%FEDER8_ADMIN_USER_PW%"
 DEL start-postgres.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
 CALL .\start-atlas-webapi.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_HOST_MACHINE%" "%FEDER8_SECURITY_METHOD%" "%FEDER8_SECURITY_LDAP_URL%" "%FEDER8_SECURITY_LDAP_SYSTEM_USERNAME%" "%FEDER8_SECURITY_LDAP_SYSTEM_PASSWORD%" "%FEDER8_SECURITY_LDAP_BASE_DN%" "%FEDER8_SECURITY_LDAP_DN%"
 DEL start-atlas-webapi.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
 CALL .\start-zeppelin.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_ZEPPELIN_LOGS%" "%FEDER8_ZEPPELIN_NOTEBOOKS%" "%FEDER8_ANALYTICS_SHARED_FOLDER%" "%FEDER8_SECURITY_METHOD%" "%FEDER8_SECURITY_LDAP_URL%" "%FEDER8_SECURITY_LDAP_SYSTEM_USERNAME%" "%FEDER8_SECURITY_LDAP_SYSTEM_PASSWORD%" "%FEDER8_SECURITY_LDAP_BASE_DN%" "%FEDER8_SECURITY_LDAP_DN%"
 DEL start-zeppelin.cmd
 
 if "%FEDER8_SECURITY_METHOD%" NEQ "none" (
-    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
     CALL .\start-user-management.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_USERMGMT_ADMIN_USERNAME%" "%FEDER8_USERMGMT_ADMIN_PASSWORD%"
     DEL start-user-management.cmd
 )
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
 CALL .\start-nginx.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%"
 DEL start-nginx.cmd
 

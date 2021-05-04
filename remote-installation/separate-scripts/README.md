@@ -48,12 +48,12 @@ Postgres database can be installed by running the installation script..
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 ```
 
 2. You can run this script using the following command:
@@ -71,10 +71,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a new password for standard database user.
 8. The script will prompt you to enter a new password for admin database user.
@@ -90,12 +89,12 @@ Atlas/WebAPI can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
 ```
 
 2. You can run this script using the following command:
@@ -113,10 +112,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing HONEUR Components like Postgres/Zeppelin or FEDER8 Studio. Please use the same security settings as with these previous installation.
@@ -133,12 +131,12 @@ Zeppelin can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
 ```
 
 2. You can run this script using the following command:
@@ -156,10 +154,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 8. The script will prompt you to enter the security options for Zeppelin. If you have existing HONEUR Components like Postgres/Atlas/WebAPI or FEDER8 Studio. Please use the same security settings as with these previous installation.
@@ -178,12 +175,12 @@ User Management can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
 ```
 
 2. You can run this script using the following command:
@@ -201,10 +198,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter credentials for the administrator user that can manage users and roles.
 
@@ -221,12 +217,12 @@ Distributed Analytics can be installed by running the installation script.
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
 ```
 
 2. You can run this script using the following command:
@@ -244,10 +240,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter the directory where zeppelin will save its prepared distributed analytics data. Use the same directory as with the installation of Zeppelin.
 8. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the HONEUR Team.
@@ -261,12 +256,12 @@ FEDER8 Studio can be downloaded right next to an existing installation. Please f
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
 ```
 
 2. You can run this script using the following command:
@@ -284,10 +279,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. FEDER8 Studio will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter the directory of where the FEDER8 Studio will store its working directory files.
@@ -305,12 +299,12 @@ Proxy can be downloaded right next to an existing installation. Please follow th
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
 ```
 
 2. You can run this script using the following command:
@@ -328,10 +322,9 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor-uat.honeur.org for HONEUR
-    * https://harbor-uat.phederation.org for PHederation
-    * https://harbor-uat.esfurn.org for Esfurn
-    * https://harbor-uat.athenafederation.org for Athena
+    * https://harbor.honeur.org for HONEUR
+    * https://harbor.phederation.org for PHederation
+    * https://harbor.esfurn.org for Esfurn
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the HONEUR Proxy docker image and will create the docker container.
