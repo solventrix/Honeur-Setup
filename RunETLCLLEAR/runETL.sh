@@ -3,7 +3,7 @@ rm -rf ./CLLEAR
 
 git clone https://github.com/solventrix/CLLEAR_SOURCE ./CLLEAR
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLCLLEAR/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/RunETLCLLEAR/docker-compose.yml --output docker-compose.yml
 
 read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}

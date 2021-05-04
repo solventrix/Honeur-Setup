@@ -40,9 +40,9 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images required to run the full setup are located on a central repository. Make sure you have an account on our central platform before trying to run the local setup installation scripts:
 
-  * For HONEUR: https://portal.honeur.org
-  * For PHederation: https://portal.phederation.org
-  * For Esfurn: https://portal.esfurn.org
+  * For HONEUR: https://portal-uat.honeur.org
+  * For PHederation: https://portal-uat.phederation.org
+  * For Esfurn: https://portal-uat.esfurn.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -62,12 +62,12 @@ Essential remote installation can be installed by running the installation helpe
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur.sh --output start-honeur.sh && chmod +x start-honeur.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-honeur.sh --output start-honeur.sh && chmod +x start-honeur.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur.cmd --output start-honeur.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-honeur.cmd --output start-honeur.cmd
 ```
 
 2. You can run this script using the following command:
@@ -81,8 +81,8 @@ Windows
 ```
 .\start-honeur.cmd
 ```
-3. The script will promt you to enter your email address that you use as your login on our central platform https://portal.honeur.org.
-4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor.honeur.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+3. The script will promt you to enter your email address that you use as your login on our central platform https://portal-uat.honeur.org.
+4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor-uat.honeur.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing HONEUR Components like Postgres/Zeppelin or HONEUR studio. Please use the same security settings as with these previous installation.
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
@@ -97,12 +97,12 @@ Once done, the script will download all essential docker images and will create 
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation.sh --output start-phederation.sh && chmod +x start-phederation.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-phederation.sh --output start-phederation.sh && chmod +x start-phederation.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation.cmd --output start-phederation.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-phederation.cmd --output start-phederation.cmd
 ```
 
 2. You can run this script using the following command:
@@ -117,8 +117,8 @@ Windows
 .\start-phederation.cmd
 ```
 
-3. The script will promt you to enter your email address that you use as your login on our central platform https://portal.phederation.org.
-4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor.phederation.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+3. The script will promt you to enter your email address that you use as your login on our central platform https://portal-uat.phederation.org.
+4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor-uat.phederation.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing PHederation Components like Postgres/Zeppelin or PHEDERATION studio. Please use the same security settings as with these previous installation.
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
@@ -133,12 +133,12 @@ Once done, the script will download all essential docker images and will create 
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-esfurn.sh --output start-esfurn.sh && chmod +x start-esfurn.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-esfurn.sh --output start-esfurn.sh && chmod +x start-esfurn.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-esfurn.cmd --output start-esfurn.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-esfurn.cmd --output start-esfurn.cmd
 ```
 
 2. You can run this script using the following command:
@@ -153,8 +153,8 @@ Windows
 .\start-esfurn.cmd
 ```
 
-3. The script will promt you to enter your email address that you use as your login on our central platform https://portal.esfurn.org.
-4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor.esfurn.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+3. The script will promt you to enter your email address that you use as your login on our central platform https://portal-uat.esfurn.org.
+4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor-uat.esfurn.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing Esfurn Components like Postgres/Zeppelin or ESFURN studio. Please use the same security settings as with these previous installation.
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
@@ -182,12 +182,12 @@ Full remote installation can be installed by running the installation helper scr
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur-full.sh --output start-honeur.sh && chmod +x start-honeur.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-honeur-full.sh --output start-honeur.sh && chmod +x start-honeur.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-honeur-full.cmd --output start-honeur.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-honeur-full.cmd --output start-honeur.cmd
 ```
 
 2. You can run this script using the following command:
@@ -201,8 +201,8 @@ Windows
 ```
 .\start-honeur.cmd
 ```
-3. The script will promt you to enter your email address that you use as your login on our central platform https://portal.honeur.org.
-4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor.honeur.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+3. The script will promt you to enter your email address that you use as your login on our central platform https://portal-uat.honeur.org.
+4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor-uat.honeur.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing HONEUR Components like Postgres/Zeppelin or HONEUR studio. Please use the same security settings as with these previous installation.
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
@@ -219,12 +219,12 @@ Once done, the script will download all docker images and will create the docker
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation-full.sh --output start-phederation.sh && chmod +x start-phederation.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-phederation-full.sh --output start-phederation.sh && chmod +x start-phederation.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-phederation-full.cmd --output start-phederation.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-phederation-full.cmd --output start-phederation.cmd
 ```
 
 2. You can run this script using the following command:
@@ -238,8 +238,8 @@ Windows
 ```
 .\start-phederation.cmd
 ```
-3. The script will promt you to enter your email address that you use as your login on our central platform https://portal.phederation.org.
-4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor.phederation.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+3. The script will promt you to enter your email address that you use as your login on our central platform https://portal-uat.phederation.org.
+4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor-uat.phederation.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing PHederation Components like Postgres/Zeppelin or PHederation studio. Please use the same security settings as with these previous installation.
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
@@ -256,12 +256,12 @@ Once done, the script will download all docker images and will create the docker
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-esfurn-full.sh --output start-esfurn.sh && chmod +x start-esfurn.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-esfurn-full.sh --output start-esfurn.sh && chmod +x start-esfurn.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-esfurn-full.cmd --output start-esfurn.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-esfurn-full.cmd --output start-esfurn.cmd
 ```
 
 2. You can run this script using the following command:
@@ -275,8 +275,8 @@ Windows
 ```
 .\start-esfurn.cmd
 ```
-3. The script will promt you to enter your email address that you use as your login on our central platform https://portal.esfurn.org.
-4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor.esfurn.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+3. The script will promt you to enter your email address that you use as your login on our central platform https://portal-uat.esfurn.org.
+4. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to https://harbor-uat.esfurn.org and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 5. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing Esfurn Components like Postgres/Zeppelin or ESFURN studio. Please use the same security settings as with these previous installation.
 6. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
