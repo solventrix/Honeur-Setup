@@ -65,6 +65,7 @@ rm -rf start-postgres.sh
 
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-creation.sh --output start-source-creation.sh
 chmod +x start-source-creation.sh
+export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 {
   echo "$FEDER8_THERAPEUTIC_AREA";
   echo "$FEDER8_EMAIL_ADDRESS";

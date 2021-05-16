@@ -47,10 +47,14 @@ FEDER8_DATABASE_HOST=${FEDER8_DATABASE_HOST:-postgres}
 read -p 'Enter the priority for the new source [2]: ' FEDER8_DAIMONS_PRIORITY
 FEDER8_DAIMONS_PRIORITY=${FEDER8_DAIMONS_PRIORITY:-2}
 
+if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
+fi
+
 touch webapi-source-add.env
 
 echo "DB_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-add.env
-echo "FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA}" >> webapi-source-add.env
+echo "FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA} QA" >> webapi-source-add.env
 echo "FEDER8_DATABASE_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-add.env
 echo "FEDER8_DAIMONS_PRIORITY=${FEDER8_DAIMONS_PRIORITY}" >> webapi-source-add.env
 
@@ -69,6 +73,7 @@ echo "Run $FEDER8_THERAPEUTIC_AREA/postgres:$TAG container. This could take a wh
 docker run \
 --name "webapi-source-add" \
 --rm \
+-v $FEDER8_SHARED_SECRETS_VOLUME_NAME:/var/lib/shared \
 --env-file webapi-source-add.env \
 --network $FEDER8_THERAPEUTIC_AREA-net \
 $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG > /dev/null 2>&1
