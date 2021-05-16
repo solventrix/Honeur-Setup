@@ -49,7 +49,27 @@ FEDER8_NEW_PASSWORD=${FEDER8_NEW_PASSWORD:-$FEDER8_PASSWORD}
 read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$FEDER8_ADMIN_PASSWORD]: " FEDER8_NEW_ADMIN_PASSWORD
 FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-$FEDER8_ADMIN_PASSWORD}
 
-echo "This script will install version 2.0.1 of the $FEDER8_THERAPEUTIC_AREA database. All $FEDER8_THERAPEUTIC_AREA docker containers will be restarted after running this script."
+if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
+fi
+
+if [ -z "$FEDER8_PGDATA_VOLUME_NAME" ]; then
+    FEDER8_PGDATA_VOLUME_NAME=pgdata
+fi
+
+if [ -z "$FEDER8_POSTGRES_CONTAINER_NAME" ]; then
+    FEDER8_POSTGRES_CONTAINER_NAME=postgres
+fi
+
+if [ -z "$FEDER8_RESTART_OTHER_COMPONENTS" ]; then
+    FEDER8_RESTART_OTHER_COMPONENTS=true
+fi
+
+if [ -z "$FEDER8_CONTAINER_HOST_PORT" ]; then
+    FEDER8_CONTAINER_HOST_PORT=5444
+fi
+
+echo "This script will install version $VERSION of the $FEDER8_THERAPEUTIC_AREA database. All $FEDER8_THERAPEUTIC_AREA docker containers will be restarted after running this script."
 
 touch postgres.env
 
@@ -58,12 +78,12 @@ echo "HONEUR_USER_PW=$FEDER8_NEW_PASSWORD" >> postgres.env
 echo "HONEUR_ADMIN_USER_USERNAME=${FEDER8_THERAPEUTIC_AREA}_admin" >> postgres.env
 echo "HONEUR_ADMIN_USER_PW=$FEDER8_NEW_ADMIN_PASSWORD" >> postgres.env
 
-echo "Stop and remove postgres container if exists"
-docker stop postgres > /dev/null 2>&1 || true
-docker rm postgres > /dev/null 2>&1 || true
+echo "Stop and remove $FEDER8_POSTGRES_CONTAINER_NAME container if exists"
+docker stop $FEDER8_POSTGRES_CONTAINER_NAME > /dev/null 2>&1 || true
+docker rm $FEDER8_POSTGRES_CONTAINER_NAME > /dev/null 2>&1 || true
 
 echo "Removing existing helper volumes"
-docker volume rm shared > /dev/null 2>&1 || true
+docker volume rm $FEDER8_SHARED_SECRETS_VOLUME_NAME > /dev/null 2>&1 || true
 
 echo "Create $FEDER8_THERAPEUTIC_AREA-net network if it does not exists"
 docker network create --driver bridge $FEDER8_THERAPEUTIC_AREA-net > /dev/null 2>&1 || true
@@ -73,18 +93,18 @@ echo "$FEDER8_CLI_SECRET" | docker login https://$FEDER8_THERAPEUTIC_AREA_URL --
 docker pull $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
 
 echo "Creating helper volumes"
-docker volume create shared > /dev/null 2>&1 || true
-docker volume create pgdata > /dev/null 2>&1 || true
+docker volume create $FEDER8_SHARED_SECRETS_VOLUME_NAME > /dev/null 2>&1 || true
+docker volume create $FEDER8_PGDATA_VOLUME_NAME > /dev/null 2>&1 || true
 
 echo "Run $FEDER8_THERAPEUTIC_AREA/postgres:$TAG container. This could take a while..."
 docker run \
---name "postgres" \
+--name "$FEDER8_POSTGRES_CONTAINER_NAME" \
 --restart on-failure:5 \
 --security-opt no-new-privileges \
 --env-file postgres.env \
--p "5444:5432" \
--v "pgdata:/var/lib/postgresql/data" \
--v "shared:/var/lib/postgresql/envfileshared" \
+-p "${FEDER8_CONTAINER_HOST_PORT}:5432" \
+-v "${FEDER8_PGDATA_VOLUME_NAME}:/var/lib/postgresql/data" \
+-v "${FEDER8_SHARED_SECRETS_VOLUME_NAME}:/var/lib/postgresql/envfileshared" \
 -m "2g" \
 --cpus "2" \
 --pids-limit 100 \
@@ -93,17 +113,19 @@ docker run \
 -d \
 $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG > /dev/null 2>&1
 
-echo "Connect postgres to $FEDER8_THERAPEUTIC_AREA-net network"
-docker network connect $FEDER8_THERAPEUTIC_AREA-net postgres > /dev/null 2>&1
+echo "Connect $FEDER8_POSTGRES_CONTAINER_NAME to $FEDER8_THERAPEUTIC_AREA-net network"
+docker network connect $FEDER8_THERAPEUTIC_AREA-net $FEDER8_POSTGRES_CONTAINER_NAME > /dev/null 2>&1
 
 echo "Clean up helper files"
 rm -rf postgres.env
 
 echo "Done"
 
-echo "Restarting $FEDER8_THERAPEUTIC_AREA Components"
-docker restart webapi > /dev/null 2>&1 || true
-docker restart user-mgmt > /dev/null 2>&1 || true
-docker restart zeppelin > /dev/null 2>&1 || true
-docker restart $FEDER8_THERAPEUTIC_AREA-studio > /dev/null 2>&1 || true
-docker restart $FEDER8_THERAPEUTIC_AREA-studio-chronicle > /dev/null 2>&1 || true
+if [ $FEDER8_RESTART_OTHER_COMPONENTS = "true" ]; then
+    echo "Restarting $FEDER8_THERAPEUTIC_AREA Components"
+    docker restart webapi > /dev/null 2>&1 || true
+    docker restart user-mgmt > /dev/null 2>&1 || true
+    docker restart zeppelin > /dev/null 2>&1 || true
+    docker restart $FEDER8_THERAPEUTIC_AREA-studio > /dev/null 2>&1 || true
+    docker restart $FEDER8_THERAPEUTIC_AREA-studio-chronicle > /dev/null 2>&1 || true
+fi

@@ -1,4 +1,4 @@
-# Remote Installation
+# Feder8 local installation
 
 Table of Contents
 =================
@@ -7,32 +7,24 @@ Table of Contents
   * [Separate Scripts](#separate-scripts)
   * [More info](#more-info)
 ## Installation Methods
-Remote installation can be installed using the following methods:
-1. [Helper scripts](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/helper-scripts) (recommended)
-2. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/separate-scripts).
+The Feder8 local installation can be installed as follows:
+1. [Helper scripts](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/helper-scripts) (recommended)
+2. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/master/remote-installation/separate-scripts).
 
 ## Helper scripts
-Helper scripts combines the installation of FEDER8 Components. You can choose to fully install all components or only install the essential components.
+Helper scripts combine the installation of the Feder8 components. You can choose to fully install all components or only install the essential components.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/helper-scripts)
 
 ## Separate Scripts
-Separate installation scripts are created for each FEDER8 Component.
+Separate installation scripts are available for each Feder8 component.
 
 Installation instructions can be found [here](https://github.com/solventrix/Honeur-Setup/tree/develop/remote-installation/separate-scripts)
 
 ## More info
 
-You can find the more information about the installation in pdf and docx format.
+More information about the installation is available in pdf and docx format.
 
-### HONEUR - Remote setup with Docker
-- [HONEUR Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/develop/remote-installation/HONEUR%20local%20installation%20instructions.pdf)
-- [HONEUR Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/develop/remote-installation/HONEUR%20local%20installation%20instructions.docx)
-
-### PHEDERATION - Remote setup with Docker
-- [PHederation Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/develop/remote-installation/PHederation%20local%20installation%20instructions.pdf)
-- [PHederation Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/develop/remote-installation/PHederation%20local%20installation%20instructions.docx)
-
-### Esfurn - Remote setup with Docker
-- [Esfurn Remote setup PDF](https://github.com/solventrix/Honeur-Setup/raw/develop/remote-installation/Esfurn%20local%20installation%20instructions.pdf)
-- [Esfurn Remote setup docx](https://github.com/solventrix/Honeur-Setup/raw/develop/remote-installation/Esfurn%20local%20installation%20instructions.docx)
+### Feder8 - local installation instructions
+- [Feder8 - local installation instructions PDF](https://github.com/solventrix/Honeur-Setup/blob/master/remote-installation/Feder8%20local%20installation%20instructions.pdf)
+- [Feder8 - local installation instructions docx](https://github.com/solventrix/Honeur-Setup/raw/master/remote-installation/Feder8%20local%20installation%20instructions.docx)
