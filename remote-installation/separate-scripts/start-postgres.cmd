@@ -110,7 +110,7 @@ docker stop %FEDER8_POSTGRES_CONTAINER_NAME% >nul 2>&1
 docker rm %FEDER8_POSTGRES_CONTAINER_NAME% >nul 2>&1
 
 echo Removing existing helper volumes
-docker volume rm shared >nul 2>&1
+docker volume rm %FEDER8_SHARED_SECRETS_VOLUME_NAME% >nul 2>&1
 
 echo Create %FEDER8_THERAPEUTIC_AREA%-net network if it does not exists
 docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-net >nul 2>&1
@@ -120,8 +120,8 @@ docker login https://%FEDER8_THERAPEUTIC_AREA_URL% --username %FEDER8_EMAIL_ADDR
 docker pull %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG%
 
 echo Creating helper volumes
-docker volume create shared >nul 2>&1
-docker volume create pgdata >nul 2>&1
+docker volume create %FEDER8_SHARED_SECRETS_VOLUME_NAME% >nul 2>&1
+docker volume create %FEDER8_PGDATA_VOLUME_NAME% >nul 2>&1
 
 echo Run %FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% container. This could take a while...
 docker run ^

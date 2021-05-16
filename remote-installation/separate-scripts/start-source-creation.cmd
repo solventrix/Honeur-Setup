@@ -109,12 +109,12 @@ docker run ^
 --name "webapi-source-add" ^
 --rm ^
 -v %FEDER8_SHARED_SECRETS_VOLUME_NAME%:/var/lib/shared ^
---env-file postgres.env ^
+--env-file webapi-source-add.env ^
 --network %FEDER8_THERAPEUTIC_AREA%-net ^
 %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% >nul 2>&1
 
 echo Clean up helper files
-DEL /Q postgres.env
+DEL /Q webapi-source-add.env
 
 echo Done
 EXIT /B 0

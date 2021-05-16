@@ -79,13 +79,6 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
-echo Stop and remove postgres-qa container if exists
-docker stop postgres-qa >nul 2>&1
-docker rm postgres-qa >nul 2>&1
-
-docker stop webapi-source-qa-enable >nul 2>&1
-docker rm webapi-source-qa-enable >nul 2>&1
-
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 SET FEDER8_PGDATA_VOLUME_NAME=pgdata-qa
