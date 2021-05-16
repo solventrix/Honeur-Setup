@@ -34,26 +34,18 @@ if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#0794e0
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#002562
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "phederation" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#3590d5
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#0741ad
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#668772
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#44594c
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#0794e0
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#002562
 )
 
 SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
@@ -73,51 +65,37 @@ if "%FEDER8_CLI_SECRET%" == "" (
    goto :while-cli-secret-not-correct
 )
 
-SET /p FEDER8_USER_PW="Enter password for %FEDER8_THERAPEUTIC_AREA% database user [%FEDER8_USER_PW%]: " || SET FEDER8_USER_PW=%FEDER8_USER_PW%
-SET /p FEDER8_ADMIN_USER_PW="Enter password for %FEDER8_THERAPEUTIC_AREA%_admin database user [%FEDER8_ADMIN_USER_PW%]: " || SET FEDER8_ADMIN_USER_PW=%FEDER8_ADMIN_USER_PW%
-
 :installation
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#0794e0
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#002562
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "phederation" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#3590d5
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#0741ad
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#668772
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#44594c
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_LIGHT_THEME_COLOR=#0794e0
-    SET FEDER8_CHANGE_THERAPEUTIC_AREA_DARK_THEME_COLOR=#002562
 )
 
-echo This script will install version 2.0.1 of the %FEDER8_THERAPEUTIC_AREA% database. All %FEDER8_THERAPEUTIC_AREA% docker containers will be restarted after running this script.
+IF "%FEDER8_SHARED_SECRETS_VOLUME_NAME%"=="" SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
 
-echo. 2>postgres.env
+echo. 2>webapi-source-add.env
 
-echo HONEUR_USER_USERNAME=%FEDER8_THERAPEUTIC_AREA%> postgres.env
-echo HONEUR_USER_PW=%FEDER8_USER_PW%>> postgres.env
-echo HONEUR_ADMIN_USER_USERNAME=%FEDER8_THERAPEUTIC_AREA%_admin>> postgres.env
-echo HONEUR_ADMIN_USER_PW=%FEDER8_ADMIN_USER_PW%>> postgres.env
+echo DB_HOST=%FEDER8_DATABASE_HOST% >> webapi-source-add.env
+echo FEDER8_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA% QA >> webapi-source-add.env
+echo FEDER8_DATABASE_HOST=%FEDER8_DATABASE_HOST% >> webapi-source-add.env
+echo FEDER8_DAIMONS_PRIORITY=%FEDER8_DAIMONS_PRIORITY% >> webapi-source-add.env
 
-echo Stop and remove postgres container if exists
-docker stop postgres >nul 2>&1
-docker rm postgres >nul 2>&1
-
-echo Removing existing helper volumes
-docker volume rm shared >nul 2>&1
+echo Stop and remove %FEDER8_POSTGRES_CONTAINER_NAME% container if exists
+docker stop webapi-source-add >nul 2>&1
+docker rm webapi-source-add >nul 2>&1
 
 echo Create %FEDER8_THERAPEUTIC_AREA%-net network if it does not exists
 docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-net >nul 2>&1
@@ -126,40 +104,17 @@ echo Pull %FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% from https://%FEDER8_THERAPEU
 docker login https://%FEDER8_THERAPEUTIC_AREA_URL% --username %FEDER8_EMAIL_ADDRESS% --password %FEDER8_CLI_SECRET%
 docker pull %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG%
 
-echo Creating helper volumes
-docker volume create shared >nul 2>&1
-docker volume create pgdata >nul 2>&1
-
 echo Run %FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% container. This could take a while...
 docker run ^
---name "postgres" ^
--p "5444:5432" ^
+--name "webapi-source-add" ^
+--rm ^
+-v %FEDER8_SHARED_SECRETS_VOLUME_NAME%:/var/lib/shared ^
 --env-file postgres.env ^
---restart on-failure:5 ^
---security-opt no-new-privileges ^
--v "pgdata:/var/lib/postgresql/data" ^
--v "shared:/var/lib/postgresql/envfileshared" ^
--m "2g" ^
---cpus "2" ^
---pids-limit 100 ^
---cpu-shares 1024 ^
---ulimit nofile=1024:1024 ^
--d ^
+--network %FEDER8_THERAPEUTIC_AREA%-net ^
 %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% >nul 2>&1
-
-echo Connect postgres to %FEDER8_THERAPEUTIC_AREA%-net network
-docker network connect %FEDER8_THERAPEUTIC_AREA%-net postgres >nul 2>&1
 
 echo Clean up helper files
 DEL /Q postgres.env
 
 echo Done
-
-echo Restarting %FEDER8_THERAPEUTIC_AREA% Components
-docker restart webapi >nul 2>&1
-docker restart user-mgmt >nul 2>&1
-docker restart zeppelin >nul 2>&1
-docker restart %FEDER8_THERAPEUTIC_AREA%-studio >nul 2>&1
-docker restart %FEDER8_THERAPEUTIC_AREA%-studio-chronicle >nul 2>&1
-
 EXIT /B 0

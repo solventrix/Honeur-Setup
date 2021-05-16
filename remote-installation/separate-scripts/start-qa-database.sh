@@ -4,10 +4,6 @@ set -e
 cr=$(echo $'\n.')
 cr=${cr%.}
 
-VERSION=2.0.1
-TAG=2.7.1-$VERSION
-CURRENT_DIRECTORY=$(pwd)
-
 read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
 while [[ "$FEDER8_THERAPEUTIC_AREA" != "honeur" && "$FEDER8_THERAPEUTIC_AREA" != "phederation" && "$FEDER8_THERAPEUTIC_AREA" != "esfurn" && "$FEDER8_THERAPEUTIC_AREA" != "athena" && "$FEDER8_THERAPEUTIC_AREA" != "" ]]; do
     echo "Enter \"honeur\", \"phederation\", \"esfurn\", \"athena\" or empty for default \"honeur\" value"
@@ -40,7 +36,7 @@ while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
     read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
 done
 
-echo "Stop and remove webapi container if exists"
+echo "Stop and remove postgres-qa container if exists"
 docker stop postgres-qa > /dev/null 2>&1 || true
 docker rm postgres-qa > /dev/null 2>&1 || true
 

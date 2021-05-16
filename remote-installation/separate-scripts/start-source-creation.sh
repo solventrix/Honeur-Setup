@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-export LC_CTYPE=C
-
 cr=$(echo $'\n.')
 cr=${cr%.}
 
