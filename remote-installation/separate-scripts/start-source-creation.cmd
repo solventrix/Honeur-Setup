@@ -88,10 +88,10 @@ IF "%FEDER8_SHARED_SECRETS_VOLUME_NAME%"=="" SET FEDER8_SHARED_SECRETS_VOLUME_NA
 
 echo. 2>webapi-source-add.env
 
-echo DB_HOST=%FEDER8_DATABASE_HOST% >> webapi-source-add.env
-echo FEDER8_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA% QA >> webapi-source-add.env
-echo FEDER8_DATABASE_HOST=%FEDER8_DATABASE_HOST% >> webapi-source-add.env
-echo FEDER8_DAIMONS_PRIORITY=%FEDER8_DAIMONS_PRIORITY% >> webapi-source-add.env
+echo DB_HOST=%FEDER8_DATABASE_HOST%>> webapi-source-add.env
+echo FEDER8_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA% QA>> webapi-source-add.env
+echo FEDER8_DATABASE_HOST=%FEDER8_DATABASE_HOST%>> webapi-source-add.env
+echo FEDER8_DAIMONS_PRIORITY=%FEDER8_DAIMONS_PRIORITY%>> webapi-source-add.env
 
 echo Stop and remove %FEDER8_POSTGRES_CONTAINER_NAME% container if exists
 docker stop webapi-source-add >nul 2>&1
