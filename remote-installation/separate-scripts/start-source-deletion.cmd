@@ -1,6 +1,9 @@
 @echo off
 Setlocal EnableDelayedExpansion
 
+SET VERSION=2.0.0
+SET TAG=webapi-source-delete-%VERSION%
+
 set argumentCount=0
 for %%x in (%*) do (
     set /A argumentCount+=1
@@ -8,13 +11,15 @@ for %%x in (%*) do (
 )
 
 if "%~1" NEQ "" (
-    if %argumentCount% LSS 3 (
+    if %argumentCount% LSS 5 (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
     SET "FEDER8_THERAPEUTIC_AREA=%~1"
     SET "FEDER8_EMAIL_ADDRESS=%~2"
     SET "FEDER8_CLI_SECRET=%~3"
+    SET "FEDER8_DATABASE_HOST=%~4"
+    SET "FEDER8_SOURCE_NAME=%~5"
     goto installation
 )
 
@@ -60,9 +65,11 @@ if "%FEDER8_CLI_SECRET%" == "" (
    goto :while-cli-secret-not-correct
 )
 
-:installation
+SET /p FEDER8_DATABASE_HOST="Enter the database host [postgres]: " || SET FEDER8_DATABASE_HOST=postgres
 
-for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
+SET /p FEDER8_SOURCE_NAME="Enter the name of the source to delete [HONEUR OMOP CDM]: " || SET FEDER8_SOURCE_NAME=HONEUR OMOP CDM
+
+:installation
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
@@ -81,18 +88,35 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
-SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
-SET FEDER8_PGDATA_VOLUME_NAME=pgdata-qa
-SET FEDER8_POSTGRES_CONTAINER_NAME=postgres-qa
-SET FEDER8_RESTART_OTHER_COMPONENTS=false
-SET FEDER8_CONTAINER_HOST_PORT=5445
-CALL .\start-postgres.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_USER_PW%" "%FEDER8_ADMIN_USER_PW%"
-DEL start-postgres.cmd
+IF "%FEDER8_SHARED_SECRETS_VOLUME_NAME%"=="" SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-creation.cmd --output start-source-creation.cmd
-SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
-CALL .\start-source-creation.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "postgres-qa" "%FEDER8_THERAPEUTIC_AREA_UPPERCASE% QA OMOP CDM" "2"
-DEL start-source-creation.cmd
+echo. 2>webapi-source-delete.env
+
+echo DB_HOST=%FEDER8_DATABASE_HOST%>> webapi-source-delete.env
+echo FEDER8_SOURCE_NAME=%FEDER8_SOURCE_NAME%>> webapi-source-delete.env
+
+echo Stop and remove %FEDER8_POSTGRES_CONTAINER_NAME% container if exists
+docker stop webapi-source-delete >nul 2>&1
+docker rm webapi-source-delete >nul 2>&1
+
+echo Create %FEDER8_THERAPEUTIC_AREA%-net network if it does not exists
+docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-net >nul 2>&1
+
+echo Pull %FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% from https://%FEDER8_THERAPEUTIC_AREA_URL%. This could take a while if not present on machine
+docker login https://%FEDER8_THERAPEUTIC_AREA_URL% --username %FEDER8_EMAIL_ADDRESS% --password %FEDER8_CLI_SECRET%
+docker pull %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG%
+
+echo Run %FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% container. This could take a while...
+docker run ^
+--name "webapi-source-delete" ^
+--rm ^
+-v %FEDER8_SHARED_SECRETS_VOLUME_NAME%:/var/lib/shared ^
+--env-file webapi-source-delete.env ^
+--network %FEDER8_THERAPEUTIC_AREA%-net ^
+%FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% >nul 2>&1
+
+echo Clean up helper files
+DEL /Q webapi-source-delete.env
 
 echo Done
+EXIT /B 0
