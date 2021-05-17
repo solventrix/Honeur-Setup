@@ -106,7 +106,7 @@ echo FEDER8_DATABASE_HOST=%FEDER8_DATABASE_HOST%>> webapi-source-add.env
 echo FEDER8_SOURCE_NAME=%FEDER8_SOURCE_NAME%>> webapi-source-add.env
 echo FEDER8_DAIMONS_PRIORITY=%FEDER8_DAIMONS_PRIORITY%>> webapi-source-add.env
 
-echo Stop and remove %FEDER8_POSTGRES_CONTAINER_NAME% container if exists
+echo Stop and remove webapi-source-delete container if exists
 docker stop webapi-source-add >nul 2>&1
 docker rm webapi-source-add >nul 2>&1
 

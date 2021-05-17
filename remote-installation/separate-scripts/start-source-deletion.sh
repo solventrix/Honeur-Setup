@@ -55,7 +55,7 @@ touch webapi-source-delete.env
 echo "DB_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-delete.env
 echo "FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME} QA" >> webapi-source-delete.env
 
-echo "Stop and remove $FEDER8_POSTGRES_CONTAINER_NAME container if exists"
+echo "Stop and remove webapi-source-delete container if exists"
 docker stop webapi-source-delete > /dev/null 2>&1 || true
 docker rm webapi-source-delete > /dev/null 2>&1 || true
 
