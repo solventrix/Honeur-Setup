@@ -58,7 +58,7 @@ fi
 touch webapi-source-add.env
 
 echo "DB_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-add.env
-echo "FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA} QA" >> webapi-source-add.env
+echo "FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA}" >> webapi-source-add.env
 echo "FEDER8_DATABASE_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-add.env
 echo "FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME}" >> webapi-source-add.env
 echo "FEDER8_DAIMONS_PRIORITY=${FEDER8_DAIMONS_PRIORITY}" >> webapi-source-add.env
