@@ -45,8 +45,8 @@ docker rm postgres-qa > /dev/null 2>&1 || true
 docker stop webapi-source-qa-enable > /dev/null 2>&1 || true
 docker rm webapi-source-qa-enable > /dev/null 2>&1 || true
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-deletion.sh --output start-source-deletion
-chmod +x start-source-deletion
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-deletion.sh --output start-source-deletion.sh
+chmod +x start-source-deletion.sh
 export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 {
   echo "$FEDER8_THERAPEUTIC_AREA";
