@@ -46,6 +46,7 @@ read -p 'Enter the name of the source to delete [HONEUR OMOP CDM]: ' FEDER8_SOUR
 FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME:-HONEUR OMOP CDM}
 
 if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    echo "FEDER8_SHARED_SECRETS_VOLUME_NAME not set, using default shared volume for secrets."
     FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
 fi
 

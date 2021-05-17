@@ -51,6 +51,7 @@ read -p 'Enter the priority for the new source [2]: ' FEDER8_DAIMONS_PRIORITY
 FEDER8_DAIMONS_PRIORITY=${FEDER8_DAIMONS_PRIORITY:-2}
 
 if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    echo "FEDER8_SHARED_SECRETS_VOLUME_NAME not set, using default shared volume for secrets."
     FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
 fi
 
