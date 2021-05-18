@@ -370,21 +370,21 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-omopcdm-custom-concepts-update.sh && chmod +x start-omopcdm-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh.sh && chmod +x start-custom-concepts-update.sh.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-omopcdm-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 3.	Run the script
 
 Linux/MacOS
 ```
-./start-omopcdm-custom-concepts-update.sh
+./start-custom-concepts-update.sh
 ```
 Windows
 ```
-.\start-omopcdm-custom-concepts-update.cmd
+.\start-custom-concepts-update.cmd
 ```
 
 ## QA database
