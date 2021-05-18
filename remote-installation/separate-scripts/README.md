@@ -370,7 +370,7 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh.sh && chmod +x start-custom-concepts-update.sh.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 Windows
 ```
