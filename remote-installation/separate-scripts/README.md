@@ -345,21 +345,21 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omopcdm-indexes-and-constraints.sh --output start-omopcdm-indexes-and-constraints.sh && chmod +x start-omopcdm-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omopcdm-indexes-and-constraints.cmd --output start-omopcdm-indexes-and-constraints.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
 ```
 3.	Run the script
 
 Linux/MacOS
 ```
-./start-omopcdm-indexes-and-constraints.sh
+./start-omop-indexes-and-constraints.sh
 ```
 Windows
 ```
-.\start-omopcdm-indexes-and-constraints.cmd
+.\start-omop-indexes-and-constraints.cmd
 ```
 
 ### Update custom concepts
