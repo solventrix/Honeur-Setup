@@ -4,7 +4,7 @@ set -e
 cr=$(echo $'\n.')
 cr=${cr%.}
 
-VERSION=2.2-RC2
+VERSION=2.2-RC3
 TAG=omop-cdm-custom-concepts-update-$VERSION
 
 read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
