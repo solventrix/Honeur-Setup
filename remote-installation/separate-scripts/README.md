@@ -345,11 +345,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
 ```
 3.	Run the script
 
@@ -370,11 +370,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 3.	Run the script
 
