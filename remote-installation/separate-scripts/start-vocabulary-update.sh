@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
 cr=$(echo $'\n.')
 cr=${cr%.}
