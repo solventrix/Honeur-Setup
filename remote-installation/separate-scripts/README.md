@@ -22,6 +22,7 @@ Table of Contents
     * [Installation](#qa-database-installation)
     * [Removal](#qa-database-removal)
   * [Backup and restore of the database](#backup-and-restore-of-the-database)
+  * [Vocabulary update](#vocabulary-update)
 
 ## Requirements
 
@@ -496,4 +497,29 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remo
 2. Run the script, provide the source volume as first parameter and the target volume as second parameter.
 ```
 ./clone-volume.sh pgdata pgdata_snapshot1
+```
+
+## Vocabulary update
+When a new vocabulary is available, it can be easily loaded in the OMOP CDM database.
+Installation steps:
+1.	Open a terminal window (Command Prompt on Windows)
+2.	Download the installation script
+
+Linux/MacOS
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-vocabulary-update.sh --output start-vocabulary-update.sh && chmod +x start-vocabulary-update.sh
+```
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-vocabulary-update.cmd --output start-vocabulary-update.cmd
+```
+3.	Run the script
+
+Linux/MacOS
+```
+./start-vocabulary-update.sh
+```
+Windows
+```
+.\start-vocabulary-update.cmd
 ```
