@@ -6,7 +6,7 @@ export LC_CTYPE=C
 cr=$(echo $'\n.')
 cr=${cr%.}
 
-VERSION=2.0.1
+VERSION=2.0.2
 TAG=9.6-omopcdm-5.3.1-webapi-2.7.1-$VERSION
 
 FEDER8_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
