@@ -1,7 +1,7 @@
 @echo off
 Setlocal EnableDelayedExpansion
 
-SET VERSION=2.0.1
+SET VERSION=2.0.2
 SET TAG=9.6-omopcdm-5.3.1-webapi-2.7.1-%VERSION%
 
 set argumentCount=0
