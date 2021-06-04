@@ -18,10 +18,10 @@ Table of Contents
   * [Post ETL installation steps](#post-etl-installation-steps)
     * [Add constraints and indexes](#add-constraints-and-indexes)
     * [Update custom concepts](#update-custom-concepts)
-  * [QA database](#qa-database) 
+  * [QA database](#qa-database)
     * [Installation](#qa-database-installation)
     * [Removal](#qa-database-removal)
-  * [Backup and restore of the database](#backup-and-restore-of-the-database)  
+  * [Backup and restore of the database](#backup-and-restore-of-the-database)
 
 ## Requirements
 
@@ -351,8 +351,8 @@ Windows
 ```
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omopcdm-indexes-and-constraints.cmd --output start-omopcdm-indexes-and-constraints.cmd
 ```
-3.	Run the script 
-      
+3.	Run the script
+
 Linux/MacOS
 ```
 ./start-omopcdm-indexes-and-constraints.sh
@@ -366,7 +366,7 @@ Windows
 When new custom concepts are available, they can be easily loaded in the OMOP CDM database.
 Installation steps:
 1.	Open a terminal window (Command Prompt on Windows)
-2.	Download the installation script 
+2.	Download the installation script
 
 Linux/MacOS
 ```
@@ -375,9 +375,9 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remo
 Windows
 ```
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-omopcdm-custom-concepts-update.cmd --output start-omopcdm-custom-concepts-update.cmd
-``` 
-3.	Run the script 
-      
+```
+3.	Run the script
+
 Linux/MacOS
 ```
 ./start-omopcdm-custom-concepts-update.sh
@@ -411,7 +411,7 @@ Linux/MacOS
 Windows
 ```
 .\start-qa-database.cmd
-```      
+```
 ### QA database removal
 Removal steps:
 1.	Open a terminal window (Command Prompt on Windows)
@@ -434,7 +434,7 @@ Linux/MacOS
 Windows
 ```
 .\remove-qa-database.cmd
-```      
+```
 
 ## Backup and restore of the database
 
@@ -458,16 +458,16 @@ Linux/MacOS
 Windows
 ```
 .\backup-database.cmd
-```    
+```
 The backup script will create a tar file name '<db_name>_<date_time>.tar.bz2' in the current directory. Creating the backup file can take a long time depending on the size of the database.
-Copy the backup file to a save location for long term storage. 
+Copy the backup file to a save location for long term storage.
 
 ### Database restore
 1. Download the restore script:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh 
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
 ```
 Windows
 ```
@@ -477,29 +477,23 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remo
 
 Linux/MacOS
 ```
-./restore-database.sh <db_name>_<date_time>.tar.bz2 
+./restore-database.sh <db_name>_<date_time>.tar.bz2
 ```
 Windows
 ```
 .\restore-database.cmd <db_name>_<date_time>.tar.bz2
-```    
- 
-### Hot snapshot of the database volume
-The database volume can be copied to a new volume (with a different name) to take a snapshot of the current database state. 
+```
 
-1. Download the script 
+### Hot snapshot of the database volume
+The database volume can be copied to a new volume (with a different name) to take a snapshot of the current database state.
+
+1. Download the script
 
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/clone-volume.sh --output clone-volume.sh && chmod +x clone-volume.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/clone-docker-volume.sh --output clone-docker-volume.sh && chmod +x clone-volume.sh
 ```
 
 2. Run the script, provide the source volume as first parameter and the target volume as second parameter.
 ```
-./clone-volume.sh pgdata pgdata_snapshot1
+./clone-docker-volume.sh pgdata pgdata_snapshot1
 ```
-
-
- 
-
-
-
