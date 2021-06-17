@@ -16,12 +16,12 @@ services:
       DB_SCHEMA: "omopcdm"
       DB_USER: db_username
       DB_PASSWORD: db_password
-      VERBOSITY_LEVEL: "INFO"
+      VERBOSITY_LEVEL: verbosity_level
       FILENAME: "honeur_*.csv"
       CARE_SITE_DOC: "care_site.csv"
       MAPPING_DOC: "general_measurement_cleaned.csv"
       VAR_TABLE_DOC: "None"
-      LAST_DATA_EXPORT: "2021-06-01"
+      LAST_DATA_EXPORT: date_last_export
       VERBOSITY_LEVEL: verbosity_level
       DEV_FLAG: "False"
       LOAD_VAR_TABLE_PICKLE: "True"
