@@ -24,6 +24,6 @@ sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
 sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 sed -i -e "s/date_last_export/$date_last_export/g" docker-compose.yml
 
-docker login
+docker login harbor.honeur.org
 docker-compose pull
 docker-compose run --rm --name etl etl
