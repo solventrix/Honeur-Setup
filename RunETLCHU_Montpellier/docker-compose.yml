@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+  etl:
+    image: harbor.honeur.org/etl-montpellier/etl:image_tag
+    volumes:
+      - "./log:/log"
+      - "data_folder:/data"
+    networks:
+      - honeur_honeur-net
+    environment:
+      DB_DBMS: "postgresql"
+      DB_SERVER : "postgres"
+      DB_PORT: "5432"
+      DB_DBNAME: "OHDSI"
+      DB_SCHEMA: "omopcdm"
+      DB_USER: db_username
+      DB_PASSWORD: db_password
+      VERBOSITY_LEVEL: "INFO"
+      FILENAME: "honeur_*.csv"
+      CARE_SITE_DOC: "care_site.csv"
+      MAPPING_DOC: "general_measurement_cleaned.csv"
+      VAR_TABLE_DOC: "None"
+      LAST_DATA_EXPORT: "2021-06-01"
+      VERBOSITY_LEVEL: verbosity_level
+      DEV_FLAG: "False"
+      LOAD_VAR_TABLE_PICKLE: "True"
+
+networks:
+  honeur_honeur-net:
+    external:
+      name: honeur-net
