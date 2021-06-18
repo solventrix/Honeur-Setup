@@ -16,7 +16,6 @@ services:
       DB_SCHEMA: "omopcdm"
       DB_USER: db_username
       DB_PASSWORD: db_password
-      VERBOSITY_LEVEL: verbosity_level
       FILENAME: "honeur_*.csv"
       CARE_SITE_DOC: "care_site.csv"
       MAPPING_DOC: "general_measurement_cleaned.csv"
