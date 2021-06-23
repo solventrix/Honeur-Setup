@@ -6,7 +6,7 @@ Table of Contents
     * [Hardware](#hardware)
     * [Operating system](#operating-system)
     * [Docker](#docker)
-    * [Docker images for HONEUR](#docker-images-for-honeur)
+    * [Docker images](#docker-images)
   * [Essentials](#essentials)
     * [Installation instructions](#essential-installation-instruction)
       * [HONEUR](#essential-honeur)
