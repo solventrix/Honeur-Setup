@@ -6,7 +6,7 @@ Table of Contents
     * [Hardware](#hardware)
     * [Operating system](#operating-system)
     * [Docker](#docker)
-    * [Docker images for HONEUR](#docker-images-for-honeur)
+    * [Docker images](#docker-images)
   * [Important Note](#important-note)
   * [Postgres installation instructions](#postgres-installation-instructions)
   * [Atlas/WebAPI installation instructions](#atlas-webapi-separate)
