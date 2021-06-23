@@ -41,10 +41,14 @@ Linux: https://docs.docker.com/install/linux/docker-ce/ubuntu/
 Assign 2 or more CPU’s, 8 GB of RAM and 100 GB of disk space to Docker in Docker Desktop.
 On Linux Docker compose (v1.24 or higher) should be installed separately.
 
-### Docker images for HONEUR
-A Docker Hub account with read access on the HONEUR Docker image repository (https://hub.docker.com/u/honeur) is required.
+### Docker images
+The docker images are located on a central repository. Make sure you have a central platform account before trying to run the local setup installation scripts:
 
-Please create a Docker hub account or use an existing account and request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
+* For HONEUR: https://portal.honeur.org
+* For PHederation: https://portal.phederation.org
+* For Esfurn: https://portal.esfurn.org
+
+Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
 ## Important Note
 Components like [Atlas/WebAPI](#atlas/webapi-installation-instructions), [Zeppelin](#zeppelin-installation-instructions), [User Management](#user-management-installation-instructions) and [FEDER8 Studio](#feder8-studio-installation-instructions) are only accessible through a web browser when installing the [Proxy](#proxy). Please run the installation script of the [Proxy](#proxy) after installing or updating one of the previous mentioned components.
@@ -356,7 +360,7 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/rem
 
 Linux/MacOS
 ```
-./start-omop-indexes-and-constraints.sh
+./start-omopcdm-indexes-and-constraints.sh
 ```
 Windows
 ```
@@ -444,11 +448,11 @@ Windows
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/backup-database.cmd --output backup-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/backup-database.cmd --output backup-database.cmd
 ```
 2. Run the script
 
@@ -468,7 +472,7 @@ Copy the backup file to a save location for long term storage.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
 ```
 Windows
 ```
@@ -491,12 +495,12 @@ The database volume can be copied to a new volume (with a different name) to tak
 1. Download the script
 
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/clone-volume.sh --output clone-volume.sh && chmod +x clone-volume.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/clone-docker-volume.sh --output clone-docker-volume.sh && chmod +x clone-volume.sh
 ```
 
 2. Run the script, provide the source volume as first parameter and the target volume as second parameter.
 ```
-./clone-volume.sh pgdata pgdata_snapshot1
+./clone-docker-volume.sh pgdata pgdata_snapshot1
 ```
 
 ## Vocabulary update

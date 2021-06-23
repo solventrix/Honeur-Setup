@@ -11,7 +11,7 @@ for %%x in (%*) do (
 )
 
 if "%~1" NEQ "" (
-    if %argumentCount% LSS 5 (
+    if %argumentCount% LSS 6 (
         echo Give all arguments or none to use the interactive script.
         EXIT 1
     )
@@ -19,7 +19,8 @@ if "%~1" NEQ "" (
     SET "FEDER8_EMAIL_ADDRESS=%~2"
     SET "FEDER8_CLI_SECRET=%~3"
     SET "FEDER8_DATABASE_HOST=%~4"
-    SET "FEDER8_DAIMONS_PRIORITY=%~5"
+    SET "FEDER8_SOURCE_NAME=%~5"
+    SET "FEDER8_DAIMONS_PRIORITY=%~6"
     goto installation
 )
 
@@ -30,6 +31,8 @@ if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%
    SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
    goto :while-therapeutic-area-not-correct
 )
+
+for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
@@ -65,6 +68,12 @@ if "%FEDER8_CLI_SECRET%" == "" (
    goto :while-cli-secret-not-correct
 )
 
+SET /p FEDER8_DATABASE_HOST="Enter the database host [postgres]: " || SET FEDER8_DATABASE_HOST=postgres
+
+SET /p FEDER8_SOURCE_NAME="Enter the source name [%FEDER8_THERAPEUTIC_AREA_UPPERCASE% QA OMOP CDM]: " || SET FEDER8_SOURCE_NAME=%FEDER8_THERAPEUTIC_AREA_UPPERCASE% QA OMOP CDM
+
+SET /p FEDER8_DAIMONS_PRIORITY="Enter the priority for the new source [2]: " || SET FEDER8_DAIMONS_PRIORITY=2
+
 :installation
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
@@ -84,16 +93,20 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
-IF "%FEDER8_SHARED_SECRETS_VOLUME_NAME%"=="" SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
+IF "%FEDER8_SHARED_SECRETS_VOLUME_NAME%"=="" (
+    ECHO FEDER8_SHARED_SECRETS_VOLUME_NAME not set, using default shared volume for secrets.
+    SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
+)
 
 echo. 2>webapi-source-add.env
 
 echo DB_HOST=%FEDER8_DATABASE_HOST%>> webapi-source-add.env
-echo FEDER8_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA% QA>> webapi-source-add.env
+echo FEDER8_THERAPEUTIC_AREA=%FEDER8_THERAPEUTIC_AREA%>> webapi-source-add.env
 echo FEDER8_DATABASE_HOST=%FEDER8_DATABASE_HOST%>> webapi-source-add.env
+echo FEDER8_SOURCE_NAME=%FEDER8_SOURCE_NAME%>> webapi-source-add.env
 echo FEDER8_DAIMONS_PRIORITY=%FEDER8_DAIMONS_PRIORITY%>> webapi-source-add.env
 
-echo Stop and remove %FEDER8_POSTGRES_CONTAINER_NAME% container if exists
+echo Stop and remove webapi-source-delete container if exists
 docker stop webapi-source-add >nul 2>&1
 docker rm webapi-source-add >nul 2>&1
 

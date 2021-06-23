@@ -4,6 +4,9 @@ set -e
 cr=$(echo $'\n.')
 cr=${cr%.}
 
+VERSION=2.0.0
+TAG=webapi-source-delete-$VERSION
+
 read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
 while [[ "$FEDER8_THERAPEUTIC_AREA" != "honeur" && "$FEDER8_THERAPEUTIC_AREA" != "phederation" && "$FEDER8_THERAPEUTIC_AREA" != "esfurn" && "$FEDER8_THERAPEUTIC_AREA" != "athena" && "$FEDER8_THERAPEUTIC_AREA" != "" ]]; do
     echo "Enter \"honeur\", \"phederation\", \"esfurn\", \"athena\" or empty for default \"honeur\" value"
@@ -25,9 +28,7 @@ elif [ "$FEDER8_THERAPEUTIC_AREA" = "athena" ]; then
     FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 fi
 
-FEDER8_THERAPEUTIC_AREA_UPPERCASE=$(echo "$FEDER8_THERAPEUTIC_AREA" |  tr '[:lower:]' '[:upper:]' )
-
-read -p "Enter email address used to login to https://portal.${FEDER8_THERAPEUTIC_AREA_DOMAIN}: " FEDER8_EMAIL_ADDRESS
+read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
     read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
@@ -38,38 +39,43 @@ while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
     read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
 done
 
-echo "Stop and remove postgres-qa container if exists"
-docker stop postgres-qa > /dev/null 2>&1 || true
-docker rm postgres-qa > /dev/null 2>&1 || true
+read -p 'Enter the database host [postgres]: ' FEDER8_DATABASE_HOST
+FEDER8_DATABASE_HOST=${FEDER8_DATABASE_HOST:-postgres}
 
-docker stop webapi-source-qa-enable > /dev/null 2>&1 || true
-docker rm webapi-source-qa-enable > /dev/null 2>&1 || true
+read -p 'Enter the name of the source to delete [HONEUR OMOP CDM]: ' FEDER8_SOURCE_NAME
+FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME:-HONEUR OMOP CDM}
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
-chmod +x start-postgres.sh
-export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
-export FEDER8_PGDATA_VOLUME_NAME=pgdata-qa
-export FEDER8_POSTGRES_CONTAINER_NAME=postgres-qa
-export FEDER8_RESTART_OTHER_COMPONENTS=false
-export FEDER8_CONTAINER_HOST_PORT=5445
-{
-  echo "$FEDER8_THERAPEUTIC_AREA";
-  echo "$FEDER8_EMAIL_ADDRESS";
-  echo "$FEDER8_CLI_SECRET";
-  echo "$FEDER8_NEW_PASSWORD";
-  echo "$FEDER8_NEW_ADMIN_PASSWORD"
-} | ./start-postgres.sh
-rm -rf start-postgres.sh
+if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    echo "FEDER8_SHARED_SECRETS_VOLUME_NAME not set, using default shared volume for secrets."
+    FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
+fi
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-creation.sh --output start-source-creation.sh
-chmod +x start-source-creation.sh
-export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
-{
-  echo "$FEDER8_THERAPEUTIC_AREA";
-  echo "$FEDER8_EMAIL_ADDRESS";
-  echo "$FEDER8_CLI_SECRET";
-  echo "postgres-qa";
-  echo "${FEDER8_THERAPEUTIC_AREA_UPPERCASE} QA OMOP CDM";
-  echo "2"
-} | ./start-source-creation.sh
-rm -rf start-source-creation.sh
+touch webapi-source-delete.env
+
+echo "DB_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-delete.env
+echo "FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME}" >> webapi-source-delete.env
+
+echo "Stop and remove webapi-source-delete container if exists"
+docker stop webapi-source-delete > /dev/null 2>&1 || true
+docker rm webapi-source-delete > /dev/null 2>&1 || true
+
+echo "Create $FEDER8_THERAPEUTIC_AREA-net network if it does not exists"
+docker network create --driver bridge $FEDER8_THERAPEUTIC_AREA-net > /dev/null 2>&1 || true
+
+echo "Pull $FEDER8_THERAPEUTIC_AREA/postgres:$TAG from https://$FEDER8_THERAPEUTIC_AREA_URL. This could take a while if not present on machine..."
+echo "$FEDER8_CLI_SECRET" | docker login https://$FEDER8_THERAPEUTIC_AREA_URL --username $FEDER8_EMAIL_ADDRESS --password-stdin
+docker pull $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
+
+echo "Run $FEDER8_THERAPEUTIC_AREA/postgres:$TAG container. This could take a while..."
+docker run \
+--name "webapi-source-delete" \
+--rm \
+-v $FEDER8_SHARED_SECRETS_VOLUME_NAME:/var/lib/shared \
+--env-file webapi-source-delete.env \
+--network $FEDER8_THERAPEUTIC_AREA-net \
+$FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG > /dev/null 2>&1
+
+echo "Clean up helper files"
+rm -rf webapi-source-delete.env
+
+echo "Done"

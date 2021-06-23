@@ -28,6 +28,8 @@ elif [ "$FEDER8_THERAPEUTIC_AREA" = "athena" ]; then
     FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 fi
 
+FEDER8_THERAPEUTIC_AREA_UPPERCASE=$(echo "$FEDER8_THERAPEUTIC_AREA" |  tr '[:lower:]' '[:upper:]' )
+
 read -p "Enter email address used to login to https://portal.$FEDER8_THERAPEUTIC_AREA_DOMAIN: " FEDER8_EMAIL_ADDRESS
 while [[ "$FEDER8_EMAIL_ADDRESS" == "" ]]; do
     echo "Email address can not be empty"
@@ -42,21 +44,26 @@ done
 read -p 'Enter the database host [postgres]: ' FEDER8_DATABASE_HOST
 FEDER8_DATABASE_HOST=${FEDER8_DATABASE_HOST:-postgres}
 
+read -p "Enter the source name [${FEDER8_THERAPEUTIC_AREA_UPPERCASE} QA OMOP CDM]: " FEDER8_SOURCE_NAME
+FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME:-${FEDER8_THERAPEUTIC_AREA_UPPERCASE} QA OMOP CDM}
+
 read -p 'Enter the priority for the new source [2]: ' FEDER8_DAIMONS_PRIORITY
 FEDER8_DAIMONS_PRIORITY=${FEDER8_DAIMONS_PRIORITY:-2}
 
 if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    echo "FEDER8_SHARED_SECRETS_VOLUME_NAME not set, using default shared volume for secrets."
     FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
 fi
 
 touch webapi-source-add.env
 
 echo "DB_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-add.env
-echo "FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA} QA" >> webapi-source-add.env
+echo "FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA}" >> webapi-source-add.env
 echo "FEDER8_DATABASE_HOST=${FEDER8_DATABASE_HOST}" >> webapi-source-add.env
+echo "FEDER8_SOURCE_NAME=${FEDER8_SOURCE_NAME}" >> webapi-source-add.env
 echo "FEDER8_DAIMONS_PRIORITY=${FEDER8_DAIMONS_PRIORITY}" >> webapi-source-add.env
 
-echo "Stop and remove $FEDER8_POSTGRES_CONTAINER_NAME container if exists"
+echo "Stop and remove webapi-source-add container if exists"
 docker stop webapi-source-add > /dev/null 2>&1 || true
 docker rm webapi-source-add > /dev/null 2>&1 || true
 

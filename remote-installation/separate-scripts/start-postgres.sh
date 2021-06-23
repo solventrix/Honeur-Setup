@@ -50,6 +50,7 @@ read -p "Enter password for ${FEDER8_THERAPEUTIC_AREA}_admin database user [$FED
 FEDER8_NEW_ADMIN_PASSWORD=${FEDER8_NEW_ADMIN_PASSWORD:-$FEDER8_ADMIN_PASSWORD}
 
 if [ -z "$FEDER8_SHARED_SECRETS_VOLUME_NAME" ]; then
+    echo "FEDER8_SHARED_SECRETS_VOLUME_NAME not set, using default shared volume for secrets."
     FEDER8_SHARED_SECRETS_VOLUME_NAME=shared
 fi
 
