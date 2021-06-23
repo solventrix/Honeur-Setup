@@ -40,10 +40,14 @@ Linux: https://docs.docker.com/install/linux/docker-ce/ubuntu/
 Assign 2 or more CPU’s, 8 GB of RAM and 100 GB of disk space to Docker in Docker Desktop.
 On Linux Docker compose (v1.24 or higher) should be installed separately.
 
-### Docker images for HONEUR
-A Docker Hub account with read access on the HONEUR Docker image repository (https://hub.docker.com/u/honeur) is required.
+### Docker images
+The docker images are located on a central repository. Make sure you have a central platform account before trying to run the local setup installation scripts:
 
-Please create a Docker hub account or use an existing account and request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
+* For HONEUR: https://portal.honeur.org
+* For PHederation: https://portal.phederation.org
+* For Esfurn: https://portal.esfurn.org
+
+Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
 ## Important Note
 Components like [Atlas/WebAPI](#atlas/webapi-installation-instructions), [Zeppelin](#zeppelin-installation-instructions), [User Management](#user-management-installation-instructions) and [FEDER8 Studio](#feder8-studio-installation-instructions) are only accessible through a web browser when installing the [Proxy](#proxy). Please run the installation script of the [Proxy](#proxy) after installing or updating one of the previous mentioned components.
