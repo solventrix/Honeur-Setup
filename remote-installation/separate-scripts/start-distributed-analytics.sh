@@ -4,7 +4,7 @@ set -e
 cr=$(echo $'\n.')
 cr=${cr%.}
 
-VERSION_REMOTE=2.0.1
+VERSION_REMOTE=2.0.2
 TAG_REMOTE=remote-$VERSION_REMOTE
 
 VERSION_R_SERVER=2.0.3
