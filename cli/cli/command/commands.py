@@ -203,7 +203,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         sys.exit(1)
 
     network_names = ['feder8-net', therapeutic_area.lower() + '-net']
-    volume_names = ['pgdata', 'feder8-config-server']
+    volume_names = ['pgdata', 'shared', 'feder8-config-server']
     container_names = ['postgres', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
@@ -240,6 +240,10 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
             volume_names[0]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
+            },
+            volume_names[1]: {
+                'bind': '/var/lib/postgresql/envfileshared',
+                'mode': 'rw'
             }
         },
         detach=True
@@ -272,7 +276,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         },
         network=network_names[0],
         volumes={
-            volume_names[1]: {
+            volume_names[2]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -297,81 +301,64 @@ def local_portal(therapeutic_area, email, cli_key):
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
     try:
-        docker_client = docker.from_env()
+        docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network = 'feder8-net'
-    volume = 'feder8-config-server'
-    name = 'config-server'
+    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    volume_names = ['shared', 'feder8-config-server']
+    container_names = ['local-portal', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
+    repo = '/'.join([registry.registry_url, registry.project, 'local-portal'])
     tag = '2.0.0'
     image = ':'.join([repo, tag])
 
-    check_network_and_create_if_not_exists(docker_client, network)
-    check_volume_and_create_if_not_exists(docker_client, volume)
-    check_container_and_remove_if_not_exists(docker_client, name)
-
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     pull_image(docker_client,registry, image, email, cli_key)
 
-    print('Starting config-server container...')
+    print('Starting local-portal container...')
+    docker_client
     container = docker_client.containers.run(
         image=image,
-        name=name,
+        name=container_names[0],
+        ports={
+            '8080/tcp': 8080
+        },
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={},
-        network=network,
+        environment={
+            'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
+            'FEDER8_THERAPEUTIC_AREA_LIGHT_THEME_COLOR': therapeutic_area_info.light_theme,
+            'FEDER8_THERAPEUTIC_AREA_DARK_THEME_COLOR': therapeutic_area_info.dark_theme,
+            'FEDER8_CONFIG_SERVER_USERNAME': 'root',
+            'FEDER8_CONFIG_SERVER_HOST': 'config-server',
+            'FEDER8_CONFIG_SERVER_PORT': '8080'
+        },
+        network=network_names[0],
         volumes={
-            volume: {
+            volume_names[1]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            },
+            volume_names[1]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
         },
         detach=True
     )
+    networks[1].connect(container)
 
-    print('Done starting config-server container')
+    print('Done starting local-portal container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
-
-    init_config_tag = 'update-configuration-2.0.0'
-    init_config_image = ':'.join([repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating initial configuration in config-server...')
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name='config-server-add-configuration',
-        environment={
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER_URI': 'http://' + therapeutic_area_info.cas_url,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url
-        },
-        network=network,
-        volumes={
-            volume: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
-
-    print('Done updating initial configuration in config-server')
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -446,7 +433,7 @@ def atlas_webapi(therapeutic_area, email, cli_key):
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER_URI': 'http://' + therapeutic_area_info.cas_url,
+            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'http://' + therapeutic_area_info.cas_url,
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
             'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
