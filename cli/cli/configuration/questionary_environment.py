@@ -12,4 +12,5 @@ class QuestionaryEnvironment(Environment):
         question:str = Environment.configuration_key_question_map[key]
         question = question.replace('FEDER8_PORTAL_URL', self.therapeutic_area.portal_url)
         question = question.replace('FEDER8_REGISTRY_URL', self.therapeutic_area.registry.registry_url)
+        question = question.replace('FEDER8_THERAPEUTIC_AREA', self.therapeutic_area.name)
         return questionary.text(question).ask()
