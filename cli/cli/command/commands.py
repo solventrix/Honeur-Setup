@@ -688,7 +688,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     )
     networks[1].connect(container)
 
-    print('Done starting WebAPI container')
+    print('Done starting Zeppelin container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
@@ -742,7 +742,9 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def user_management(therapeutic_area, email, cli_key):
+@click.option('-u', '--username')
+@click.option('-p', '--password')
+def user_management(therapeutic_area, email, cli_key, username, password):
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
@@ -752,74 +754,89 @@ def user_management(therapeutic_area, email, cli_key):
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
+    if username is None:
+        username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+
+    if password is None:
+        password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+
     try:
-        docker_client = docker.from_env()
+        docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network = 'feder8-net'
-    volume = 'feder8-config-server'
-    name = 'config-server'
+    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    volume_names = ['shared', 'feder8-config-server']
+    container_names = ['user-mgmt', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    tag = '2.0.0'
-    image = ':'.join([repo, tag])
+    user_management_repo = '/'.join([registry.registry_url, registry.project, 'user-mgmt'])
+    user_management_tag = '2.0.2'
+    user_management_image = ':'.join([user_management_repo, user_management_tag])
 
-    check_network_and_create_if_not_exists(docker_client, network)
-    check_volume_and_create_if_not_exists(docker_client, volume)
-    check_container_and_remove_if_not_exists(docker_client, name)
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
 
+    pull_image(docker_client, registry, user_management_image, email, cli_key)
 
-    pull_image(docker_client,registry, image, email, cli_key)
-
-    print('Starting config-server container...')
+    print('Starting User Management container...')
+    environment_variables = {
+        'HONEUR_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
+        'HONEUR_THERAPEUTIC_AREA_LIGHT_THEME_COLOR': therapeutic_area_info.light_theme,
+        'HONEUR_THERAPEUTIC_AREA_DARK_THEME_COLOR': therapeutic_area_info.dark_theme,
+        'HONEUR_USERMGMT_USERNAME': username,
+        'HONEUR_USERMGMT_PASSWORD': password,
+        'DATASOURCE_DRIVER_CLASS_NAME': 'org.postgresql.Driver',
+        'DATASOURCE_URL': 'jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi',
+        'WEBAPI_ADMIN_USERNAME': 'ohdsi_admin_user'
+    }
     container = docker_client.containers.run(
-        image=image,
-        name=name,
+        image=user_management_image,
+        name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={},
-        network=network,
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
+            volume_names[0]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
             }
         },
         detach=True
     )
+    networks[1].connect(container)
 
-    print('Done starting config-server container')
+    print('Done starting User Management container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
     init_config_tag = 'update-configuration-2.0.0'
-    init_config_image = ':'.join([repo, init_config_tag])
+    init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating initial configuration in config-server...')
+    print('Updating configuration in config-server...')
+    environment_variables = {
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME': username,
+        'FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD': password
+    }
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
-        name='config-server-add-configuration',
-        environment={
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER_URI': 'http://' + therapeutic_area_info.cas_url,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url
-        },
-        network=network,
+        name=container_names[1],
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
+            volume_names[1]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -827,14 +844,16 @@ def user_management(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
-    print('Done updating initial configuration in config-server')
+    print('Done updating configuration in config-server')
 
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def distributed_analytics(therapeutic_area, email, cli_key):
+@click.option('-dd', '--data-directory')
+@click.option('-o', '--organization', type=click.Choice(Globals.all_organizations))
+def distributed_analytics(therapeutic_area, email, cli_key, data_directory, organization):
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
@@ -844,74 +863,104 @@ def distributed_analytics(therapeutic_area, email, cli_key):
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
+    if data_directory is None:
+        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+
+    if organization is None:
+        organization = questionary.select("Name of organization?", choices=Globals.all_organizations).ask()
+
     try:
-        docker_client = docker.from_env()
+        docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network = 'feder8-net'
-    volume = 'feder8-config-server'
-    name = 'config-server'
+    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    volume_names = ['feder8-config-server']
+    container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    tag = '2.0.0'
-    image = ':'.join([repo, tag])
+    distributed_analytics_r_server_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
+    distributed_analytics_r_server_tag = 'r-server-2.0.3'
+    distributed_analytics_r_server_image = ':'.join([distributed_analytics_r_server_repo, distributed_analytics_r_server_tag])
 
-    check_network_and_create_if_not_exists(docker_client, network)
-    check_volume_and_create_if_not_exists(docker_client, volume)
-    check_container_and_remove_if_not_exists(docker_client, name)
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
 
+    pull_image(docker_client, registry, distributed_analytics_r_server_image, email, cli_key)
 
-    pull_image(docker_client,registry, image, email, cli_key)
-
-    print('Starting config-server container...')
+    print('Starting Distributed Analytics R Server container...')
+    environment_variables = {}
     container = docker_client.containers.run(
-        image=image,
-        name=name,
+        image=distributed_analytics_r_server_image,
+        name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={},
-        network=network,
-        volumes={
-            volume: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={},
         detach=True
     )
+    networks[1].connect(container)
 
-    print('Done starting config-server container')
+    print('Done starting Distributed Analytics R Server container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    distributed_analytics_remote_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
+    distributed_analytics_remote_tag = 'remote-2.0.2'
+    distributed_analytics_remote_image = ':'.join([distributed_analytics_remote_repo, distributed_analytics_remote_tag])
+
+    pull_image(docker_client, registry, distributed_analytics_remote_image, email, cli_key)
+
+    print('Starting Distributed Analytics Remote container...')
+    environment_variables = {
+        'DISTRIBUTED_SERVICE_CLIENT_HOST': therapeutic_area_info.distributed_analytics_url,
+        'LOCAL_CONFIGURATION_CLIENT_HOST': 'config-server',
+        'R_SERVER_CLIENT_HOST': 'distributed-analytics-r-server',
+        'HONEUR_ANALYTICS_ORGANIZATION': organization
+    }
+    container = docker_client.containers.run(
+        image=distributed_analytics_remote_image,
+        name=container_names[1],
+        restart_policy={"Name": "always"},
+        security_opt=['no-new-privileges'],
+        remove=False,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={},
+        detach=True
+    )
+    networks[1].connect(container)
+
+    print('Done starting Distributed Analytics Remote container')
+
+    wait_for_healthy_container(docker_client, container, 5, 120)
+
+    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
     init_config_tag = 'update-configuration-2.0.0'
-    init_config_image = ':'.join([repo, init_config_tag])
+    init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating initial configuration in config-server...')
+    print('Updating configuration in config-server...')
+    environment_variables = {
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_DATA-DIRECTORY': data_directory
+    }
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
-        name='config-server-add-configuration',
-        environment={
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER_URI': 'http://' + therapeutic_area_info.cas_url,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url
-        },
-        network=network,
+        name=container_names[2],
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
+            volume_names[0]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -919,7 +968,7 @@ def distributed_analytics(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
-    print('Done updating initial configuration in config-server')
+    print('Done updating configuration in config-server')
 
 
 @init.command()
@@ -936,74 +985,104 @@ def feder8_studio(therapeutic_area, email, cli_key):
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
+    if data_directory is None:
+        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+
+    if organization is None:
+        organization = questionary.select("Name of organization?", choices=Globals.all_organizations).ask()
+
     try:
-        docker_client = docker.from_env()
+        docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network = 'feder8-net'
-    volume = 'feder8-config-server'
-    name = 'config-server'
+    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    volume_names = ['feder8-config-server']
+    container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    tag = '2.0.0'
-    image = ':'.join([repo, tag])
+    distributed_analytics_r_server_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
+    distributed_analytics_r_server_tag = 'r-server-2.0.3'
+    distributed_analytics_r_server_image = ':'.join([distributed_analytics_r_server_repo, distributed_analytics_r_server_tag])
 
-    check_network_and_create_if_not_exists(docker_client, network)
-    check_volume_and_create_if_not_exists(docker_client, volume)
-    check_container_and_remove_if_not_exists(docker_client, name)
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
 
+    pull_image(docker_client, registry, distributed_analytics_r_server_image, email, cli_key)
 
-    pull_image(docker_client,registry, image, email, cli_key)
-
-    print('Starting config-server container...')
+    print('Starting Distributed Analytics R Server container...')
+    environment_variables = {}
     container = docker_client.containers.run(
-        image=image,
-        name=name,
+        image=distributed_analytics_r_server_image,
+        name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={},
-        network=network,
-        volumes={
-            volume: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={},
         detach=True
     )
+    networks[1].connect(container)
 
-    print('Done starting config-server container')
+    print('Done starting Distributed Analytics R Server container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    distributed_analytics_remote_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
+    distributed_analytics_remote_tag = 'remote-2.0.2'
+    distributed_analytics_remote_image = ':'.join([distributed_analytics_remote_repo, distributed_analytics_remote_tag])
+
+    pull_image(docker_client, registry, distributed_analytics_remote_image, email, cli_key)
+
+    print('Starting Distributed Analytics Remote container...')
+    environment_variables = {
+        'DISTRIBUTED_SERVICE_CLIENT_HOST': therapeutic_area_info.distributed_analytics_url,
+        'LOCAL_CONFIGURATION_CLIENT_HOST': 'config-server',
+        'R_SERVER_CLIENT_HOST': 'distributed-analytics-r-server',
+        'HONEUR_ANALYTICS_ORGANIZATION': organization
+    }
+    container = docker_client.containers.run(
+        image=distributed_analytics_remote_image,
+        name=container_names[1],
+        restart_policy={"Name": "always"},
+        security_opt=['no-new-privileges'],
+        remove=False,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={},
+        detach=True
+    )
+    networks[1].connect(container)
+
+    print('Done starting Distributed Analytics Remote container')
+
+    wait_for_healthy_container(docker_client, container, 5, 120)
+
+    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
     init_config_tag = 'update-configuration-2.0.0'
-    init_config_image = ':'.join([repo, init_config_tag])
+    init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating initial configuration in config-server...')
+    print('Updating configuration in config-server...')
+    environment_variables = {
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_DATA-DIRECTORY': data_directory
+    }
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
-        name='config-server-add-configuration',
-        environment={
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER_URI': 'http://' + therapeutic_area_info.cas_url,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url
-        },
-        network=network,
+        name=container_names[2],
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
+            volume_names[0]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -1011,4 +1090,4 @@ def feder8_studio(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
-    print('Done updating initial configuration in config-server')
+    print('Done updating configuration in config-server')

@@ -3,15 +3,15 @@ from cli.configuration.single_choice_question import SingleChoiceQuestion
 from cli.configuration.question import Question
 from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-from typing import Dict
+from typing import Dict, List
 
 
 class Globals:
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur')),
-        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation')),
-        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn')),
-        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'))
+        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur')),
+        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation')),
+        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn')),
+        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'distributed-analytics.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'))
     }
 
     all_questions:Dict[str,Question] = {
@@ -29,4 +29,10 @@ class Globals:
         'feder8.local.host.log-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin logs will kept on the host machine?'),
         'feder8.local.host.notebook-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin notebooks will kept on the host machine?'),
         'feder8.local.host.data-directory': SingleChoiceQuestion('Enter the directory where Zeppelin will save the prepared data?'),
+        'feder8.local.security.user-mgmt-username': SingleChoiceQuestion('Enter the administrator username?'),
+        'feder8.local.security.user-mgmt-password': SingleChoiceQuestion('Enter the administrator password?')
     }
+
+    all_organizations:List[str] = [
+        'Janssen'
+    ]
