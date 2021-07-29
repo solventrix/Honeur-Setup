@@ -87,7 +87,8 @@ def init():
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def config_server(therapeutic_area, email, cli_key):
+@click.option('-h', '--host')
+def config_server(therapeutic_area, email, cli_key, host):
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
@@ -96,7 +97,8 @@ def config_server(therapeutic_area, email, cli_key):
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-
+    if host is None:
+        host = configuration.get_configuration('feder8.local.host.name')
     try:
         docker_client = docker.from_env()
     except docker.errors.DockerException:
@@ -146,13 +148,14 @@ def config_server(therapeutic_area, email, cli_key):
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating initial configuration in config-server...')
+    print('Updating configuration in config-server...')
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
         name=container_names[1],
         environment={
+            'FEDER8_LOCAL_HOST_NAME': host,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
@@ -172,8 +175,7 @@ def config_server(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
-    print('Done updating initial configuration in config-server')
-
+    print('Done updating configuration in config-server')
 
 
 @init.command()
@@ -259,13 +261,16 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating database configuration in config-server...')
+    print('Updating configuration in config-server...')
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
         name=container_names[1],
         environment={
+            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
             'FEDER8_LOCAL_DATASOURCE_HOST': container_names[0],
             'FEDER8_LOCAL_DATASOURCE_NAME': 'OHDSI',
             'FEDER8_LOCAL_DATASOURCE_PORT': '5432',
@@ -284,7 +289,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         detach=True,
         show_logs=True)
 
-    print('Done updating database configuration in config-server')
+    print('Done updating configuration in config-server')
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -323,7 +328,6 @@ def local_portal(therapeutic_area, email, cli_key):
     pull_image(docker_client,registry, image, email, cli_key)
 
     print('Starting local-portal container...')
-    docker_client
     container = docker_client.containers.run(
         image=image,
         name=container_names[0],
@@ -360,11 +364,46 @@ def local_portal(therapeutic_area, email, cli_key):
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
+    init_config_tag = 'update-configuration-2.0.0'
+    init_config_image = ':'.join([init_config_repo, init_config_tag])
+    pull_image(docker_client,registry, init_config_image, email, cli_key)
+
+    print('Updating configuration in config-server...')
+    run_container(
+        docker_client=docker_client,
+        image=init_config_image,
+        remove=True,
+        name=container_names[1],
+        environment={
+            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        },
+        network=network_names[0],
+        volumes={
+            volume_names[1]: {
+                'bind': '/home/feder8/config-repo',
+                'mode': 'rw'
+            }
+        },
+        detach=True,
+        show_logs=True)
+
+    print('Done updating configuration in config-server')
+
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def atlas_webapi(therapeutic_area, email, cli_key):
+@click.option('-h', '--host')
+@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
+@click.option('-lu', '--ldap-url')
+@click.option('-ldn', '--ldap-dn')
+@click.option('-lbdn', '--ldap-base-dn')
+@click.option('-lsu', '--ldap-system-username')
+@click.option('-lsp', '--ldap-system-password')
+def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
@@ -374,74 +413,156 @@ def atlas_webapi(therapeutic_area, email, cli_key):
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
+    if host is None:
+        host = configuration.get_configuration('feder8.local.host.name')
+
+    if security_method is None:
+        security_method = configuration.get_configuration('feder8.local.security.security-method')
+
+    if security_method is 'LDAP':
+        if ldap_url is None:
+            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+        if ldap_dn is None:
+            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+        if ldap_base_dn is None:
+            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+        if ldap_system_username is None:
+            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+        if ldap_system_password is None:
+            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+
     try:
-        docker_client = docker.from_env()
+        docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network = 'feder8-net'
-    volume = 'feder8-config-server'
-    name = 'config-server'
+    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    volume_names = ['shared', 'feder8-config-server']
+    container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    tag = '2.0.0'
-    image = ':'.join([repo, tag])
+    webapi_repo = '/'.join([registry.registry_url, registry.project, 'webapi'])
+    webapi_tag = '2.9.0-2.0.0'
+    webapi_image = ':'.join([webapi_repo, webapi_tag])
 
-    check_network_and_create_if_not_exists(docker_client, network)
-    check_volume_and_create_if_not_exists(docker_client, volume)
-    check_container_and_remove_if_not_exists(docker_client, name)
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
 
+    pull_image(docker_client, registry, webapi_image, email, cli_key)
 
-    pull_image(docker_client,registry, image, email, cli_key)
+    print('Starting WebAPI container...')
+    environment_variables = {
+        'DB_HOST': 'postgres',
+        'FEDER8_WEBAPI_CENTRAL': 'false',
+    }
+    if security_method is 'None':
+        environment_variables['FEDER8_WEBAPI_SECURE'] = 'false'
+    else:
+        environment_variables['FEDER8_WEBAPI_SECURE'] = 'true'
+        if security_method is 'LDAP':
+            environment_variables['FEDER8_WEBAPI_AUTH_METHOD'] = 'ldap'
+            environment_variables['FEDER8_WEBAPI_LDAP_URL'] = ldap_url
+            environment_variables['FEDER8_WEBAPI_LDAP_DN'] = ldap_dn
+            environment_variables['FEDER8_WEBAPI_LDAP_BASEDN'] = ldap_base_dn
+            environment_variables['FEDER8_WEBAPI_LDAP_SYSTEM_USERNAME'] = ldap_system_username
+            environment_variables['FEDER8_WEBAPI_LDAP_SYSTEM_PASSWORD'] = ldap_system_password
+        else:
+            environment_variables['FEDER8_WEBAPI_AUTH_METHOD'] = 'jdbc'
 
-    print('Starting config-server container...')
     container = docker_client.containers.run(
-        image=image,
-        name=name,
+        image=webapi_image,
+        name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={},
-        network=network,
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
+            volume_names[0]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
             }
         },
         detach=True
     )
+    networks[1].connect(container)
 
-    print('Done starting config-server container')
+    print('Done starting WebAPI container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    atlas_repo = '/'.join([registry.registry_url, registry.project, 'atlas'])
+    atlas_tag = '2.9.0-2.0.0'
+    atlas_image = ':'.join([atlas_repo, atlas_tag])
+    pull_image(docker_client,registry, atlas_image, email, cli_key)
+
+    print('Starting Atlas container...')
+    environment_variables = {
+        'FEDER8_WEBAPI_URL': 'http://' + host + '/WebAPI/',
+        'FEDER8_ATLAS_CENTRAL': 'false',
+    }
+    if security_method is 'None':
+        environment_variables['FEDER8_ATLAS_SECURE'] = 'false'
+    else:
+        environment_variables['FEDER8_ATLAS_SECURE'] = 'true'
+        if security_method is 'LDAP':
+            environment_variables['FEDER8_ATLAS_LDAP_ENABLED'] = 'true'
+        else:
+            environment_variables['FEDER8_ATLAS_LDAP_ENABLED'] = 'false'
+    container = docker_client.containers.run(
+        image=atlas_image,
+        name=container_names[1],
+        restart_policy={"Name": "always"},
+        security_opt=['no-new-privileges'],
+        remove=False,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={},
+        detach=True
+    )
+    networks[1].connect(container)
+
+    print('Done starting Atlas container')
+
+    wait_for_healthy_container(docker_client, container, 5, 120)
+
+    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
     init_config_tag = 'update-configuration-2.0.0'
-    init_config_image = ':'.join([repo, init_config_tag])
+    init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating initial configuration in config-server...')
+    print('Updating configuration in config-server...')
+    environment_variables = {
+        'FEDER8_LOCAL_HOST_NAME': host,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+    }
+    if security_method is 'None':
+        environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+    else:
+        if security_method is 'LDAP':
+            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
+        else:
+            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
+
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
-        name='config-server-add-configuration',
-        environment={
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'http://' + therapeutic_area_info.cas_url,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url
-        },
-        network=network,
+        name=container_names[2],
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
+            volume_names[1]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -449,14 +570,23 @@ def atlas_webapi(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
-    print('Done updating initial configuration in config-server')
+    print('Done updating configuration in config-server')
 
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def zeppelin(therapeutic_area, email, cli_key):
+@click.option('-ld', '--log-directory')
+@click.option('-nd', '--notebook-directory')
+@click.option('-dd', '--data-directory')
+@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
+@click.option('-lu', '--ldap-url')
+@click.option('-ldn', '--ldap-dn')
+@click.option('-lbdn', '--ldap-base-dn')
+@click.option('-lsu', '--ldap-system-username')
+@click.option('-lsp', '--ldap-system-password')
+def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
@@ -466,74 +596,138 @@ def zeppelin(therapeutic_area, email, cli_key):
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
+    if log_directory is None:
+        log_directory = configuration.get_configuration('feder8.local.host.log-directory')
+
+    if notebook_directory is None:
+        notebook_directory = configuration.get_configuration('feder8.local.host.notebook-directory')
+
+    if data_directory is None:
+        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+
+    if security_method is None:
+        security_method = configuration.get_configuration('feder8.local.security.security-method')
+
+    if security_method is 'LDAP':
+        if ldap_url is None:
+            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+        if ldap_dn is None:
+            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+        if ldap_base_dn is None:
+            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+        if ldap_system_username is None:
+            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+        if ldap_system_password is None:
+            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+
     try:
-        docker_client = docker.from_env()
+        docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network = 'feder8-net'
-    volume = 'feder8-config-server'
-    name = 'config-server'
+    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    volume_names = ['shared', 'feder8-config-server']
+    container_names = ['zeppelin', 'config-server-update-configuration']
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    tag = '2.0.0'
-    image = ':'.join([repo, tag])
+    webapi_repo = '/'.join([registry.registry_url, registry.project, 'zeppelin'])
+    webapi_tag = '0.8.2-2.0.0'
+    webapi_image = ':'.join([webapi_repo, webapi_tag])
 
-    check_network_and_create_if_not_exists(docker_client, network)
-    check_volume_and_create_if_not_exists(docker_client, volume)
-    check_container_and_remove_if_not_exists(docker_client, name)
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
 
+    pull_image(docker_client, registry, webapi_image, email, cli_key)
 
-    pull_image(docker_client,registry, image, email, cli_key)
+    print('Starting Zeppelin container...')
+    environment_variables = {
+        'ZEPPELIN_NOTEBOOK_DIR': '/notebook',
+        'FEDER8_WEBAPI_CENTRAL': 'false',
+    }
+    if security_method is 'LDAP':
+        environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
+        environment_variables['LDAP_URL'] = ldap_url
+        environment_variables['LDAP_DN'] = ldap_dn
+        environment_variables['LDAP_BASE_DN'] = ldap_base_dn
+    elif security_method is 'JDBC':
+        environment_variables['ZEPPELIN_SECURITY'] = 'jdbc'
+        environment_variables['LDAP_URL'] = 'ldap://localhost:389'
+        environment_variables['LDAP_DN'] = 'dc=example,dc=org'
+        environment_variables['LDAP_BASE_DN'] = 'cn=\{0\},dc=example,dc=org'
 
-    print('Starting config-server container...')
     container = docker_client.containers.run(
-        image=image,
-        name=name,
+        image=webapi_image,
+        name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={},
-        network=network,
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
-                'bind': '/home/feder8/config-repo',
+            volume_names[0]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            },
+            log_directory: {
+                'bind': '/logs',
+                'mode': 'rw'
+            },
+            notebook_directory: {
+                'bind': '/notebook',
+                'mode': 'rw'
+            },
+            data_directory: {
+                'bind': '/usr/local/src/datafiles',
                 'mode': 'rw'
             }
         },
         detach=True
     )
+    networks[1].connect(container)
 
-    print('Done starting config-server container')
+    print('Done starting WebAPI container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
     init_config_tag = 'update-configuration-2.0.0'
-    init_config_image = ':'.join([repo, init_config_tag])
+    init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
-    print('Updating initial configuration in config-server...')
+    print('Updating configuration in config-server...')
+    environment_variables = {
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_LOG-DIRECTORY': log_directory,
+        'FEDER8_LOCAL_HOST_NOTEBOOK-DIRECTORY': notebook_directory,
+        'FEDER8_LOCAL_HOST_DATA-DIRECTORY': data_directory
+    }
+    if security_method is 'None':
+        environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+    else:
+        if security_method is 'LDAP':
+            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
+            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
+        else:
+            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
+
     run_container(
         docker_client=docker_client,
         image=init_config_image,
         remove=True,
-        name='config-server-add-configuration',
-        environment={
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER_URI': 'http://' + therapeutic_area_info.cas_url,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url
-        },
-        network=network,
+        name=container_names[1],
+        environment=environment_variables,
+        network=network_names[0],
         volumes={
-            volume: {
+            volume_names[1]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -541,7 +735,7 @@ def zeppelin(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
-    print('Done updating initial configuration in config-server')
+    print('Done updating configuration in config-server')
 
 
 @init.command()

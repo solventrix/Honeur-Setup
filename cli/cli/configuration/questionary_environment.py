@@ -1,6 +1,7 @@
+from cli.globals import Globals
+from cli.configuration.question import Question
 from cli.configuration.config_server_environment import Environment
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-import questionary
 
 class QuestionaryEnvironment(Environment):
 
@@ -9,8 +10,5 @@ class QuestionaryEnvironment(Environment):
         self.therapeutic_area = therapeutic_area
 
     def get_configuration(self, key:str) -> str:
-        question:str = Environment.configuration_key_question_map[key]
-        question = question.replace('FEDER8_PORTAL_URL', self.therapeutic_area.portal_url)
-        question = question.replace('FEDER8_REGISTRY_URL', self.therapeutic_area.registry.registry_url)
-        question = question.replace('FEDER8_THERAPEUTIC_AREA', self.therapeutic_area.name)
-        return questionary.text(question).ask()
+        question:Question = Globals.all_questions[key]
+        return question.ask(self.therapeutic_area)
