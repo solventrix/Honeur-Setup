@@ -26,9 +26,10 @@ class Globals:
         'feder8.local.security.ldap-base-dn': SingleChoiceQuestion('Enter LDAP Base DN (e.g. dc=example,dc=com)?'),
         'feder8.local.security.ldap-system-username': SingleChoiceQuestion('Enter LDAP System username?'),
         'feder8.local.security.ldap-system-password': SingleChoiceQuestion('Enter LDAP System password?'),
-        'feder8.local.host.log-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin logs will kept on the host machine?'),
-        'feder8.local.host.notebook-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin notebooks will kept on the host machine?'),
+        'feder8.local.host.zeppelin-log-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin logs will be kept on the host machine?'),
+        'feder8.local.host.zeppelin-notebook-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin notebooks will be kept on the host machine?'),
         'feder8.local.host.data-directory': SingleChoiceQuestion('Enter the directory where Zeppelin will save the prepared data?'),
+        'feder8.local.host.feder8-studio-directory': SingleChoiceQuestion('Enter the directory where Feder8 Studio files will be kept on the host machine?'),
         'feder8.local.security.user-mgmt-username': SingleChoiceQuestion('Enter the administrator username?'),
         'feder8.local.security.user-mgmt-password': SingleChoiceQuestion('Enter the administrator password?')
     }

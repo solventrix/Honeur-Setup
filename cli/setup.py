@@ -32,7 +32,8 @@ setup(
         'click==8.0.1',
         'docker==5.0.0',
         'questionary==1.10.0',
-        'config-client==0.12.0'
+        'config-client==0.12.0',
+        'six==1.16.0'
     ],
     extras_require={
         'dev': [

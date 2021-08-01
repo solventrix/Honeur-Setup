@@ -9,24 +9,12 @@ from config.spring import ConfigClient
 class ConfigurationController:
 
     def __init__(self, therapeutic_area:str) -> None:
-        self.environment:Environment
         self.therapeutic_area:TherapeuticArea = Globals.therapeutic_areas[therapeutic_area]
-        self.check_environment()
+        self.question_environment = QuestionaryEnvironment(self.therapeutic_area)
+        self.config_server_environment = ConfigurationServerEnvironment(self.therapeutic_area)
 
     def get_configuration(self, key:str) -> str:
-        return self.environment.get_configuration(key)
-
-    def check_environment(self):
-        config_client = ConfigClient(
-            address='http://root:s3cr3t@config-server:8080',
-            branch='master',
-            profile='default',
-            app_name='feder8-config-honeur',
-            url="{address}/{branch}/{profile}-{app_name}.yaml"
-        )
-
-        try:
-            config_client.get_config()
-            self.environment = ConfigurationServerEnvironment(config_client)
-        except:
-            self.environment = QuestionaryEnvironment(self.therapeutic_area)
+        response = self.config_server_environment.get_configuration(key)
+        if response == '':
+            response = self.question_environment.get_configuration(key)
+        return response
