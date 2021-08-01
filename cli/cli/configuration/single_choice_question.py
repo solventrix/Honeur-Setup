@@ -4,5 +4,5 @@ import questionary
 
 class SingleChoiceQuestion(Question):
 
-    def ask_question(self, question:str) -> str:
-        return questionary.text(question).ask()
+    def ask_question(self, question:str, default:str) -> str:
+        return questionary.text(question, default=default).ask()

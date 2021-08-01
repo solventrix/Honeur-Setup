@@ -8,9 +8,9 @@ from config.spring import ConfigClient
 
 class ConfigurationController:
 
-    def __init__(self, therapeutic_area:str) -> None:
+    def __init__(self, therapeutic_area:str, current_directory:str, is_windows:bool) -> None:
         self.therapeutic_area:TherapeuticArea = Globals.therapeutic_areas[therapeutic_area]
-        self.question_environment = QuestionaryEnvironment(self.therapeutic_area)
+        self.question_environment = QuestionaryEnvironment(self.therapeutic_area, current_directory, is_windows)
         self.config_server_environment = ConfigurationServerEnvironment(self.therapeutic_area)
 
     def get_configuration(self, key:str) -> str:

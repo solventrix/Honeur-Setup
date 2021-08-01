@@ -10,6 +10,7 @@ from cli.globals import Globals
 import click
 import questionary
 import docker
+import os
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
     container = docker_client.containers.run(
@@ -88,10 +89,12 @@ def init():
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def config_server(therapeutic_area, email, cli_key):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -184,10 +187,12 @@ def config_server(therapeutic_area, email, cli_key):
 @click.option('-up', '--user-password')
 @click.option('-ap', '--admin-password')
 def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -295,10 +300,12 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def local_portal(therapeutic_area, email, cli_key):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -403,10 +410,12 @@ def local_portal(therapeutic_area, email, cli_key):
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -589,10 +598,12 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -747,10 +758,12 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 def user_management(therapeutic_area, email, cli_key, username, password):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -854,10 +867,12 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-dd', '--data-directory')
-@click.option('-o', '--organization', type=click.Choice(Globals.all_organizations))
+@click.option('-o', '--organization')
 def distributed_analytics(therapeutic_area, email, cli_key, data_directory, organization):
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+
+    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
     configuration:ConfigurationController = ConfigurationController(therapeutic_area)
     if email is None:
@@ -869,7 +884,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         data_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
     if organization is None:
-        organization = questionary.select("Name of organization?", choices=Globals.all_organizations).ask()
+        organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).ask()
 
     try:
         docker_client = docker.from_env(timeout=3000)
@@ -881,7 +896,6 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
     volume_names = ['feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
-    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
     distributed_analytics_r_server_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
     distributed_analytics_r_server_tag = 'r-server-2.0.3'
@@ -987,10 +1001,12 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -1177,10 +1193,12 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def nginx(therapeutic_area, email, cli_key):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -1206,8 +1224,7 @@ def nginx(therapeutic_area, email, cli_key):
     volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
-    # pull_image(docker_client, registry, nginx_image, email, cli_key)
-    nginx_image = 'feder8/nginx:2.0.3'
+    pull_image(docker_client, registry, nginx_image, email, cli_key)
 
     print('Starting Nginx container...')
     environment_variables = {
