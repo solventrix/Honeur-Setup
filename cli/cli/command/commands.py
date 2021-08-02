@@ -1003,6 +1003,8 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
 def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     current_environment = os.getenv('CURRENT_DIRECTORY', '')
     is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
+
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
@@ -1035,6 +1037,9 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
             ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
         if ldap_system_password is None:
             ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+
+    if docker_cert_support:
+        feder8_certificate_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
     try:
         docker_client = docker.from_env(timeout=3000)
@@ -1096,6 +1101,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     wait_for_healthy_container(docker_client, container, 5, 120)
 
     print('Starting Feder8 Studio container...')
+
     environment_variables = {
         'TAG': feder8_studio_tag,
         'APPLICATION_LOGS_TO_STDOUT': 'false',
@@ -1118,6 +1124,26 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         environment_variables['DATASOURCE_DRIVER_CLASS_NAME'] = 'org.postgresql.Driver'
         environment_variables['DATASOURCE_URL'] = 'jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi'
         environment_variables['WEBAPI_ADMIN_USERNAME'] = 'ohdsi_admin_user'
+    if docker_cert_support:
+        environment_variables['PROXY_DOCKER_URL'] = 'https://172.17.0.1:2376'
+        environment_variables['PROXY_DOCKER_CERT_PATH'] = '/home/certs'
+
+    feder8_studio_volumes = {
+        volume_names[3]: {
+            'bind': '/var/lib/shared',
+            'mode': 'ro'
+        }
+    }
+    if docker_cert_support:
+        feder8_studio_volumes[feder8_certificate_directory] = {
+            'bind': '/home/certs',
+            'mode': 'rw'
+        }
+    else:
+        feder8_studio_volumes['/var/run/docker.sock'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
     container = docker_client.containers.run(
         image=feder8_studio_image,
         name=container_names[1],
@@ -1126,16 +1152,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         remove=False,
         environment=environment_variables,
         network=network_names[0],
-        volumes={
-            volume_names[3]: {
-                'bind': '/var/lib/shared',
-                'mode': 'ro'
-            },
-            '/var/run/docker.sock': {
-                'bind': '/var/run/docker.sock',
-                'mode': 'rw'
-            }
-        },
+        volumes=feder8_studio_volumes,
         detach=True
     )
     networks[1].connect(container)
