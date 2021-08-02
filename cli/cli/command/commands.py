@@ -1345,10 +1345,8 @@ def nginx(therapeutic_area, email, cli_key):
 @click.option('-ld', '--log-directory')
 @click.option('-nd', '--notebook-directory')
 @click.option('-dd', '--data-directory')
-@click.option('-fsd', '--feder8-studio-directory')
 @click.option('-u', '--username')
 @click.option('-p', '--password')
-@click.option('-o', '--organization')
 def essentials(therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, data_directory, username, password):
     current_environment = os.getenv('CURRENT_DIRECTORY', '')
     is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
