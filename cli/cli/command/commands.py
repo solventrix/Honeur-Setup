@@ -764,6 +764,12 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
     configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+
+    security_method = configuration.get_configuration('feder8.local.security.security-method')
+    if security_method == 'None':
+        print('Local security is not enabled.')
+        return
+
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
@@ -1322,3 +1328,166 @@ def nginx(therapeutic_area, email, cli_key):
         show_logs=True)
 
     print('Done updating configuration in config-server')
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+@click.option('-up', '--user-password')
+@click.option('-ap', '--admin-password')
+@click.option('-h', '--host')
+@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
+@click.option('-lu', '--ldap-url')
+@click.option('-ldn', '--ldap-dn')
+@click.option('-lbdn', '--ldap-base-dn')
+@click.option('-lsu', '--ldap-system-username')
+@click.option('-lsp', '--ldap-system-password')
+@click.option('-ld', '--log-directory')
+@click.option('-nd', '--notebook-directory')
+@click.option('-dd', '--data-directory')
+@click.option('-fsd', '--feder8-studio-directory')
+@click.option('-u', '--username')
+@click.option('-p', '--password')
+@click.option('-o', '--organization')
+def essentials(therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, data_directory, username, password):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    if therapeutic_area is None:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+    if email is None:
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+    if cli_key is None:
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+    if user_password is None:
+        user_password = configuration.get_configuration('feder8.local.datasource.password')
+    if admin_password is None:
+        admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+    if host is None:
+        host = configuration.get_configuration('feder8.local.host.name')
+
+    if security_method is None:
+        security_method = configuration.get_configuration('feder8.local.security.security-method')
+
+    if security_method == 'LDAP':
+        if ldap_url is None:
+            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+        if ldap_dn is None:
+            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+        if ldap_base_dn is None:
+            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+        if ldap_system_username is None:
+            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+        if ldap_system_password is None:
+            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+
+    if log_directory is None:
+        log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
+
+    if notebook_directory is None:
+        notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
+
+    if data_directory is None:
+        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+
+    if username is None:
+        username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+
+    if password is None:
+        password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+
+    config_server(therapeutic_area, email, cli_key)
+    postgres(therapeutic_area, email, cli_key, user_password, admin_password)
+    local_portal(therapeutic_area, email, cli_key)
+    atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password)
+    zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password)
+    user_management(therapeutic_area, email, cli_key, username, password)
+    nginx(therapeutic_area, email, cli_key)
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+@click.option('-up', '--user-password')
+@click.option('-ap', '--admin-password')
+@click.option('-h', '--host')
+@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
+@click.option('-lu', '--ldap-url')
+@click.option('-ldn', '--ldap-dn')
+@click.option('-lbdn', '--ldap-base-dn')
+@click.option('-lsu', '--ldap-system-username')
+@click.option('-lsp', '--ldap-system-password')
+@click.option('-ld', '--log-directory')
+@click.option('-nd', '--notebook-directory')
+@click.option('-dd', '--data-directory')
+@click.option('-fsd', '--feder8-studio-directory')
+@click.option('-u', '--username')
+@click.option('-p', '--password')
+@click.option('-o', '--organization')
+def full(therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, data_directory, feder8_studio_directory, username, password, organization):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    if therapeutic_area is None:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+
+    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+    if email is None:
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+    if cli_key is None:
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+    if user_password is None:
+        user_password = configuration.get_configuration('feder8.local.datasource.password')
+    if admin_password is None:
+        admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+    if host is None:
+        host = configuration.get_configuration('feder8.local.host.name')
+
+    if security_method is None:
+        security_method = configuration.get_configuration('feder8.local.security.security-method')
+
+    if security_method == 'LDAP':
+        if ldap_url is None:
+            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+        if ldap_dn is None:
+            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+        if ldap_base_dn is None:
+            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+        if ldap_system_username is None:
+            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+        if ldap_system_password is None:
+            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+    if log_directory is None:
+        log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
+
+    if notebook_directory is None:
+        notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
+
+    if data_directory is None:
+        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+
+    if feder8_studio_directory is None:
+        feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+
+    if username is None:
+        username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+
+    if password is None:
+        password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+
+    if organization is None:
+        organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).ask()
+
+    config_server(therapeutic_area, email, cli_key)
+    postgres(therapeutic_area, email, cli_key, user_password, admin_password)
+    local_portal(therapeutic_area, email, cli_key)
+    atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password)
+    zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password)
+    user_management(therapeutic_area, email, cli_key, username, password)
+    distributed_analytics(therapeutic_area, email, cli_key, data_directory, organization)
+    feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password)
+    nginx(therapeutic_area, email, cli_key)

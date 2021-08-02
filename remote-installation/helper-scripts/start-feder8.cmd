@@ -1,29 +1,4 @@
-@echo off
+@ECHO off
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-config-server.cmd --output start-config-server.cmd
-CALL .\start-config-server.cmd
-DEL start-config-server.cmd
-
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
-CALL .\start-postgres.cmd
-DEL start-postgres.cmd
-
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-local-portal.cmd --output start-local-portal.cmd
-CALL .\start-local-portal.cmd
-DEL start-local-portal.cmd
-
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
-CALL .\start-atlas-webapi.cmd
-DEL start-atlas-webapi.cmd
-
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
-CALL .\start-zeppelin.cmd
-DEL start-zeppelin.cmd
-
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
-CALL .\start-user-management.cmd
-DEL start-user-management.cmd
-
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
-CALL .\start-nginx.cmd
-DEL start-nginx.cmd
+docker network create feder8-net
+docker run --rm -it --network feder8-net -e CURRENT_DIRECTORY=%CD% -e IS_WINDOWS=true -e DOCKER_CERT_SUPPORT=false -v /var/run/docker.sock:/var/run/docker.sock harbor.honeur.org/library/install-script:2.0.0 feder8 init essentials
