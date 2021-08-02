@@ -876,12 +876,15 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-dd', '--data-directory')
 @click.option('-o', '--organization')
 def distributed_analytics(therapeutic_area, email, cli_key, data_directory, organization):
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if therapeutic_area is None:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area)
+    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+
     if email is None:
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
     if cli_key is None:
