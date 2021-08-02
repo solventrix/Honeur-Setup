@@ -1063,7 +1063,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
-    feder8_studio_repo = '/'.join([registry.registry_url, registry.project, therapeutic_area_info.name+'-studio'])
+    feder8_studio_repo = '/'.join([registry.registry_url, registry.project, 'feder8-studio'])
     feder8_studio_tag = '2.0.4'
     feder8_studio_image = ':'.join([feder8_studio_repo, feder8_studio_tag])
 
