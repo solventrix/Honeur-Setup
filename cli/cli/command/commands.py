@@ -929,7 +929,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         network=network_names[0],
         volumes={
             data_directory: {
-                'bind': '/usr/local/src/datafiles',
+                'bind': '/home/feder8/data',
                 'mode': 'rw'
             }
         },
@@ -964,7 +964,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         network=network_names[0],
         volumes={
             data_directory: {
-                'bind': '/usr/local/src/datafiles',
+                'bind': '/home/feder8/data',
                 'mode': 'rw'
             }
         },
