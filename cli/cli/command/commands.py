@@ -927,7 +927,12 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         remove=False,
         environment=environment_variables,
         network=network_names[0],
-        volumes={},
+        volumes={
+            data_directory: {
+                'bind': '/usr/local/src/datafiles',
+                'mode': 'rw'
+            }
+        },
         detach=True
     )
     networks[1].connect(container)
@@ -957,7 +962,12 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         remove=False,
         environment=environment_variables,
         network=network_names[0],
-        volumes={},
+        volumes={
+            data_directory: {
+                'bind': '/usr/local/src/datafiles',
+                'mode': 'rw'
+            }
+        },
         detach=True
     )
     networks[1].connect(container)
