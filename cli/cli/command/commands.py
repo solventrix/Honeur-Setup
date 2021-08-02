@@ -898,7 +898,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
 
     registry = therapeutic_area_info.registry
     distributed_analytics_r_server_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
-    distributed_analytics_r_server_tag = 'r-server-2.0.3'
+    distributed_analytics_r_server_tag = 'r-server-2.0.4'
     distributed_analytics_r_server_image = ':'.join([distributed_analytics_r_server_repo, distributed_analytics_r_server_tag])
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -927,7 +927,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
     wait_for_healthy_container(docker_client, container, 5, 120)
 
     distributed_analytics_remote_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
-    distributed_analytics_remote_tag = 'remote-2.0.2'
+    distributed_analytics_remote_tag = 'remote-2.0.3'
     distributed_analytics_remote_image = ':'.join([distributed_analytics_remote_repo, distributed_analytics_remote_tag])
 
     pull_image(docker_client, registry, distributed_analytics_remote_image, email, cli_key)
@@ -1054,7 +1054,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
     feder8_studio_repo = '/'.join([registry.registry_url, registry.project, therapeutic_area_info.name+'-studio'])
-    feder8_studio_tag = '2.0.3'
+    feder8_studio_tag = '2.0.4'
     feder8_studio_image = ':'.join([feder8_studio_repo, feder8_studio_tag])
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1234,7 +1234,7 @@ def nginx(therapeutic_area, email, cli_key):
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
     nginx_repo = '/'.join([registry.registry_url, registry.project, 'nginx'])
-    nginx_tag = '2.0.3'
+    nginx_tag = '2.0.4'
     nginx_image = ':'.join([nginx_repo, nginx_tag])
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
