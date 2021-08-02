@@ -19,14 +19,12 @@ pipeline {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
-                        for (int i = 0; i < therapeuticAreas.size(); i++) {
-                            try {
-                                withDockerRegistry(credentialsId: "harbor-honeur-library-robot", url: "https://harbor.honeur.org") {
-                                    sh "THERAPEUTIC_AREA_URL=harbor.honeur.org ./publish.sh"
-                                }
-                            } catch (e) {
-                                notifyPushFailed("https://harbor.honeur.org")
+                        try {
+                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot", url: "https://harbor.honeur.org") {
+                                sh "THERAPEUTIC_AREA_URL=harbor.honeur.org ./publish.sh"
                             }
+                        } catch (e) {
+                            notifyPushFailed("https://harbor.honeur.org")
                         }
                     }
                 }
