@@ -1039,7 +1039,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
             ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
 
     if docker_cert_support:
-        feder8_certificate_directory = configuration.get_configuration('feder8.local.host.data-directory')
+        feder8_certificate_directory = configuration.get_configuration('feder8.local.host.docker-cert-directory')
 
     try:
         docker_client = docker.from_env(timeout=3000)

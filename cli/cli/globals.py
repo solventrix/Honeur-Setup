@@ -30,6 +30,7 @@ class Globals:
         'feder8.local.host.zeppelin-notebook-directory': SingleChoiceQuestion('Enter the directory where the Zeppelin notebooks will be kept on the host machine?', 'FEDER8_CURRENT_DIRECTORYFEDER8_DIRECTORY_SEPARATORzeppelinFEDER8_DIRECTORY_SEPARATORnotebook'),
         'feder8.local.host.data-directory': SingleChoiceQuestion('Enter the directory where Zeppelin will save the prepared data?', 'FEDER8_CURRENT_DIRECTORYFEDER8_DIRECTORY_SEPARATORdistributed-analytics'),
         'feder8.local.host.feder8-studio-directory': SingleChoiceQuestion('Enter the directory where Feder8 Studio files will be kept on the host machine?', 'FEDER8_CURRENT_DIRECTORYFEDER8_DIRECTORY_SEPARATORFEDER8_THERAPEUTIC_AREA-studio'),
+        'feder8.local.host.docker-cert-directory': SingleChoiceQuestion('Enter the folder containing the certificates?', 'FEDER8_CURRENT_DIRECTORYFEDER8_DIRECTORY_SEPARATORcertificatesFEDER8_DIRECTORY_SEPARATORfeder8-client-certificates'),
         'feder8.local.security.user-mgmt-username': SingleChoiceQuestion('Enter the administrator username?', 'admin'),
         'feder8.local.security.user-mgmt-password': SingleChoiceQuestion('Enter the administrator password?', 'admin')
     }
