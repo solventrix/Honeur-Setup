@@ -48,13 +48,15 @@ def check_volumes_and_create_if_not_exists(docker_client:DockerClient, volume_na
 
 def check_containers_and_remove_if_not_exists(docker_client:DockerClient, container_names:List[str]):
     for container_name in container_names:
-        if len(docker_client.containers.list(all=True, filters={"name":container_name})) > 0:
+        try:
+            container = docker_client.containers.get(container_name)
             print(' '.join([container_name,'is running.']))
             print(' '.join(['Removing',container_name,'container...']))
-            container = docker_client.containers.get(container_name)
             container.stop()
             container.remove(v=True)
             print(' '.join(['Done removing',container_name,'container...']))
+        except:
+            pass
 
 def pull_image(docker_client:DockerClient, registry:Registry, image:str, email:str, cli_key:str):
     print(' '.join(['Pulling image', image, '...']))
@@ -89,17 +91,19 @@ def init():
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def config_server(therapeutic_area, email, cli_key):
-    print('test')
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env()
     except docker.errors.DockerException:
@@ -188,21 +192,23 @@ def config_server(therapeutic_area, email, cli_key):
 @click.option('-up', '--user-password')
 @click.option('-ap', '--admin-password')
 def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-    if user_password is None:
-        user_password = configuration.get_configuration('feder8.local.datasource.password')
-    if admin_password is None:
-        admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
-
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        if user_password is None:
+            user_password = configuration.get_configuration('feder8.local.datasource.password')
+        if admin_password is None:
+            admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -301,17 +307,19 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def local_portal(therapeutic_area, email, cli_key):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -411,35 +419,37 @@ def local_portal(therapeutic_area, email, cli_key):
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if host is None:
-        host = configuration.get_configuration('feder8.local.host.name')
+        if host is None:
+            host = configuration.get_configuration('feder8.local.host.name')
 
-    if security_method is None:
-        security_method = configuration.get_configuration('feder8.local.security.security-method')
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
 
-    if security_method == 'LDAP':
-        if ldap_url is None:
-            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-        if ldap_dn is None:
-            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-        if ldap_base_dn is None:
-            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-        if ldap_system_username is None:
-            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-        if ldap_system_password is None:
-            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
-
+        if security_method == 'LDAP':
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+            if ldap_system_username is None:
+                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+            if ldap_system_password is None:
+                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -599,41 +609,43 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if log_directory is None:
-        log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
+        if log_directory is None:
+            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
 
-    if notebook_directory is None:
-        notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
+        if notebook_directory is None:
+            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
-    if data_directory is None:
-        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+        if data_directory is None:
+            data_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
-    if security_method is None:
-        security_method = configuration.get_configuration('feder8.local.security.security-method')
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
 
-    if security_method == 'LDAP':
-        if ldap_url is None:
-            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-        if ldap_dn is None:
-            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-        if ldap_base_dn is None:
-            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-        if ldap_system_username is None:
-            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-        if ldap_system_password is None:
-            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
-
+        if security_method == 'LDAP':
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+            if ldap_system_username is None:
+                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+            if ldap_system_password is None:
+                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -759,29 +771,31 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 def user_management(therapeutic_area, email, cli_key, username, password):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
 
-    security_method = configuration.get_configuration('feder8.local.security.security-method')
-    if security_method == 'None':
-        print('Local security is not enabled.')
-        return
+        security_method = configuration.get_configuration('feder8.local.security.security-method')
+        if security_method == 'None':
+            print('Local security is not enabled.')
+            return
 
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if username is None:
-        username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if username is None:
+            username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
 
-    if password is None:
-        password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
-
+        if password is None:
+            password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -876,25 +890,29 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-dd', '--data-directory')
 @click.option('-o', '--organization')
 def distributed_analytics(therapeutic_area, email, cli_key, data_directory, organization):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
 
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if data_directory is None:
-        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+        if data_directory is None:
+            data_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
-    if organization is None:
-        organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).ask()
+        if organization is None:
+            organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).ask()
+
+    except KeyboardInterrupt:
+        sys.exit(1)
 
     try:
         docker_client = docker.from_env(timeout=3000)
@@ -952,6 +970,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         'DISTRIBUTED_SERVICE_CLIENT_HOST': therapeutic_area_info.distributed_analytics_url,
         'LOCAL_CONFIGURATION_CLIENT_HOST': 'config-server',
         'R_SERVER_CLIENT_HOST': 'distributed-analytics-r-server',
+        'R_SERVER_CLIENT_PORT': '8080',
         'HONEUR_ANALYTICS_ORGANIZATION': organization
     }
     container = docker_client.containers.run(
@@ -1021,46 +1040,48 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, data_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
 
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if host is None:
-        host = configuration.get_configuration('feder8.local.host.name')
+        if host is None:
+            host = configuration.get_configuration('feder8.local.host.name')
 
-    if feder8_studio_directory is None:
-        feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+        if feder8_studio_directory is None:
+            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
 
-    if data_directory is None:
-        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+        if data_directory is None:
+            data_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
-    if security_method is None:
-        security_method = configuration.get_configuration('feder8.local.security.security-method')
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
 
-    if security_method == 'LDAP':
-        if ldap_url is None:
-            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-        if ldap_dn is None:
-            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-        if ldap_base_dn is None:
-            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-        if ldap_system_username is None:
-            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-        if ldap_system_password is None:
-            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+        if security_method == 'LDAP':
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+            if ldap_system_username is None:
+                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+            if ldap_system_password is None:
+                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
 
-    if docker_cert_support:
-        feder8_certificate_directory = configuration.get_configuration('feder8.local.host.docker-cert-directory')
-
+        if docker_cert_support:
+            feder8_certificate_directory = configuration.get_configuration('feder8.local.host.docker-cert-directory')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -1230,17 +1251,19 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def nginx(therapeutic_area, email, cli_key):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
     try:
         docker_client = docker.from_env(timeout=3000)
     except docker.errors.DockerException:
@@ -1363,60 +1386,64 @@ def nginx(therapeutic_area, email, cli_key):
 @click.option('-p', '--password')
 @click.pass_context
 def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, data_directory, username, password):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if user_password is None:
-        user_password = configuration.get_configuration('feder8.local.datasource.password')
-    if admin_password is None:
-        admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
-    if host is None:
-        host = configuration.get_configuration('feder8.local.host.name')
+        if user_password is None:
+            user_password = configuration.get_configuration('feder8.local.datasource.password')
+        if admin_password is None:
+            admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+        if host is None:
+            host = configuration.get_configuration('feder8.local.host.name')
 
-    if security_method is None:
-        security_method = configuration.get_configuration('feder8.local.security.security-method')
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
 
-    if security_method == 'LDAP':
-        if ldap_url is None:
-            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-        if ldap_dn is None:
-            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-        if ldap_base_dn is None:
-            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-        if ldap_system_username is None:
-            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-        if ldap_system_password is None:
-            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+        if security_method == 'LDAP':
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+            if ldap_system_username is None:
+                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+            if ldap_system_password is None:
+                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
 
-    if log_directory is None:
-        log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
+        if log_directory is None:
+            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
 
-    if notebook_directory is None:
-        notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
+        if notebook_directory is None:
+            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
-    if data_directory is None:
-        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+        if data_directory is None:
+            data_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
-    if username is None:
-        username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if security_method != 'None':
+            if username is None:
+                username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
 
-    if password is None:
-        password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
-
+            if password is None:
+                password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+    except KeyboardInterrupt:
+        sys.exit(1)
     ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, data_directory=data_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
+    if security_method != 'None':
+        ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
 
 @init.command()
@@ -1441,67 +1468,71 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
 @click.option('-o', '--organization')
 @click.pass_context
 def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, data_directory, feder8_studio_directory, username, password, organization):
-    current_environment = os.getenv('CURRENT_DIRECTORY', '')
-    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-    if therapeutic_area is None:
-        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).ask()
 
-    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-    configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-    if email is None:
-        email = configuration.get_configuration('feder8.central.service.image-repo-username')
-    if cli_key is None:
-        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    if user_password is None:
-        user_password = configuration.get_configuration('feder8.local.datasource.password')
-    if admin_password is None:
-        admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
-    if host is None:
-        host = configuration.get_configuration('feder8.local.host.name')
+        if user_password is None:
+            user_password = configuration.get_configuration('feder8.local.datasource.password')
+        if admin_password is None:
+            admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+        if host is None:
+            host = configuration.get_configuration('feder8.local.host.name')
 
-    if security_method is None:
-        security_method = configuration.get_configuration('feder8.local.security.security-method')
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
 
-    if security_method == 'LDAP':
-        if ldap_url is None:
-            ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-        if ldap_dn is None:
-            ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-        if ldap_base_dn is None:
-            ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-        if ldap_system_username is None:
-            ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-        if ldap_system_password is None:
-            ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
-    if log_directory is None:
-        log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
+        if security_method == 'LDAP':
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+            if ldap_system_username is None:
+                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
+            if ldap_system_password is None:
+                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+        if log_directory is None:
+            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
 
-    if notebook_directory is None:
-        notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
+        if notebook_directory is None:
+            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
-    if data_directory is None:
-        data_directory = configuration.get_configuration('feder8.local.host.data-directory')
+        if data_directory is None:
+            data_directory = configuration.get_configuration('feder8.local.host.data-directory')
 
-    if feder8_studio_directory is None:
-        feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+        if feder8_studio_directory is None:
+            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
 
-    if username is None:
-        username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if security_method != 'None':
+            if username is None:
+                username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
 
-    if password is None:
-        password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+            if password is None:
+                password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
 
-    if organization is None:
-        organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).ask()
-
+        if organization is None:
+            organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).ask()
+    except KeyboardInterrupt:
+        sys.exit(1)
     ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, data_directory=data_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
+    if security_method != 'None':
+        ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
     ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, data_directory=data_directory, organization=organization)
     ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, data_directory=data_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)

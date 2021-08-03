@@ -10,4 +10,4 @@ class MultipleChoiceQuestion(Question):
         self.choices:List[str] = choices
 
     def ask_question(self, question:str, default:str) -> str:
-        return questionary.select(question, choices=self.choices, default=default).ask()
+        return questionary.select(question, choices=self.choices, default=default).unsafe_ask()

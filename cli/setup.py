@@ -33,7 +33,8 @@ setup(
         'docker==5.0.0',
         'questionary==1.10.0',
         'config-client==0.12.0',
-        'six==1.16.0'
+        'six==1.16.0',
+        'StringGenerator==0.4.4'
     ],
     extras_require={
         'dev': [

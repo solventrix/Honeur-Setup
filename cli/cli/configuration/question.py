@@ -1,5 +1,5 @@
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-
+import strgen
 
 class Question:
 
@@ -13,7 +13,6 @@ class Question:
         question = question.replace('FEDER8_REGISTRY_URL', therapeutic_area.registry.registry_url)
         question = question.replace('FEDER8_THERAPEUTIC_AREA', therapeutic_area.name)
         question = question.replace('FEDER8_CURRENT_DIRECTORY', current_directory)
-        question = question.replace('FEDER8_CURRENT_DIRECTORY', current_directory)
         if is_windows:
             question = question.replace('FEDER8_DIRECTORY_SEPARATOR', '\\')
         else:
@@ -24,6 +23,7 @@ class Question:
             question_default = question_default.replace('FEDER8_PORTAL_URL', therapeutic_area.portal_url)
             question_default = question_default.replace('FEDER8_REGISTRY_URL', therapeutic_area.registry.registry_url)
             question_default = question_default.replace('FEDER8_THERAPEUTIC_AREA', therapeutic_area.name)
+            question_default = question_default.replace('FEDER8_RANDOM_PASSWORD', strgen.StringGenerator(r"[\w]{16}").render())
             question_default = question_default.replace('FEDER8_CURRENT_DIRECTORY', current_directory)
             if is_windows:
                 question_default = question_default.replace('FEDER8_DIRECTORY_SEPARATOR', '\\')
