@@ -8,14 +8,14 @@ from typing import Dict, List
 
 class Globals:
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-dev.honeur.org', 'catalogue-dev.honeur.org', 'distributed-analytics-dev.honeur.org', 'cas-dev.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Jannsen', 'TestOrg1', 'TestOrg3', 'TestOrg3']),
+        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-dev.honeur.org', 'catalogue-dev.honeur.org', 'distributed-analytics-dev.honeur.org', 'cas-dev.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Jannsen', 'TestOrg1', 'TestOrg2', 'TestOrg3']),
         "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal-dev.phederation.org', 'catalogue-dev.phederation.org', 'distributed-analytics-dev.phederation.org', 'cas-dev.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Jannsen']),
         "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal-dev.esfurn.org', 'catalogue-dev.esfurn.org', 'distributed-analytics-dev.esfurn.org', 'cas-dev.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Jannsen']),
         "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal-dev.athenafederation.org', 'catalogue-dev.athenafederation.org', 'distributed-analytics-dev.athenafederation.org', 'cas-dev.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['Jannsen'])
     }
 
     all_questions:Dict[str,Question] = {
-        'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost to for testing?', 'localhost'),
+        'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
         'feder8.central.service.image-repo-username': SingleChoiceQuestion('Enter email address used to login to FEDER8_PORTAL_URL?', ''),
         'feder8.central.service.image-repo-key': SingleChoiceQuestion('Surf to FEDER8_REGISTRY_URL and login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field. Enter the CLI Secret?', ''),
         'feder8.local.datasource.password': SingleChoiceQuestion('Enter password for FEDER8_THERAPEUTIC_AREA database user?', 'FEDER8_RANDOM_PASSWORD'),

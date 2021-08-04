@@ -166,7 +166,7 @@ def config_server(therapeutic_area, email, cli_key):
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url,
+            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url + "/oidc",
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
             'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
@@ -968,10 +968,15 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
     print('Starting Distributed Analytics Remote container...')
     environment_variables = {
         'DISTRIBUTED_SERVICE_CLIENT_HOST': therapeutic_area_info.distributed_analytics_url,
-        'LOCAL_CONFIGURATION_CLIENT_HOST': 'config-server',
+        'LOCAL_CONFIGURATION_CLIENT_HOST': 'local-portal',
+        'LOCAL_CONFIGURATION_CLIENT_BIND': 'portal',
+        'LOCAL_CONFIGURATION_CLIENT_API': 'api',
         'R_SERVER_CLIENT_HOST': 'distributed-analytics-r-server',
         'R_SERVER_CLIENT_PORT': '8080',
-        'HONEUR_ANALYTICS_ORGANIZATION': organization
+        'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
+        'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
+        'HONEUR_ANALYTICS_ORGANIZATION': organization,
+        'FEDER8_DATA_DIRECTORY': data_directory
     }
     container = docker_client.containers.run(
         image=distributed_analytics_remote_image,
@@ -1148,7 +1153,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'APPLICATION_LOGS_TO_STDOUT': 'false',
         'SITE_NAME': therapeutic_area_info.name + 'studio',
         'CONTENT_PATH': feder8_studio_directory,
-        'USERID': '1000',
+        'USERID': '54321',
         'DOMAIN_NAME': host,
         'HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER': data_directory,
         'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
