@@ -140,7 +140,7 @@ def config_server(therapeutic_area, email, cli_key):
         network=network_names[0],
         volumes={
             volume_names[0]: {
-                'bind': '/home/feder8/config-repo',
+                'bind': '/root/config-repo',
                 'mode': 'rw'
             }
         },
@@ -367,7 +367,11 @@ def local_portal(therapeutic_area, email, cli_key):
                 'mode': 'ro'
             },
             volume_names[1]: {
-                'bind': '/home/feder8/config-repo',
+                'bind': '/root/config-repo',
+                'mode': 'rw'
+            },
+            '/var/run/docker.sock': {
+                'bind': '/var/run/docker.sock',
                 'mode': 'rw'
             }
         },
@@ -728,8 +732,8 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-        'FEDER8_LOCAL_HOST_LOG-DIRECTORY': log_directory,
-        'FEDER8_LOCAL_HOST_NOTEBOOK-DIRECTORY': notebook_directory,
+        'FEDER8_LOCAL_HOST_ZEPPELIN-LOG-DIRECTORY': log_directory,
+        'FEDER8_LOCAL_HOST_ZEPPELIN-NOTEBOOK-DIRECTORY': notebook_directory,
         'FEDER8_LOCAL_HOST_DATA-DIRECTORY': data_directory
     }
     if security_method == 'None':
@@ -921,7 +925,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         sys.exit(1)
 
     network_names = ['feder8-net', therapeutic_area.lower() + '-net']
-    volume_names = ['feder8-config-server']
+    volume_names = ['feder8-data', 'feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
     registry = therapeutic_area_info.registry
@@ -946,7 +950,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            data_directory: {
+            volume_names[0]: {
                 'bind': '/home/feder8/data',
                 'mode': 'rw'
             }
@@ -976,7 +980,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'HONEUR_ANALYTICS_ORGANIZATION': organization,
-        'FEDER8_DATA_DIRECTORY': data_directory
+        'FEDER8_DATA_DIRECTORY': volume_names[0]
     }
     container = docker_client.containers.run(
         image=distributed_analytics_remote_image,
@@ -987,7 +991,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            data_directory: {
+            volume_names[0]: {
                 'bind': '/home/feder8/data',
                 'mode': 'rw'
             }
@@ -1020,7 +1024,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, data_directory, orga
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            volume_names[1]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
