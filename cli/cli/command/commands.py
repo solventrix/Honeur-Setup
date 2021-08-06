@@ -251,7 +251,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         network=network_names[0],
         volumes={
             volume_names[0]: {
-                'bind': '/home/feder8/config-repo',
+                'bind': '/var/lib/postgresql/data',
                 'mode': 'rw'
             },
             volume_names[1]: {
