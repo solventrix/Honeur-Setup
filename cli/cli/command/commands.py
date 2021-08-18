@@ -1390,7 +1390,7 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
         sys.exit(1)
 
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
@@ -1480,7 +1480,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         sys.exit(1)
 
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
