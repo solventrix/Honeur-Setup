@@ -1346,7 +1346,12 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
 
+    ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+
+    try:
         if user_password is None:
             user_password = configuration.get_configuration('feder8.local.datasource.password')
         if admin_password is None:
@@ -1383,7 +1388,7 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
                 password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
     except KeyboardInterrupt:
         sys.exit(1)
-    ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
@@ -1426,7 +1431,12 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
 
+    ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+
+    try:
         if user_password is None:
             user_password = configuration.get_configuration('feder8.local.datasource.password')
         if admin_password is None:
@@ -1468,7 +1478,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).unsafe_ask()
     except KeyboardInterrupt:
         sys.exit(1)
-    ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
