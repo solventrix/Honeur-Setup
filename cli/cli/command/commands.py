@@ -400,8 +400,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
             'FEDER8_CONFIG_SERVER_PORT': '8080',
             'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-            'SERVER_SERVLET_CONTEXT_PATH': '/portal',
-            'SPRING_APPLICATION_NAME': 'feder8-config-' + therapeutic_area_info.name
+            'SERVER_SERVLET_CONTEXT_PATH': '/portal'
         },
         network=network_names[0],
         volumes={
