@@ -20,8 +20,8 @@ fi
 
 mkdir -p certificates
 cd certificates
-  
-# 01. Create CA keys 
+
+# 01. Create CA keys
 echo "01a. Create ca-key.pem"
 # Generate CA password
 LC_CTYPE=C GEN_CA_PWD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
@@ -30,9 +30,9 @@ read -p "Enter password for CA certificate [$GEN_CA_PWD]: " CA_PWD
 CA_PWD=${CA_PWD:-$GEN_CA_PWD}
 openssl genrsa -aes256 -out ca-key.pem -passout pass:$CA_PWD 4096
 echo "01b. Create ca.pem"
-openssl req -new -passin pass:$CA_PWD -x509 -days $VALIDITY_DAYS -subj "/C=BE/ST=Antwerp/L=Beerse/O=HONEUR/OU=Data Sciences/CN=$DOCKER_HOST_IP" -key ca-key.pem -sha256 -out ca.pem
+openssl req -new -passin pass:$CA_PWD -x509 -days $VALIDITY_DAYS -subj "/C=BE/ST=Antwerp/L=Beerse/O=FEDER8/OU=Data Sciences/CN=$DOCKER_HOST_IP" -key ca-key.pem -sha256 -out ca.pem
 
-# Create server keys 
+# Create server keys
 echo "02a. Create server-key.pem"
 openssl genrsa -out server-key.pem 4096
 echo "02b. Create server.csr"
@@ -53,15 +53,15 @@ echo extendedKeyUsage = clientAuth > extfile-host-client.cnf
 echo "03c. Create host-client-cert.pem"
 openssl x509 -req -passin pass:$CA_PWD -days $VALIDITY_DAYS -sha256 -in host-client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out host-client-cert.pem -extfile extfile-host-client.cnf
 
-# Create honeur-studio client keys
-echo "04a. Create honeur-studio-client-key.pem"
-openssl genrsa -out honeur-studio-client-key.pem 4096
-echo "04b. Create honeur-studio-client.csr"
-openssl req -passin pass:$CA_PWD -subj '/CN=honeur-studio' -new -key honeur-studio-client-key.pem -out honeur-studio-client.csr
-echo -n "" > extfile-honeur-studio-client.cnf
-echo extendedKeyUsage = clientAuth > extfile-honeur-studio-client.cnf
-echo "04c. Create honeur-studio-client-cert.pem"
-openssl x509 -req -passin pass:$CA_PWD -days $VALIDITY_DAYS -sha256 -in honeur-studio-client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out honeur-studio-client-cert.pem -extfile extfile-honeur-studio-client.cnf
+# Create feder8 client keys
+echo "04a. Create feder8-client-key.pem"
+openssl genrsa -out feder8-client-key.pem 4096
+echo "04b. Create feder8-client.csr"
+openssl req -passin pass:$CA_PWD -subj '/CN=feder8' -new -key feder8-client-key.pem -out feder8-client.csr
+echo -n "" > extfile-feder8-client.cnf
+echo extendedKeyUsage = clientAuth > extfile-feder8-client.cnf
+echo "04c. Create feder8-client-cert.pem"
+openssl x509 -req -passin pass:$CA_PWD -days $VALIDITY_DAYS -sha256 -in feder8-client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out feder8-client-cert.pem -extfile extfile-feder8-client.cnf
 
 # Set minimal permissions
 echo "05. Limit access to keys and certificates"
@@ -70,6 +70,12 @@ chmod -v 0444 ca.pem server-cert.pem host-client-cert.pem
 
 # Cleanup
 echo "06. Cleanup"
-rm -v server.csr host-client.csr honeur-studio-client.csr extfile.cnf extfile-host-client.cnf extfile-honeur-studio-client.cnf 
+rm -v server.csr host-client.csr feder8-client.csr extfile.cnf extfile-host-client.cnf extfile-feder8-client.cnf
 unset GEN_CA_PWD
 unset CA_PWD
+
+mkdir -p feder8-client-certificates
+mv feder8-client-key.pem feder8-client-certificates/key.pem
+mv feder8-client-cert.pem feder8-client-certificates/cert.pem
+cp -v ca.pem feder8-client-certificates/ca.pem
+echo "Feder8 certificates can be found in $(pwd)/feder8-client-certificates"
