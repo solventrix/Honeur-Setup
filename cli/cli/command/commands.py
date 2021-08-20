@@ -134,6 +134,7 @@ def config_server(therapeutic_area, email, cli_key):
         remove=True,
         name=container_names[1],
         environment={
+            'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
@@ -242,6 +243,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         remove=True,
         name=container_names[1],
         environment={
+            'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
@@ -358,6 +360,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
         remove=True,
         name=container_names[1],
         environment={
+            'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
@@ -489,6 +492,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
     print('Updating configuration in config-server...')
     environment_variables = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_LOCAL_HOST_NAME': host,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
@@ -682,6 +686,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
     print('Updating configuration in config-server...')
     environment_variables = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
@@ -833,6 +838,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
     print('Updating configuration in config-server...')
     environment_variables = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
@@ -946,6 +952,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     print('Updating configuration in config-server...')
     environment_variables = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
@@ -1116,6 +1123,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
     print('Updating configuration in config-server...')
     environment_variables = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_LOCAL_HOST_NAME': host,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
@@ -1262,6 +1270,7 @@ def nginx(therapeutic_area, email, cli_key):
 
     print('Updating configuration in config-server...')
     environment_variables = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
