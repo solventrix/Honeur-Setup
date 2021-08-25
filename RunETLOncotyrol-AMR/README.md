@@ -20,7 +20,7 @@
     * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
     * the tag name for the Docker Hub image
     * the verbosity level [DEBUG, INFO, WARNING, ERROR]
-    * the filenameß
+    * the filename
 5. The script will run the ETL code and show the output of the code
 6. The `etl.log` log file will be available in the `log` folder
 7. Review the log file to verify that there is no patient-level information.
