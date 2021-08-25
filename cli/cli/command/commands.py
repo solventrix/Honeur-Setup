@@ -1023,7 +1023,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         'R_SERVER_CLIENT_PORT': '8080',
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
-        'HONEUR_ANALYTICS_ORGANIZATION': organization,
+        'FEDER8_ANALYTICS_ORGANIZATION': organization,
         'FEDER8_DATA_DIRECTORY': volume_names[0]
     }
     container = docker_client.containers.run(
