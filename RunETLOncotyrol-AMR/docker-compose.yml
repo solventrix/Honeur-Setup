@@ -1,0 +1,25 @@
+version: '3.5'
+
+services:
+  etl:
+    image: harbor.honeur.org/etl-oncotyrol/etl:current
+    volumes:
+      - "./log:/log"
+      - "data_folder:/data"
+    networks:
+      - honeur_honeur-net
+    environment:
+      FILENAME: filename
+      DB_DBMS: "postgresql"
+      DB_SERVER : "postgres"
+      DB_PORT: "5432"
+      DB_DBNAME: "OHDSI"
+      DB_SCHEMA: "omopcdm"
+      DB_USER: db_username
+      DB_PASSWORD: db_password
+      VERBOSITY_LEVEL: verbosity_level
+
+networks:
+  honeur_honeur-net:
+    external:
+      name: honeur-net
