@@ -45,7 +45,7 @@ docker rm postgres-qa > /dev/null 2>&1 || true
 docker stop webapi-source-qa-enable > /dev/null 2>&1 || true
 docker rm webapi-source-qa-enable > /dev/null 2>&1 || true
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/UAT/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh
 chmod +x start-postgres.sh
 export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 export FEDER8_PGDATA_VOLUME_NAME=pgdata-qa
@@ -61,7 +61,7 @@ export FEDER8_CONTAINER_HOST_PORT=5445
 } | ./start-postgres.sh
 rm -rf start-postgres.sh
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-creation.sh --output start-source-creation.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/UAT/remote-installation/separate-scripts/start-source-creation.sh --output start-source-creation.sh
 chmod +x start-source-creation.sh
 export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 {

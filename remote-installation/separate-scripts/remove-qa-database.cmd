@@ -81,7 +81,7 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
 
 for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toUpper()"`) do set "FEDER8_THERAPEUTIC_AREA_UPPERCASE=%%~I"
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-deletion.cmd --output start-source-deletion.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/UAT/remote-installation/separate-scripts/start-source-deletion.cmd --output start-source-deletion.cmd
 SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 CALL .\start-source-deletion.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "postgres-qa" "%FEDER8_THERAPEUTIC_AREA_UPPERCASE% QA OMOP CDM"
 DEL start-source-deletion.cmd

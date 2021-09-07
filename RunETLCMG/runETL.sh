@@ -5,7 +5,7 @@ rm -rf ./CMG
 
 git clone https://github.com/solventrix/CMG ./CMG
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLCMG/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/UAT/RunETLCMG/docker-compose.yml --output docker-compose.yml
 
 read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}
