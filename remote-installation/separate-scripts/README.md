@@ -43,9 +43,10 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images are located on a central repository. Make sure you have a central platform account before trying to run the local setup installation scripts:
 
-* For HONEUR: https://portal.honeur.org
-* For PHederation: https://portal.phederation.org
-* For Esfurn: https://portal.esfurn.org
+* For HONEUR: https://portal-uat.honeur.org
+* For PHederation: https://portal-uat.phederation.org
+* For Esfurn: https://portal-uat.esfurn.org
+* For Athena: https://portal-uat.athenafederation.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -82,9 +83,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a new password for standard database user.
 8. The script will prompt you to enter a new password for admin database user.
@@ -123,9 +125,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing HONEUR Components like Postgres/Zeppelin or FEDER8 Studio. Please use the same security settings as with these previous installation.
@@ -165,9 +168,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a Directory on the host machine to save the Zeppelin logs, notebooks and prepared distributed analytics data. Please provide an absolute path.
 8. The script will prompt you to enter the security options for Zeppelin. If you have existing HONEUR Components like Postgres/Atlas/WebAPI or FEDER8 Studio. Please use the same security settings as with these previous installation.
@@ -209,9 +213,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter credentials for the administrator user that can manage users and roles.
 
@@ -251,9 +256,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter the directory where zeppelin will save its prepared distributed analytics data. Use the same directory as with the installation of Zeppelin.
 8. The script will prompt you to enter the name of your organization. :warning: The name of the organization is given by the HONEUR Team.
@@ -290,9 +296,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. FEDER8 Studio will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt you to enter the directory of where the FEDER8 Studio will store its working directory files.
@@ -333,9 +340,10 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
+    * https://harbor-uat.athenafederation.org for Athena
 6. login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the HONEUR Proxy docker image and will create the docker container.
