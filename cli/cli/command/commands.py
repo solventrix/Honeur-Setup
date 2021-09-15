@@ -1017,7 +1017,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     print('Starting Distributed Analytics Remote container...')
     environment_variables = {
         'DISTRIBUTED_SERVICE_CLIENT_HOST': therapeutic_area_info.distributed_analytics_url,
-        'DISTRIBUTED_SERVICE_CLIENT_BIND': 'distributed-service',
+        'DISTRIBUTED_SERVICE_CLIENT_BIND': '',
         'LOCAL_CONFIGURATION_CLIENT_HOST': 'local-portal',
         'LOCAL_CONFIGURATION_CLIENT_BIND': 'portal',
         'LOCAL_CONFIGURATION_CLIENT_API': 'api',
