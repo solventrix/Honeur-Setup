@@ -20,7 +20,7 @@ pipeline {
                 script {
                     dir('Honeur-Setup/cli') {
                         try {
-                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot", url: "https://harbor-uat.honeur.org") {
+                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot-uat", url: "https://harbor-uat.honeur.org") {
                                 sh "THERAPEUTIC_AREA_URL=harbor-uat.honeur.org ./publish.sh"
                             }
                         } catch (e) {
