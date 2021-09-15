@@ -622,15 +622,13 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-lu', '--ldap-url')
 @click.option('-ldn', '--ldap-dn')
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+def zeppelin(therapeutic_area, email, cli_key, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -645,12 +643,6 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
-
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
@@ -675,7 +667,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         sys.exit(1)
 
     network_names = ['feder8-net', therapeutic_area.lower() + '-net']
-    volume_names = ['feder8-data', 'shared', 'feder8-config-server']
+    volume_names = ['feder8-data', 'feder8-zeppelin-notebook', 'feder8-zeppelin-logs', 'shared', 'feder8-config-server']
     container_names = ['zeppelin', 'config-server-update-configuration']
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -717,7 +709,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[2]: {
+            volume_names[4]: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -728,7 +720,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     print('Done updating configuration in config-server')
 
     zeppelin_repo = '/'.join([registry.registry_url, registry.project, 'zeppelin'])
-    zeppelin_tag = '0.8.2-2.0.0'
+    zeppelin_tag = '0.8.2-2.0.1'
     zeppelin_image = ':'.join([zeppelin_repo, zeppelin_tag])
 
     pull_image(docker_client, registry, zeppelin_image, email, cli_key)
@@ -759,16 +751,16 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         network=network_names[0],
         volumes={
             volume_names[1]: {
-                'bind': '/var/lib/shared',
-                'mode': 'ro'
+                'bind': '/notebook',
+                'mode': 'rw'
             },
-            log_directory: {
+            volume_names[2]: {
                 'bind': '/logs',
                 'mode': 'rw'
             },
-            notebook_directory: {
-                'bind': '/notebook',
-                'mode': 'rw'
+            volume_names[3]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
             },
             volume_names[0]: {
                 'bind': '/usr/local/src/datafiles',
@@ -1342,12 +1334,10 @@ def nginx(therapeutic_area, email, cli_key):
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 @click.pass_context
-def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, username, password):
+def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, username, password):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -1387,12 +1377,6 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
             if ldap_system_password is None:
                 ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
 
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
-
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
-
         if security_method != 'None':
             if username is None:
                 username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
@@ -1405,7 +1389,7 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
@@ -1423,14 +1407,12 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
 @click.option('-fsd', '--feder8-studio-directory')
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 @click.option('-o', '--organization')
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, feder8_studio_directory, username, password, organization):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -1471,11 +1453,6 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                 ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
             if ldap_system_password is None:
                 ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
-
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
         if feder8_studio_directory is None:
             feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
@@ -1495,7 +1472,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
     ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
