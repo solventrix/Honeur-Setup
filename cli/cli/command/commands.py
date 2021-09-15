@@ -728,7 +728,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     print('Done updating configuration in config-server')
 
     zeppelin_repo = '/'.join([registry.registry_url, registry.project, 'zeppelin'])
-    zeppelin_tag = '0.8.2-2.0.0'
+    zeppelin_tag = '0.8.2-2.0.1'
     zeppelin_image = ':'.join([zeppelin_repo, zeppelin_tag])
 
     pull_image(docker_client, registry, zeppelin_image, email, cli_key)
