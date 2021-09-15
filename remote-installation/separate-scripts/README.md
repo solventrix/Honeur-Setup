@@ -44,9 +44,9 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images are located on a central repository. Make sure you have a central platform account before trying to run the local setup installation scripts:
 
-* For HONEUR: https://portal.honeur.org
-* For PHederation: https://portal.phederation.org
-* For Esfurn: https://portal.esfurn.org
+* For HONEUR: https://portal-uat.honeur.org
+* For PHederation: https://portal-uat.phederation.org
+* For Esfurn: https://portal-uat.esfurn.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -60,12 +60,12 @@ Postgres database can be installed by running the installation script..
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 ```
 
 2. You can run this script using the following command:
@@ -101,12 +101,12 @@ Atlas/WebAPI can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
 ```
 
 2. You can run this script using the following command:
@@ -143,12 +143,12 @@ Zeppelin can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
 ```
 
 2. You can run this script using the following command:
@@ -187,12 +187,12 @@ User Management can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
 ```
 
 2. You can run this script using the following command:
@@ -229,12 +229,12 @@ Distributed Analytics can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
 ```
 
 2. You can run this script using the following command:
@@ -268,12 +268,12 @@ FEDER8 Studio can be downloaded right next to an existing installation. Please f
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
 ```
 
 2. You can run this script using the following command:
@@ -311,12 +311,12 @@ Proxy can be downloaded right next to an existing installation. Please follow th
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
 ```
 
 2. You can run this script using the following command:
@@ -350,11 +350,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
 ```
 3.	Run the script
 
@@ -375,11 +375,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 3.	Run the script
 
@@ -401,11 +401,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-qa-database.sh --output start-qa-database.sh && chmod +x start-qa-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-qa-database.sh --output start-qa-database.sh && chmod +x start-qa-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-qa-database.cmd --output start-qa-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-qa-database.cmd --output start-qa-database.cmd
 ```
 3.	Run the script
 
@@ -424,11 +424,11 @@ Removal steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/remove-qa-database.sh --output remove-qa-database.sh && chmod +x remove-qa-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/remove-qa-database.sh --output remove-qa-database.sh && chmod +x remove-qa-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/remove-qa-database.cmd --output remove-qa-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/remove-qa-database.cmd --output remove-qa-database.cmd
 ```
 3.	Run the script
 
@@ -448,11 +448,11 @@ Windows
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/backup-database.cmd --output backup-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/backup-database.cmd --output backup-database.cmd
 ```
 2. Run the script
 
@@ -472,11 +472,11 @@ Copy the backup file to a save location for long term storage.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/restore-database.cmd --output restore-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/restore-database.cmd --output restore-database.cmd
 ```
 2. Run the script and provide the name of the backup file as parameter. The backup file should be present in the folder where the script is executed.
 
@@ -495,7 +495,7 @@ The database volume can be copied to a new volume (with a different name) to tak
 1. Download the script
 
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/clone-docker-volume.sh --output clone-docker-volume.sh && chmod +x clone-volume.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/clone-docker-volume.sh --output clone-docker-volume.sh && chmod +x clone-volume.sh
 ```
 
 2. Run the script, provide the source volume as first parameter and the target volume as second parameter.
@@ -511,11 +511,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-vocabulary-update.sh --output start-vocabulary-update.sh && chmod +x start-vocabulary-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-vocabulary-update.sh --output start-vocabulary-update.sh && chmod +x start-vocabulary-update.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-vocabulary-update.cmd --output start-vocabulary-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-vocabulary-update.cmd --output start-vocabulary-update.cmd
 ```
 3.	Run the script
 

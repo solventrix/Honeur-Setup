@@ -3,15 +3,15 @@ from cli.configuration.single_choice_question import SingleChoiceQuestion
 from cli.configuration.question import Question
 from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-from typing import Dict, List
+from typing import Dict
 
 
 class Globals:
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-dev.honeur.org', 'catalogue-dev.honeur.org', 'distributed-analytics-dev.honeur.org', 'cas-dev.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Jannsen', 'TestOrg1', 'TestOrg2', 'TestOrg3']),
-        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal-dev.phederation.org', 'catalogue-dev.phederation.org', 'distributed-analytics-dev.phederation.org', 'cas-dev.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Jannsen', 'TestOrg1', 'TestOrg2', 'TestOrg3']),
-        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal-dev.esfurn.org', 'catalogue-dev.esfurn.org', 'distributed-analytics-dev.esfurn.org', 'cas-dev.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Jannsen', 'TestOrg1', 'TestOrg2', 'TestOrg3']),
-        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal-dev.athenafederation.org', 'catalogue-dev.athenafederation.org', 'distributed-analytics-dev.athenafederation.org', 'cas-dev.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['Jannsen', 'TestOrg1', 'TestOrg2', 'TestOrg3'])
+        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-uat.honeur.org', 'catalogue-uat.honeur.org', 'distributed-analytics-uat.honeur.org', 'cas-uat.honeur.org', Registry('harbor-uat.honeur.org', 'honeur'), ['Security Scan', 'UHL', 'DOS', 'CLLEAR', 'RMG', 'iOMEDICO', 'OIS', 'EMMOS', 'Janssen', 'EY', 'ZOL', 'HOPE', 'TestOrg1', 'TestOrg2', 'TestOrg3', 'TestOrg4', 'TestOrg5', 'TestOrg6']),
+        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal-uat.phederation.org', 'catalogue-uat.phederation.org', 'distributed-analytics-uat.phederation.org', 'cas-uat.phederation.org', Registry('harbor-uat.phederation.org', 'phederation'), ['Security Scan', 'Janssen', 'Actelion', 'PHederationTestOrg1', 'PHederationTestOrg2', 'PHederationTestOrg3', 'PHederationTestOrg4', 'PHederationTestOrg5', 'PHederationTestOrg6']),
+        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal-uat.esfurn.org', 'catalogue-uat.esfurn.org', 'distributed-analytics-uat.esfurn.org', 'cas-uat.esfurn.org', Registry('harbor-uat.esfurn.org', 'esfurn'), ['DARM', 'Janssen', 'EsfurnTestOrg1', 'EsfurnTestOrg2', 'EsfurnTestOrg3', 'EsfurnTestOrg4', 'EsfurnTestOrg5', 'EsfurnTestOrg6']),
+        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal-uat.athenafederation.org', 'catalogue-uat.athenafederation.org', 'distributed-analytics-uat.athenafederation.org', 'cas-uat.athenafederation.org', Registry('harbor-uat.athenafederation.org', 'athena'), ['Illumina', 'KU Leuven', 'UZ Leuven', 'AZ Groeninge', 'Imec', 'edenceHealth', 'Janssen', 'AthenaTestOrg1', 'AthenaTestOrg2', 'AthenaTestOrg3', 'AthenaTestOrg4', 'AthenaTestOrg5', 'AthenaTestOrg6'])
     }
 
     all_questions:Dict[str,Question] = {

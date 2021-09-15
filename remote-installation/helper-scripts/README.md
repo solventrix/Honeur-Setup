@@ -34,10 +34,10 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images required to run the full setup are located on a central repository. Make sure you have an account on our central platform before trying to run the local setup installation scripts:
 
-  * For HONEUR: https://portal.honeur.org
-  * For PHederation: https://portal.phederation.org
-  * For Esfurn: https://portal.esfurn.org
-  * For Athena: https://portal.athenafederation.org
+  * For HONEUR: https://portal-uat.honeur.org
+  * For PHederation: https://portal-uat.phederation.org
+  * For Esfurn: https://portal-uat.esfurn.org
+  * For Athena: https://portal-uat.athenafederation.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -58,12 +58,12 @@ Essential remote installation can be installed by running the installation helpe
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-feder8.sh --output start-feder8.sh && chmod +x start-feder8.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/helper-scripts/start-feder8.sh --output start-feder8.sh && chmod +x start-feder8.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-feder8.cmd --output start-feder8.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/helper-scripts/start-feder8.cmd --output start-feder8.cmd
 ```
 
 2. You can run this script using the following command:
@@ -78,12 +78,12 @@ Windows
 .\start-feder8.cmd
 ```
 3. The script will ask you for which therapeutic area you will install the installation. Please choose the therapeutic area where you received your credentials for:
-   1. HONEUR for https://portal.honeur.org
-   2. PHederation for https://portal.phederation.org
-   3. Esfurn for https://portal.esfurn.org
-   4. Athena for https://portal.athenafederation.org
+   1. HONEUR for https://portal-uat.honeur.org
+   2. PHederation for https://portal-uat.phederation.org
+   3. Esfurn for https://portal-uat.esfurn.org
+   4. Athena for https://portal-uat.athenafederation.org
 4. The script will promt you to enter your email address that you use as your login on our central platform.
-5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to the central registry (https://harbor.honeur.org for HONEUR, https://harbor.phederation.org for PHederation, https://harbor.esfurn.org for Esfurn, https://harbor.athenafederation.org for Athena) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to the central registry (https://harbor-uat.honeur.org for HONEUR, https://harbor-uat.phederation.org for PHederation, https://harbor-uat.esfurn.org for Esfurn, https://harbor-uat.athenafederation.org for Athena) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 6. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing Feder8 Components like Postgres/Zeppelin or Feder8 studio. Please use the same security settings as with these previous installation.
 7. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 8. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
@@ -112,12 +112,12 @@ Full remote installation can be installed by running the installation helper scr
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-feder8-full.sh --output start-feder8.sh && chmod +x start-feder8.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/helper-scripts/start-feder8-full.sh --output start-feder8.sh && chmod +x start-feder8.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/helper-scripts/start-feder8-full.cmd --output start-feder8.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/helper-scripts/start-feder8-full.cmd --output start-feder8.cmd
 ```
 
 2. You can run this script using the following command:
@@ -132,12 +132,12 @@ Windows
 .\start-feder8.cmd
 ```
 3. The script will ask you for which therapeutic area you will install the installation. Please choose the therapeutic area where you received your credentials for:
-   1. HONEUR for https://portal.honeur.org
-   2. PHederation for https://portal.phederation.org
-   3. Esfurn for https://portal.esfurn.org
-   4. Athena for https://portal.athenafederation.org
+   1. HONEUR for https://portal-uat.honeur.org
+   2. PHederation for https://portal-uat.phederation.org
+   3. Esfurn for https://portal-uat.esfurn.org
+   4. Athena for https://portal-uat.athenafederation.org
 4. The script will promt you to enter your email address that you use as your login on our central platform.
-5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to the central registry (https://harbor.honeur.org for HONEUR, https://harbor.phederation.org for PHederation, https://harbor.esfurn.org for Esfurn, https://harbor.athenafederation.org for Athena) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to the central registry (https://harbor-uat.honeur.org for HONEUR, https://harbor-uat.phederation.org for PHederation, https://harbor-uat.esfurn.org for Esfurn, https://harbor-uat.athenafederation.org for Athena) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name on the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 6. The script will prompt you to enter the security options for Atlas/WebAPI. If you have existing Feder8 Components like Postgres/Zeppelin or Feder8 studio. Please use the same security settings as with these previous installation.
 7. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 8. The script will prompt you to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.

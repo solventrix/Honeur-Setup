@@ -6,12 +6,12 @@ When new custom concepts are available, they can be easily loaded in the OMOP CD
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 
 2. You can run this script using the following command:
@@ -29,8 +29,8 @@ Windows
 3. The script will prompt you to enter the therapeutic area.
 4. The script will promt you to enter your email address that you use as your login on our central platform for the chosen therapeutic area.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for Esfurn
 
 Once done, the script will download the custom concepts update image and will create the docker container that will run the update.
