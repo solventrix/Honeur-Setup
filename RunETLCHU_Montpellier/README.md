@@ -24,7 +24,7 @@
 5. The script will run the ETL code and show the output of the code
 6. The `etl_<datetime>.log` log file will be available in the `log` folder. In addition, the following logfiles are also written out:
     * `wrong_dateformat_<datetime>.log`: a list of all the unexpected dateformats and how often they appear.
-    * `missingmappings_MM_<datetime>.log`: a list of the missing medical mappings for MM patients
-    * `missingmappings_NON_MM_<datetime>.log`: a list of all the missing medical mappings for non-MM patients.
+    * `missingmappings_MM_<datetime>.log`: a list of the all missing medical mappings for MM patients and how often they appear.
+    * `missingmappings_NON_MM_<datetime>.log`: a list of all the missing medical mappings for non-MM patients and how often they appear.
 
 Please review the log files to confirm that no patient-level information was written out before sharing them.
