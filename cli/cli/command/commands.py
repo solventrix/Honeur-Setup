@@ -113,7 +113,7 @@ def config_server(therapeutic_area, email, cli_key):
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['feder8-config-server']
     container_names = ['config-server', 'config-server-update-configuration']
 
@@ -185,7 +185,6 @@ def config_server(therapeutic_area, email, cli_key):
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting config-server container')
 
