@@ -217,6 +217,8 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
             user_password = configuration.get_configuration('feder8.local.datasource.password')
         if admin_password is None:
             admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+
+        expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
     except KeyboardInterrupt:
         sys.exit(1)
     try:
@@ -278,12 +280,15 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 
     print('Starting postgres container...')
     docker_client
+
+    ports = {}
+    if expose_database_on_host:
+        ports['5432/tcp'] = 5444
+
     container = docker_client.containers.run(
         image=postgres_image,
         name=container_names[0],
-        ports={
-            '5432/tcp': 5444
-        },
+        ports=ports,
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
