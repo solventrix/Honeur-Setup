@@ -1427,9 +1427,6 @@ def backup(therapeutic_area):
     container = docker_client.containers.run(image="postgres:" + postgres_version,
                                             remove=False,
                                             name='postgres-database-backup',
-                                            environment={
-                                                'POSTGRES_PW': 'password'
-                                            },
                                             network=therapeutic_area_info.name + '-net',
                                             volumes={
                                                 current_environment: {
