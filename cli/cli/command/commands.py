@@ -105,7 +105,10 @@ def config_server(therapeutic_area, email, cli_key):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -219,7 +222,10 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -350,7 +356,10 @@ def local_portal(therapeutic_area, email, cli_key, host):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -477,7 +486,10 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -673,7 +685,10 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -839,7 +854,10 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -966,7 +984,10 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -1124,7 +1145,10 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -1301,7 +1325,10 @@ def nginx(therapeutic_area, email, cli_key):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -1402,7 +1429,10 @@ def clean(therapeutic_area):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -1476,7 +1506,10 @@ def backup(therapeutic_area):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -1624,7 +1657,10 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
@@ -1739,7 +1775,10 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
         ta_network.connect(install_container)
