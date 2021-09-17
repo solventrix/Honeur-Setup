@@ -1400,6 +1400,7 @@ def clean(therapeutic_area):
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def backup(therapeutic_area):
+    print("Creating backup of running database postgres... This could take a while")
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -1421,8 +1422,9 @@ def backup(therapeutic_area):
     try:
         postgres_container = docker_client.containers.get("postgres")
     except docker.errors.NotFound:
-        return
-    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
+        print("Postgres container not found. Could not create backup")
+        sys.exit(1)
+    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1].split('-')[0]
 
     container = docker_client.containers.run(image="postgres:" + postgres_version,
                                             remove=False,
@@ -1571,7 +1573,7 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
                     if backup_pgdata:
                         ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database)
         except docker.errors.NotFound:
             pass
 
