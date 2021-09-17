@@ -1331,6 +1331,200 @@ def nginx(therapeutic_area, email, cli_key):
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+def clean(therapeutic_area):
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        confirm_continue = questionary.confirm("This script is about to delete everything installed related to " + therapeutic_area + ". Are you sure to continue?").unsafe_ask()
+
+        if not confirm_continue:
+            sys.exit(1)
+    except KeyboardInterrupt:
+        sys.exit(1)
+    try:
+        docker_client = docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while fetching docker api... Is docker running?')
+        sys.exit(1)
+
+    ta_network_name = therapeutic_area_info.name + '-net'
+    try:
+        ta_network = docker_client.networks.get(ta_network_name)
+    except docker.errors.NotFound:
+        return
+    for container in ta_network.containers:
+        if container.attrs['Name'] != '/config-server':
+            print('Stopping and removing ' + container.attrs['Name'])
+            container.stop()
+            try:
+                container.remove(v=True)
+            except docker.errors.NotFound:
+                pass
+        else:
+            config_server_networks = container.attrs['NetworkSettings']['Networks'].keys()
+            if len(config_server_networks) == 1:
+                print('Stopping and removing ' + container.attrs['Name'])
+                container.stop()
+                try:
+                    container.remove(v=True)
+                except docker.errors.NotFound:
+                    pass
+            else:
+                print('disconnecting config-server from ' + ta_network_name)
+                ta_network.disconnect(container)
+
+
+    try:
+        docker_client.volumes.get("shared").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get("pgdata").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        ta_network.remove()
+    except docker.errors.NotFound:
+        pass
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+def backup(therapeutic_area):
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        directory_separator = '/'
+        if is_windows:
+            directory_separator = '\\'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+    except KeyboardInterrupt:
+        sys.exit(1)
+    try:
+        docker_client = docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while fetching docker api... Is docker running?')
+        sys.exit(1)
+
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+    except docker.errors.NotFound:
+        return
+    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
+
+    container = docker_client.containers.run(image="postgres:" + postgres_version,
+                                            remove=False,
+                                            name='postgres-database-backup',
+                                            environment={
+                                                'POSTGRES_PW': 'password'
+                                            },
+                                            network=therapeutic_area_info.name + '-net',
+                                            volumes={
+                                                current_environment: {
+                                                    'bind': '/opt/database',
+                                                    'mode': 'rw'
+                                                },
+                                                'shared': {
+                                                    'bind': '/var/lib/shared',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; cd /opt; pg_dump --create -h postgres -U postgres -f OHDSI.sql -d OHDSI; CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); tar -czf database/OHDSI_${CURRENT_TIME}.tar.gz OHDSI.sql; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI-backup.gz"\'',
+                                            detach=True)
+    for l in container.logs(stream=True):
+            print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
+
+@init.command()
+def upgrade_database():
+    try:
+        docker_client = docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while fetching docker api... Is docker running?')
+        sys.exit(1)
+
+
+    new_pgdata_volume = docker_client.volumes.create("new-pgdata")
+    postgres_container = docker_client.containers.get("postgres")
+    postgres_container.stop()
+    postgres_container.remove(v=True)
+
+    container = docker_client.containers.run(image="postgres:13",
+                                            remove=False,
+                                            name='postgres',
+                                            environment={
+                                                'POSTGRES_PASSWORD': 'postgres'
+                                            },
+                                            volumes={
+                                                'new-pgdata': {
+                                                    'bind': '/var/lib/postgresql/data',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            detach=True)
+
+    time.sleep(20)
+
+    container.stop()
+    container.remove(v=True)
+
+    container = docker_client.containers.run(image="tianon/postgres-upgrade:9.6-to-13",
+                                            remove=False,
+                                            name='postgres-data-upgrade',
+                                            volumes={
+                                                'pgdata': {
+                                                    'bind': '/var/lib/postgresql/9.6/data',
+                                                    'mode': 'rw'
+                                                },
+                                                'new-pgdata': {
+                                                    'bind': '/var/lib/postgresql/13/data',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            detach=True)
+    for l in container.logs(stream=True):
+            print(l.decode('UTF-8'), end='')
+
+
+    pgdata_volume = docker_client.volumes.get("pgdata")
+    pgdata_volume.remove()
+
+    docker_client.volumes.create("pgdata")
+
+    container = docker_client.containers.run(image="alpine",
+                                            remove=False,
+                                            name='postgres-data-upgrade',
+                                            volumes={
+                                                'new-pgdata': {
+                                                    'bind': '/from',
+                                                    'mode': 'rw'
+                                                },
+                                                'pgdata': {
+                                                    'bind': '/to',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            command='ash -c "cd /from ; cp -av . /to"',
+                                            detach=True)
+    for l in container.logs(stream=True):
+            print(l.decode('UTF-8'), end='')
+
+    container.stop()
+    container.remove(v=True)
+
+    new_pgdata_volume.remove()
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-up', '--user-password')
@@ -1353,6 +1547,31 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
+        try:
+            docker_client.volumes.get("pgdata")
+            clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
+            if clean_install:
+                backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
+                if backup_pgdata:
+                    ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                ctx.invoke(clean, therapeutic_area=therapeutic_area)
+            else:
+                postgres_container = docker_client.container.get("postgres")
+                postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
+                if '9.6' in postgres_version:
+                    backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
+                    if backup_pgdata:
+                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+        except docker.errors.NotFound:
+            pass
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
         if email is None:
@@ -1436,6 +1655,31 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
+        try:
+            docker_client.volumes.get("pgdata")
+            clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
+            if clean_install:
+                backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
+                if backup_pgdata:
+                    ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                ctx.invoke(clean, therapeutic_area=therapeutic_area)
+            else:
+                postgres_container = docker_client.container.get("postgres")
+                postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
+                if '9.6' in postgres_version:
+                    backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
+                    if backup_pgdata:
+                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+        except docker.errors.NotFound:
+            pass
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
