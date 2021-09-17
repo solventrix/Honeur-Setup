@@ -111,7 +111,10 @@ def config_server(therapeutic_area, email, cli_key):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -228,7 +231,10 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -362,7 +368,10 @@ def local_portal(therapeutic_area, email, cli_key, host):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -492,7 +501,10 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -691,7 +703,10 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -860,7 +875,10 @@ def user_management(therapeutic_area, email, cli_key, username, password):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -990,7 +1008,10 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -1151,7 +1172,10 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -1331,7 +1355,10 @@ def nginx(therapeutic_area, email, cli_key):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         registry = therapeutic_area_info.registry
 
@@ -1435,7 +1462,10 @@ def clean(therapeutic_area):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         confirm_continue = questionary.confirm("This script is about to delete everything installed related to " + therapeutic_area + ". Are you sure to continue?").unsafe_ask()
 
@@ -1512,7 +1542,10 @@ def backup(therapeutic_area):
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -1663,7 +1696,10 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         try:
             docker_client.volumes.get("pgdata")
@@ -1781,7 +1817,10 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
         install_container = docker_client.containers.get("feder8-installer")
 
-        ta_network.connect(install_container)
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
 
         try:
             docker_client.volumes.get("pgdata")
