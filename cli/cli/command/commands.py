@@ -140,7 +140,7 @@ def config_server(therapeutic_area, email, cli_key):
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
             'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url + "/oidc",
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
+            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'dcYg4D97X78qFTGEWdYD34cqoCJuxy',
             'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
             'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
@@ -217,6 +217,8 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
             user_password = configuration.get_configuration('feder8.local.datasource.password')
         if admin_password is None:
             admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+
+        expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
     except KeyboardInterrupt:
         sys.exit(1)
     try:
@@ -278,12 +280,15 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 
     print('Starting postgres container...')
     docker_client
+
+    ports = {}
+    if expose_database_on_host:
+        ports['5432/tcp'] = 5444
+
     container = docker_client.containers.run(
         image=postgres_image,
         name=container_names[0],
-        ports={
-            '5432/tcp': 5444
-        },
+        ports=ports,
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
@@ -1395,6 +1400,7 @@ def clean(therapeutic_area):
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def backup(therapeutic_area):
+    print("Creating backup of running database postgres... This could take a while")
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -1416,15 +1422,13 @@ def backup(therapeutic_area):
     try:
         postgres_container = docker_client.containers.get("postgres")
     except docker.errors.NotFound:
-        return
-    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
+        print("Postgres container not found. Could not create backup")
+        sys.exit(1)
+    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1].split('-')[0]
 
     container = docker_client.containers.run(image="postgres:" + postgres_version,
                                             remove=False,
                                             name='postgres-database-backup',
-                                            environment={
-                                                'POSTGRES_PW': 'password'
-                                            },
                                             network=therapeutic_area_info.name + '-net',
                                             volumes={
                                                 current_environment: {
@@ -1569,7 +1573,7 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
                     if backup_pgdata:
                         ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database)
         except docker.errors.NotFound:
             pass
 
