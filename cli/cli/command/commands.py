@@ -140,7 +140,7 @@ def config_server(therapeutic_area, email, cli_key):
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
             'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url + "/oidc",
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'dcYg4D97X78qFTGEWdYD34cqoCJuxy',
+            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'qoV2hPEWQjz5mRat',
             'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
             'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
@@ -227,7 +227,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['pgdata', 'shared', 'feder8-config-server']
     container_names = ['postgres', 'config-server-update-configuration']
 
@@ -311,7 +311,6 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting postgres container')
 
@@ -348,7 +347,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['local-portal', 'config-server-update-configuration']
 
@@ -427,7 +426,6 @@ def local_portal(therapeutic_area, email, cli_key, host):
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting local-portal container')
 
@@ -485,7 +483,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
@@ -580,7 +578,6 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting WebAPI container')
 
@@ -616,7 +613,6 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         volumes={},
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting Atlas container')
 
@@ -679,7 +675,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = ['zeppelin', 'config-server-update-configuration']
 
@@ -782,7 +778,6 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting Zeppelin container')
 
@@ -830,7 +825,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['user-mgmt', 'config-server-update-configuration']
 
@@ -904,7 +899,6 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting User Management container')
 
@@ -945,7 +939,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['feder8-data', 'feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
@@ -1007,7 +1001,6 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting Distributed Analytics R Server container')
 
@@ -1049,7 +1042,6 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         },
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting Distributed Analytics Remote container')
 
@@ -1117,7 +1109,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
 
@@ -1230,7 +1222,6 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         volumes=feder8_studio_volumes,
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting Feder8 Studio container')
 
@@ -1264,7 +1255,7 @@ def nginx(therapeutic_area, email, cli_key):
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
-    network_names = ['feder8-net', therapeutic_area.lower() + '-net']
+    network_names = [therapeutic_area.lower() + '-net']
     volume_names = ['feder8-config-server']
     container_names = ['nginx', 'config-server-update-configuration']
 
@@ -1327,7 +1318,6 @@ def nginx(therapeutic_area, email, cli_key):
         volumes={},
         detach=True
     )
-    networks[1].connect(container)
 
     print('Done starting Nginx container')
 
@@ -1379,6 +1369,7 @@ def clean(therapeutic_area):
                     container.remove(v=True)
                 except docker.errors.NotFound:
                     pass
+                docker_client.volumes.get("feder8-config-server").remove()
             else:
                 print('disconnecting config-server from ' + ta_network_name)
                 ta_network.disconnect(container)
