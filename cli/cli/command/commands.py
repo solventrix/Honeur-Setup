@@ -140,7 +140,7 @@ def config_server(therapeutic_area, email, cli_key):
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
             'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url + "/oidc",
             'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'feder8-local-secret',
+            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'dcYg4D97X78qFTGEWdYD34cqoCJuxy',
             'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
             'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
