@@ -97,7 +97,19 @@ def config_server(therapeutic_area, email, cli_key):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -106,11 +118,6 @@ def config_server(therapeutic_area, email, cli_key):
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env()
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -204,7 +211,19 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -219,11 +238,6 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 
         expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -328,7 +342,19 @@ def local_portal(therapeutic_area, email, cli_key, host):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -339,11 +365,6 @@ def local_portal(therapeutic_area, email, cli_key, host):
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -448,7 +469,19 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -475,11 +508,6 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
             if ldap_system_password is None:
                 ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -637,7 +665,19 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -667,11 +707,6 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
             if ldap_system_password is None:
                 ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -796,7 +831,19 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -817,11 +864,6 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         if password is None:
             password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -916,7 +958,19 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -930,12 +984,6 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
             organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).unsafe_ask()
 
     except KeyboardInterrupt:
-        sys.exit(1)
-
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -1068,7 +1116,19 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -1101,11 +1161,6 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         if docker_cert_support:
             feder8_certificate_directory = configuration.get_configuration('feder8.local.host.docker-cert-directory')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -1238,7 +1293,19 @@ def nginx(therapeutic_area, email, cli_key):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         registry = therapeutic_area_info.registry
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
@@ -1247,11 +1314,6 @@ def nginx(therapeutic_area, email, cli_key):
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     network_names = [therapeutic_area.lower() + '-net']
@@ -1332,18 +1394,24 @@ def clean(therapeutic_area):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
 
         confirm_continue = questionary.confirm("This script is about to delete everything installed related to " + therapeutic_area + ". Are you sure to continue?").unsafe_ask()
 
         if not confirm_continue:
             sys.exit(1)
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     ta_network_name = therapeutic_area_info.name + '-net'
@@ -1400,13 +1468,19 @@ def backup(therapeutic_area):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
     except KeyboardInterrupt:
-        sys.exit(1)
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
 
     try:
@@ -1548,6 +1622,13 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
             print('Error while fetching docker api... Is docker running?')
             sys.exit(1)
 
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         try:
             docker_client.volumes.get("pgdata")
             clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
@@ -1656,6 +1737,13 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             print('Error while fetching docker api... Is docker running?')
             sys.exit(1)
 
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net")
+        install_container = docker_client.containers.get("feder8-installer")
+
+        ta_network.connect(install_container)
+
         try:
             docker_client.volumes.get("pgdata")
             clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
@@ -1675,7 +1763,6 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         except docker.errors.NotFound:
             pass
 
-        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
         if email is None:
