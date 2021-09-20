@@ -430,6 +430,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
     pull_image(docker_client,registry, local_portal_image, email, cli_key)
 
     print('Starting local-portal container...')
+    socket_gid = os.stat("/var/run/docker.sock").st_gid
     container = docker_client.containers.run(
         image=local_portal_image,
         name=container_names[0],
@@ -462,7 +463,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
                 'mode': 'rw'
             }
         },
-        group_add=[0],
+        group_add=[socket_gid],
         detach=True
     )
 
