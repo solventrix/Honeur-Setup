@@ -192,7 +192,7 @@ def config_server(therapeutic_area, email, cli_key):
         network=network_names[0],
         volumes={
             volume_names[0]: {
-                'bind': '/root/config-repo',
+                'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
         },
@@ -454,7 +454,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
                 'mode': 'ro'
             },
             volume_names[1]: {
-                'bind': '/root/config-repo',
+                'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             },
             '/var/run/docker.sock': {
@@ -462,6 +462,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
                 'mode': 'rw'
             }
         },
+        group_add=[0],
         detach=True
     )
 
