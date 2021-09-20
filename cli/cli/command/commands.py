@@ -11,6 +11,8 @@ import click
 import questionary
 import docker
 import os
+import requests
+
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
     container = docker_client.containers.run(
@@ -170,6 +172,13 @@ def config_server(therapeutic_area, email, cli_key):
         detach=True,
         show_logs=True)
 
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
+
     print('Done updating configuration in config-server')
 
     config_server_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
@@ -294,6 +303,13 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         },
         detach=True,
         show_logs=True)
+
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
 
     print('Done updating configuration in config-server')
 
@@ -420,6 +436,13 @@ def local_portal(therapeutic_area, email, cli_key, host):
         },
         detach=True,
         show_logs=True)
+
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
 
     print('Done updating configuration in config-server')
 
@@ -585,6 +608,13 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         },
         detach=True,
         show_logs=True)
+
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
 
     print('Done updating configuration in config-server')
 
@@ -792,6 +822,13 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         detach=True,
         show_logs=True)
 
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
+
     print('Done updating configuration in config-server')
 
     zeppelin_repo = '/'.join([registry.registry_url, registry.project, 'zeppelin'])
@@ -943,6 +980,13 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         detach=True,
         show_logs=True)
 
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
+
     print('Done updating configuration in config-server')
 
     user_management_repo = '/'.join([registry.registry_url, registry.project, 'user-mgmt'])
@@ -1065,6 +1109,13 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         },
         detach=True,
         show_logs=True)
+
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
 
     print('Done updating configuration in config-server')
 
@@ -1263,6 +1314,13 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         detach=True,
         show_logs=True)
 
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
+
     print('Done updating configuration in config-server')
 
     feder8_studio_repo = '/'.join([registry.registry_url, registry.project, 'feder8-studio'])
@@ -1407,6 +1465,13 @@ def nginx(therapeutic_area, email, cli_key):
         },
         detach=True,
         show_logs=True)
+
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        pass
 
     print('Done updating configuration in config-server')
 
