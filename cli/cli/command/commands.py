@@ -1714,7 +1714,7 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
                     ctx.invoke(backup, therapeutic_area=therapeutic_area)
                 ctx.invoke(clean, therapeutic_area=therapeutic_area)
             else:
-                postgres_container = docker_client.container.get("postgres")
+                postgres_container = docker_client.containers.get("postgres")
                 postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
                 if '9.6' in postgres_version:
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
@@ -1835,7 +1835,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                     ctx.invoke(backup, therapeutic_area=therapeutic_area)
                 ctx.invoke(clean, therapeutic_area=therapeutic_area)
             else:
-                postgres_container = docker_client.container.get("postgres")
+                postgres_container = docker_client.containers.get("postgres")
                 postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
                 if '9.6' in postgres_version:
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
