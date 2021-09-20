@@ -174,7 +174,7 @@ def config_server(therapeutic_area, email, cli_key):
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -306,7 +306,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -439,7 +439,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -611,7 +611,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -824,7 +824,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -982,7 +982,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -1112,7 +1112,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -1316,7 +1316,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
@@ -1468,7 +1468,7 @@ def nginx(therapeutic_area, email, cli_key):
 
     try:
         docker_client.containers.get("local-portal")
-        url = 'http://local-portal/portal/actuator/refresh'
+        url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
         pass
