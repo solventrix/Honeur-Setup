@@ -1547,7 +1547,7 @@ def clean(therapeutic_area):
     except docker.errors.NotFound:
         return
     for container in ta_network.containers:
-        if container.attrs['Name'] != '/feder8-installer':
+        if container.attrs['Name'] == '/feder8-installer':
             continue
         elif container.attrs['Name'] != '/config-server':
             print('Stopping and removing ' + container.attrs['Name'])
