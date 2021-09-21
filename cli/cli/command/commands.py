@@ -367,6 +367,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        is_mac = os.getenv('IS_MAC', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
@@ -454,6 +455,26 @@ def local_portal(therapeutic_area, email, cli_key, host):
 
     print('Starting local-portal container...')
     socket_gid = os.stat("/var/run/docker.sock").st_gid
+    volumes={
+            volume_names[0]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            },
+            volume_names[1]: {
+                'bind': '/home/feder8/config-repo',
+                'mode': 'rw'
+            }
+        }
+    if is_mac:
+        volumes['/var/run/docker.sock'] = {
+            'bind': '/var/run/docker.sock.raw',
+            'mode': 'rw'
+        }
+    else:
+        volumes['/var/run/docker.sock'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
     container = docker_client.containers.run(
         image=local_portal_image,
         name=container_names[0],
@@ -472,20 +493,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
             'SERVER_SERVLET_CONTEXT_PATH': '/portal'
         },
         network=network_names[0],
-        volumes={
-            volume_names[0]: {
-                'bind': '/var/lib/shared',
-                'mode': 'ro'
-            },
-            volume_names[1]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            },
-            '/var/run/docker.sock': {
-                'bind': '/var/run/docker.sock',
-                'mode': 'rw'
-            }
-        },
+        volumes=volumes,
         group_add=[socket_gid, 0],
         detach=True
     )
