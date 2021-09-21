@@ -1549,14 +1549,17 @@ def clean(therapeutic_area):
     for container in ta_network.containers:
         if container.attrs['Name'] == '/feder8-installer':
             continue
-        elif container.attrs['Name'] != '/config-server':
+        elif container.attrs['Name'] == '/config-server':
+            continue
+        else:
             print('Stopping and removing ' + container.attrs['Name'])
             container.stop()
             try:
                 container.remove(v=True)
             except docker.errors.NotFound:
                 pass
-        else:
+    for container in ta_network.containers:
+        if container.attrs['Name'] == '/config-server':
             config_server_networks = container.attrs['NetworkSettings']['Networks'].keys()
             if len(config_server_networks) == 1:
                 print('Stopping and removing ' + container.attrs['Name'])
