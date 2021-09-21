@@ -466,8 +466,8 @@ def local_portal(therapeutic_area, email, cli_key, host):
             }
         }
     if is_mac:
-        volumes['/var/run/docker.sock'] = {
-            'bind': '/var/run/docker.sock.raw',
+        volumes['/var/run/docker.sock.raw'] = {
+            'bind': '/var/run/docker.sock',
             'mode': 'rw'
         }
     else:
