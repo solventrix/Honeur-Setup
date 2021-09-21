@@ -486,7 +486,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
                 'mode': 'rw'
             }
         },
-        group_add=[socket_gid],
+        group_add=[socket_gid, 0],
         detach=True
     )
 
