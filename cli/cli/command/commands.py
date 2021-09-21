@@ -1546,8 +1546,17 @@ def clean(therapeutic_area):
         ta_network = docker_client.networks.get(ta_network_name)
     except docker.errors.NotFound:
         return
-    for container in ta_network.containers:
-        if container.attrs['Name'] == '/feder8-installer':
+
+    all_containers = docker_client.containers.list(all=True)
+    for container in all_containers:
+        networks_of_container = list(container.attrs['NetworkSettings']['Networks'].keys())
+        try:
+            networks_of_container.remove('bridge')
+        except ValueError:
+            pass
+        if len(networks_of_container) == 0 or networks_of_container[0] != ta_network_name:
+            continue
+        elif container.attrs['Name'] == '/feder8-installer':
             continue
         elif container.attrs['Name'] == '/config-server':
             continue
@@ -1558,10 +1567,17 @@ def clean(therapeutic_area):
                 container.remove(v=True)
             except docker.errors.NotFound:
                 pass
-    for container in ta_network.containers:
-        if container.attrs['Name'] == '/config-server':
-            config_server_networks = container.attrs['NetworkSettings']['Networks'].keys()
-            if len(config_server_networks) == 1:
+    all_containers = docker_client.containers.list(all=True)
+    for container in all_containers:
+        networks_of_container = list(container.attrs['NetworkSettings']['Networks'].keys())
+        try:
+            networks_of_container.remove('bridge')
+        except ValueError:
+            pass
+        if len(networks_of_container) == 0 or networks_of_container[0] != ta_network_name:
+            continue
+        elif container.attrs['Name'] == '/config-server':
+            if len(networks_of_container) == 1:
                 print('Stopping and removing ' + container.attrs['Name'])
                 container.stop()
                 try:
@@ -1580,10 +1596,6 @@ def clean(therapeutic_area):
         pass
     try:
         docker_client.volumes.get("pgdata").remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        ta_network.remove()
     except docker.errors.NotFound:
         pass
 
