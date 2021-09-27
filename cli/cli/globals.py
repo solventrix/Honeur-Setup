@@ -3,7 +3,7 @@ from cli.configuration.single_choice_question import SingleChoiceQuestion
 from cli.configuration.question import Question
 from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-from typing import Dict, List
+from typing import Dict
 
 
 class Globals:
