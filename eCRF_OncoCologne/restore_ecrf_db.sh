@@ -3,14 +3,20 @@ set -e
 
 if [ -z "$1" ]
   then
-    echo "Please specfy the file to restore"
+    echo "Please specify the file to restore"
     exit 1
 fi
 
-POSTGRES_PASSWORD=gyZcrz9Zzp@8waX8
 DATABASE_BACKUP_FILE=$1
 CURRENT_TIME=$(date "+%Y_%m_%d_%H_%M_%S")
 RESTORE_FOLDER=${PWD}/restore/${CURRENT_TIME}
+
+POSTGRES_PASSWORD=
+read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
+while [[ "$POSTGRES_PASSWORD" == "" ]]; do
+    echo "The password cannot be empty"
+    read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
+done
 
 mkdir -p ${RESTORE_FOLDER}
 
@@ -24,7 +30,7 @@ docker rm honeur_ecrf_postgres
 docker volume rm postgres_data
 docker volume create postgres_data
 echo "re-create database container"
-docker run -d --name honeur_ecrf_postgres --network honeur-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart=always -p 5432:5432 harbor.honeur.org/ecrf/postgres:0.2
+docker run -d --name honeur_ecrf_postgres --network honeur-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart=always -p 5432:5432 harbor.honeur.org/ecrf/oncocologne/postgres:0.2
 sleep 5s
 
 for sql_script in ${RESTORE_FOLDER}/*.sql; do
