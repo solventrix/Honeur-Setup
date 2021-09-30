@@ -20,11 +20,11 @@ pipeline {
                 script {
                     dir('Honeur-Setup/cli') {
                         try {
-                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot", url: "https://harbor.honeur.org") {
-                                sh "THERAPEUTIC_AREA_URL=harbor.honeur.org ./publish.sh"
+                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot-uat", url: "https://harbor-uat.honeur.org") {
+                                sh "THERAPEUTIC_AREA_URL=harbor-uat.honeur.org ./publish.sh"
                             }
                         } catch (e) {
-                            notifyPushFailed("https://harbor.honeur.org")
+                            notifyPushFailed("https://harbor-uat.honeur.org")
                         }
                     }
                 }
