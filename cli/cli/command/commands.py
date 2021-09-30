@@ -448,7 +448,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
     print('Done updating configuration in config-server')
 
     local_portal_repo = '/'.join([registry.registry_url, registry.project, 'local-portal'])
-    local_portal_tag = '2.0.0'
+    local_portal_tag = '2.0.1'
     local_portal_image = ':'.join([local_portal_repo, local_portal_tag])
 
     pull_image(docker_client,registry, local_portal_image, email, cli_key)
@@ -1628,7 +1628,7 @@ def nginx(therapeutic_area, email, cli_key):
     print('Done updating configuration in config-server')
 
     nginx_repo = '/'.join([registry.registry_url, registry.project, 'nginx'])
-    nginx_tag = '2.0.4'
+    nginx_tag = '2.0.5'
     nginx_image = ':'.join([nginx_repo, nginx_tag])
 
     pull_image(docker_client, registry, nginx_image, email, cli_key)
