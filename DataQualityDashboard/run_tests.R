@@ -2,7 +2,7 @@ install.packages("dplyr", repos="http://cran.us.r-project.org")
 install.packages("ParallelLogger", repos="http://cran.us.r-project.org")
 install.packages("glue", repos="http://cran.us.r-project.org")
 
-install.packages("https://github.com/solventrix/Honeur-Setup/raw/release/1.9/DataQualityDashboard/DataQualityDashboard_1.0.0.tar.gz", repos = NULL, type = "source", INSTALL_opts = c('--no-multiarch'))
+install.packages("https://github.com/solventrix/Honeur-Setup/raw/develop/DataQualityDashboard/DataQualityDashboard_1.0.0.tar.gz", repos = NULL, type = "source", INSTALL_opts = c('--no-multiarch'))
 
 library('DataQualityDashboard')
 

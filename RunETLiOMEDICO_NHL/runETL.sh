@@ -2,7 +2,7 @@ if [ $(docker ps --filter "name=etl" | grep -w 'etl' | wc -l) = 1 ]; then
   docker stop -t 1 etl && docker rm etl;
 fi
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/RunETLiOMEDICO_NHL/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/RunETLiOMEDICO_NHL/docker-compose.yml --output docker-compose.yml
 
 read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}

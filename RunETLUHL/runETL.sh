@@ -5,7 +5,7 @@ rm -rf ./UHL
 
 git clone https://github.com/solventrix/UHL ./UHL
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/RunETLUHL/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/RunETLUHL/docker-compose.yml --output docker-compose.yml
 
 read -p "Input data folder [./UHL/UHL-ETL/input]: " data_folder
 data_folder=${data_folder:-./UHL/UHL-ETL/input}
