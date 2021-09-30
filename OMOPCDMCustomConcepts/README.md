@@ -6,12 +6,12 @@ When new custom concepts are available, they can be easily loaded in the OMOP CD
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/remote-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 
 2. You can run this script using the following command:
