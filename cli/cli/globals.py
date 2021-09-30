@@ -8,10 +8,9 @@ from typing import Dict
 
 class Globals:
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Security Scan', 'UHL', 'DOS', 'CLLEAR', 'RMG', 'iOMEDICO', 'OIS', 'EMMOS', 'Janssen', 'EY', 'ZOL', 'HOPE', 'TestOrg1', 'TestOrg2', 'TestOrg3', 'TestOrg4', 'TestOrg5', 'TestOrg6']),
-        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Security Scan', 'Janssen', 'Actelion', 'PHederationTestOrg1', 'PHederationTestOrg2', 'PHederationTestOrg3', 'PHederationTestOrg4', 'PHederationTestOrg5', 'PHederationTestOrg6']),
-        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['DARM', 'Janssen', 'EsfurnTestOrg1', 'EsfurnTestOrg2', 'EsfurnTestOrg3', 'EsfurnTestOrg4', 'EsfurnTestOrg5', 'EsfurnTestOrg6']),
-        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'distributed-analytics.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['Illumina', 'KU Leuven', 'UZ Leuven', 'AZ Groeninge', 'Imec', 'edenceHealth', 'Janssen', 'AthenaTestOrg1', 'AthenaTestOrg2', 'AthenaTestOrg3', 'AthenaTestOrg4', 'AthenaTestOrg5', 'AthenaTestOrg6'])
+        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Leicester Royal Infirmary','DOS','CLLEAR','RMG','iOMEDICO','OIS','EMMOS','Janssen','GMV','Oncotyrol','CHU Montpellier','Cancer Centre London']),
+        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Actelion','Janssen']),
+        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Janssen'])
     }
 
     all_questions:Dict[str,Question] = {

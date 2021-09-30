@@ -7,10 +7,10 @@ cr=${cr%.}
 VERSION=2.0.0
 TAG=webapi-source-delete-$VERSION
 
-read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
-while [[ "$FEDER8_THERAPEUTIC_AREA" != "honeur" && "$FEDER8_THERAPEUTIC_AREA" != "phederation" && "$FEDER8_THERAPEUTIC_AREA" != "esfurn" && "$FEDER8_THERAPEUTIC_AREA" != "athena" && "$FEDER8_THERAPEUTIC_AREA" != "" ]]; do
-    echo "Enter \"honeur\", \"phederation\", \"esfurn\", \"athena\" or empty for default \"honeur\" value"
-    read -p "Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " FEDER8_THERAPEUTIC_AREA
+read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn [honeur]: ' FEDER8_THERAPEUTIC_AREA
+while [[ "$FEDER8_THERAPEUTIC_AREA" != "honeur" && "$FEDER8_THERAPEUTIC_AREA" != "phederation" && "$FEDER8_THERAPEUTIC_AREA" != "esfurn" && "$FEDER8_THERAPEUTIC_AREA" != "" ]]; do
+    echo "Enter \"honeur\", \"phederation\", \"esfurn\" or empty for default \"honeur\" value"
+    read -p "Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn [honeur]: " FEDER8_THERAPEUTIC_AREA
 done
 FEDER8_THERAPEUTIC_AREA=${FEDER8_THERAPEUTIC_AREA:-honeur}
 
@@ -22,9 +22,6 @@ elif [ "$FEDER8_THERAPEUTIC_AREA" = "phederation" ]; then
     FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 elif [ "$FEDER8_THERAPEUTIC_AREA" = "esfurn" ]; then
     FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
-    FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
-elif [ "$FEDER8_THERAPEUTIC_AREA" = "athena" ]; then
-    FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
     FEDER8_THERAPEUTIC_AREA_URL=harbor.$FEDER8_THERAPEUTIC_AREA_DOMAIN
 fi
 

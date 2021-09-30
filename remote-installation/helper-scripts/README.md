@@ -39,7 +39,6 @@ The docker images required to run the full setup are located on a central reposi
   * For HONEUR: https://portal.honeur.org
   * For PHederation: https://portal.phederation.org
   * For Esfurn: https://portal.esfurn.org
-  * For Athena: https://portal.athenafederation.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -85,9 +84,8 @@ Windows
     1. HONEUR for https://portal.honeur.org
     2. PHederation for https://portal.phederation.org
     3. ESFURN for https://portal.esfurn.org
-    4. Athena for https://portal.athenafederation.org
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
-5. The script will prompt to enter your CLI secret for pulling our Docker images. This secret can be found on our central image repository. Surf to the central registry (https://harbor.honeur.org for HONEUR, https://harbor.phederation.org for PHederation, https://harbor.esfurn.org for Esfurn, https://harbor.athenafederation.org for Athena) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name in the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+5. The script will prompt to enter your CLI secret for pulling our Docker images. This secret can be found on our central image repository. Surf to the central registry (https://harbor.honeur.org for HONEUR, https://harbor.phederation.org for PHederation, https://harbor.esfurn.org for Esfurn) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name in the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 6. The script will prompt to enter a new password for feder8 database user. 
 7. The script will prompt to enter a new password for feder8 admin database user.
 8. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine if localhost is entered as hostname.
@@ -139,9 +137,8 @@ Windows
     1. HONEUR for https://portal.honeur.org
     2. PHederation for https://portal.phederation.org
     3. ESFURN for https://portal.esfurn.org
-    4. Athena for https://portal.athenafederation.org
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
-5. The script will prompt to enter your CLI secret for pulling our Docker images. This secret can be found on our central image repository. Surf to the central registry (https://harbor.honeur.org for HONEUR, https://harbor.phederation.org for PHederation, https://harbor.esfurn.org for Esfurn, https://harbor.athenafederation.org for Athena) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name in the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+5. The script will prompt to enter your CLI secret for pulling our Docker images. This secret can be found on our central image repository. Surf to the central registry (https://harbor.honeur.org for HONEUR, https://harbor.phederation.org for PHederation, https://harbor.esfurn.org for Esfurn) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name in the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 6. The script will prompt to enter a new password for feder8 database user.
 7. The script will prompt to enter a new password for feder8 admin database user.
 8. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine if localhost is entered as hostname.
