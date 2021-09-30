@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-POSTGRES_PASSWORD=gyZcrz9Zzp@8waX8
+POSTGRES_PASSWORD=
+read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
+while [[ "$POSTGRES_PASSWORD" == "" ]]; do
+    echo "The password cannot be empty"
+    read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
+done
+
 DATABASE_NAME=postgres
 BACKUP_FOLDER=${PWD}/backup
 
@@ -36,5 +42,3 @@ tar_dump() {
 
 create_db_dump $DATABASE_NAME $POSTGRES_PASSWORD
 tar_dump $DATABASE_NAME
-
-unset POSTGRES_PASSWORD
