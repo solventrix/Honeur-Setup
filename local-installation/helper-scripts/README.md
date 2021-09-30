@@ -61,12 +61,12 @@ The full local installation can be installed by downloading and running the inst
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-feder8-full.sh --output start-feder8.sh && chmod +x start-feder8.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/helper-scripts/start-feder8-full.sh --output start-feder8.sh && chmod +x start-feder8.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-feder8-full.cmd --output start-feder8.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/helper-scripts/start-feder8-full.cmd --output start-feder8.cmd
 ```
 
 2. Run the script using the following command:
@@ -114,12 +114,12 @@ The essential local components can be installed by running the installation help
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-feder8.sh --output start-feder8.sh && chmod +x start-feder8.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/helper-scripts/start-feder8.sh --output start-feder8.sh && chmod +x start-feder8.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/helper-scripts/start-feder8.cmd --output start-feder8.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/helper-scripts/start-feder8.cmd --output start-feder8.cmd
 ```
 
 2. Run the script using the following command:
