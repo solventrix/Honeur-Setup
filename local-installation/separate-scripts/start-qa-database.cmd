@@ -81,7 +81,7 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 SET FEDER8_PGDATA_VOLUME_NAME=pgdata-qa
 SET FEDER8_POSTGRES_CONTAINER_NAME=postgres-qa
@@ -90,7 +90,7 @@ SET FEDER8_CONTAINER_HOST_PORT=5445
 CALL .\start-postgres.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "%FEDER8_USER_PW%" "%FEDER8_ADMIN_USER_PW%"
 DEL start-postgres.cmd
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-source-creation.cmd --output start-source-creation.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/start-source-creation.cmd --output start-source-creation.cmd
 SET FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 CALL .\start-source-creation.cmd "%FEDER8_THERAPEUTIC_AREA%" "%FEDER8_EMAIL_ADDRESS%" "%FEDER8_CLI_SECRET%" "postgres-qa" "%FEDER8_THERAPEUTIC_AREA_UPPERCASE% QA OMOP CDM" "2"
 DEL start-source-creation.cmd

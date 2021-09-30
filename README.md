@@ -7,7 +7,7 @@ HONEUR-Setup is a public repository. This repository is used for files that can 
 
 ## Remote Docker Installation
 
-Remote installation Instructions can be found at [remote-installation](https://github.com/solventrix/Honeur-Setup/tree/release/1.9/remote-installation)
+Remote installation Instructions can be found at [local-installation](https://github.com/solventrix/Honeur-Setup/tree/release/1.9/local-installation)
 
 ## Run ETL
 
