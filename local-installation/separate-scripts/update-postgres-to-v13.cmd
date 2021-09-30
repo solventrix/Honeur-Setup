@@ -16,5 +16,5 @@ docker run --rm -it -v new-pgdata:/from -v pgdata:/to alpine ash -c "cd /from ; 
 
 docker volume remove new-pgdata
 
-docker pull harbor-dev.honeur.org/library/install-script:2.0.0
-docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock harbor-dev.honeur.org/library/install-script:2.0.0 feder8 init postgres
+docker pull harbor-dev.honeur.org/library/install-script:2.0.1
+docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock harbor-dev.honeur.org/library/install-script:2.0.1 feder8 init postgres

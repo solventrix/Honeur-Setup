@@ -4,5 +4,5 @@ else
     DOCKER_CERT_SUPPORT=false
 fi
 
-docker pull harbor-dev.honeur.org/library/install-script:2.0.0
-docker run --rm -it --name feder8-installer -e CURRENT_DIRECTORY=$(pwd) -e IS_WINDOWS=false -e DOCKER_CERT_SUPPORT=$DOCKER_CERT_SUPPORT -v /var/run/docker.sock:/var/run/docker.sock harbor-dev.honeur.org/library/install-script:2.0.0 feder8 init feder8-studio
+docker pull harbor-dev.honeur.org/library/install-script:2.0.1
+docker run --rm -it --name feder8-installer -e CURRENT_DIRECTORY=$(pwd) -e IS_WINDOWS=false -e DOCKER_CERT_SUPPORT=$DOCKER_CERT_SUPPORT -v /var/run/docker.sock:/var/run/docker.sock harbor-dev.honeur.org/library/install-script:2.0.1 feder8 init feder8-studio
