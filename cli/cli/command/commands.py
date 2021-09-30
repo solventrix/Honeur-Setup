@@ -137,7 +137,7 @@ def config_server(therapeutic_area, email, cli_key):
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
 
     pull_image(docker_client,registry, init_config_image, email, cli_key)
@@ -270,7 +270,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
 
     pull_image(docker_client,registry, init_config_image, email, cli_key)
@@ -411,7 +411,7 @@ def local_portal(therapeutic_area, email, cli_key, host):
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
@@ -576,7 +576,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
@@ -788,7 +788,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
@@ -958,7 +958,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
 
     pull_image(docker_client,registry, init_config_image, email, cli_key)
@@ -1096,7 +1096,7 @@ def task_manager(therapeutic_area, email, cli_key, host, rstudio_upload_dir, vsc
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
@@ -1235,7 +1235,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
@@ -1425,7 +1425,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
@@ -1591,7 +1591,7 @@ def nginx(therapeutic_area, email, cli_key):
     check_containers_and_remove_if_not_exists(docker_client, container_names)
 
     init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.0'
+    init_config_tag = 'update-configuration-2.0.1'
     init_config_image = ':'.join([init_config_repo, init_config_tag])
     pull_image(docker_client,registry, init_config_image, email, cli_key)
 
