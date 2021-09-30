@@ -1,0 +1,43 @@
+pipeline {
+    agent {
+        label 'amzl-honeur'
+    }
+
+    stages {
+        stage('build image') {
+            steps {
+                script {
+                    dir('Honeur-Setup/cli') {
+                        withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
+                            sh './build.sh'
+                        }
+                    }
+                }
+            }
+        }
+        stage('upload image') {
+            steps {
+                script {
+                    dir('Honeur-Setup/cli') {
+                        try {
+                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot-uat", url: "https://harbor-uat.honeur.org") {
+                                sh "THERAPEUTIC_AREA_URL=harbor-uat.honeur.org ./publish.sh"
+                            }
+                        } catch (e) {
+                            notifyPushFailed("https://harbor-uat.honeur.org")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def notifyPushFailed(url) {
+  emailext (
+      subject: "FAILED To push image",
+      body: """<p>Jenkins failed to push image to ${url}</p>
+        <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+      to: "sverwim1@its.jnj.com,pmoorth1@its.jnj.com"
+    )
+}

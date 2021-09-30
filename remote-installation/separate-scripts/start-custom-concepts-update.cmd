@@ -1,7 +1,7 @@
 @echo off
 Setlocal EnableDelayedExpansion
 
-SET VERSION=2.2-RC1
+SET VERSION=2.2-RC4
 SET TAG=omop-cdm-custom-concepts-update-%VERSION%
 
 set argumentCount=0

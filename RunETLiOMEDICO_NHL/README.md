@@ -5,7 +5,7 @@
 2. The user has read access to the iOMEDICO-NHL Docker Hub repository containing the ETL image.
 3. The HONEUR OMOP CDM database is running in a Docker container named `postgres`:
     * Check this by running `docker ps`. You should see the `postgres` container listed as running and healthy.
-    * See [https://github.com/solventrix/Honeur-Setup/blob/master/OMOPCDM/README.md](https://github.com/solventrix/Honeur-Setup/blob/master/README.md) for more info.
+    * See [https://github.com/solventrix/Honeur-Setup/blob/release/1.9/OMOPCDM/README.md](https://github.com/solventrix/Honeur-Setup/blob/release/1.9/README.md) for more info.
 
 ## Execution steps
 1. Open a terminal window 
@@ -13,7 +13,7 @@
    * `mkdir etl_iomedico`
    * `cd etl_iomedico`
 2. Download the installation script:
-    * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLiOMEDICO_NHL/runETL.sh --output runETL.sh && chmod +x runETL.sh`
+    * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/RunETLiOMEDICO_NHL/runETL.sh --output runETL.sh && chmod +x runETL.sh`
 3. Execute the `runETL.sh` script by running `./runETL.sh` form inside the directory where the script is located.
 4. The script will request for:
     * the path to the folder that contains the input CSV data files
