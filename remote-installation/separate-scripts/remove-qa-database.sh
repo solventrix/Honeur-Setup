@@ -38,7 +38,7 @@ while [[ "$FEDER8_CLI_SECRET" == "" ]]; do
     read -p "Enter the CLI Secret: " FEDER8_CLI_SECRET
 done
 
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/remote-installation/separate-scripts/start-source-deletion.sh --output start-source-deletion.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/remote-installation/separate-scripts/start-source-deletion.sh --output start-source-deletion.sh
 chmod +x start-source-deletion.sh
 export FEDER8_SHARED_SECRETS_VOLUME_NAME=shared-qa
 {
