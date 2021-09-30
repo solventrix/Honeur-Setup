@@ -47,9 +47,9 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images are located on a central repository. Make sure you have a central platform account before trying to run the local setup installation scripts:
 
-* For HONEUR: https://portal.honeur.org
-* For PHederation: https://portal.phederation.org
-* For ESFURN: https://portal.esfurn.org
+* For HONEUR: https://portal-uat.honeur.org
+* For PHederation: https://portal-uat.phederation.org
+* For ESFURN: https://portal-uat.esfurn.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
