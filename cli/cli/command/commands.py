@@ -490,7 +490,8 @@ def local_portal(therapeutic_area, email, cli_key, host):
             'FEDER8_CONFIG_SERVER_PORT': '8080',
             'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-            'SERVER_SERVLET_CONTEXT_PATH': '/portal'
+            'SERVER_SERVLET_CONTEXT_PATH': '/portal',
+            'FEDER8_LOCAL_HOST_TOKEN_ACCESS_RESTRICTION': '*'
         },
         network=network_names[0],
         volumes=volumes,
