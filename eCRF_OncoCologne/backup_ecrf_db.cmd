@@ -20,4 +20,4 @@ docker run \
 -e DB_NAME=%DATABASE_NAME% \
 -e PGPASSWORD=%POSTGRES_PASSWORD% \
 -v ${BACKUP_FOLDER}:/opt/database \
-postgres:13.0-alpine sh -c 'set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_dump -h honeur_ecrf_postgres -U postgres -f ${DB_NAME}.sql -d ${DB_NAME}'
+postgres:13.0-alpine sh -c 'set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_dump -h honeur_ecrf_postgres -U postgres -f ${DB_NAME}.sql -d ${DB_NAME}; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); tar -czf /opt/database/${DB_NAME}_${CURRENT_TIME}.tar.gz ${DB_NAME}.sql; rm ${DB_NAME}.sql'
