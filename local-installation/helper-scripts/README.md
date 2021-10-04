@@ -53,6 +53,7 @@ The following components will be installed:
 
 ### Prerequisite for installations on Linux
 On Linux, please download and run the Docker certificates generation script before running the installation script:
+
 Download:
 ```
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
