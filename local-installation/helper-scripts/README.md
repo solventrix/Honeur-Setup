@@ -7,10 +7,7 @@ Table of Contents
     * [Operating system](#operating-system)
     * [Docker](#docker)
     * [Docker images](#docker-images)
-  * [Essentials](#essentials)
-    * [Installation instructions](#essential-installation-instruction)
-  * [Full](#full)
-    * [Installation instructions](#full-installation-instruction)
+  * [Installation instructions](#full-installation-instructions)
 
 Helper scripts combines the installation of Feder8 components. You can choose to fully install all components or only install the essential components.
 
@@ -54,7 +51,7 @@ The following components will be installed:
 * User Management (only in case authentication is enabled)
 * Proxy server (NGINX)
 
-### <a id="full-installation-instruction"></a>Installation instructions
+### <a id="full-installation-instructions"></a>Installation instructions
 The full local installation can be installed by downloading and running the installation helper script.
 
 1. Download the installation helper script **_start-feder8-full.sh_** for MacOS/Linux or **_start-feder8-full.cmd_** for Windows using the following command:
