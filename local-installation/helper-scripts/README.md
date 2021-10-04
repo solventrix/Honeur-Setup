@@ -54,6 +54,17 @@ The following components will be installed:
 ### <a id="full-installation-instructions"></a>Installation instructions
 The full local installation can be installed by downloading and running the installation helper script.
 
+On Linux, please download and run the Docker certificates generation script before running the installation script:
+Download:
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
+```
+Run:
+```
+./generate-docker-certificates.sh
+```
+
+
 1. Download the installation helper script **_start-feder8-full.sh_** for MacOS/Linux or **_start-feder8-full.cmd_** for Windows using the following command:
 
 MacOS/Linux
