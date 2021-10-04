@@ -51,9 +51,7 @@ The following components will be installed:
 * User Management (only in case authentication is enabled)
 * Proxy server (NGINX)
 
-### <a id="full-installation-instructions"></a>Installation instructions
-The full local installation can be installed by downloading and running the installation helper script.
-
+### Prerequisite for installations on Linux
 On Linux, please download and run the Docker certificates generation script before running the installation script:
 Download:
 ```
@@ -64,6 +62,8 @@ Run:
 ./generate-docker-certificates.sh
 ```
 
+### <a id="full-installation-instructions"></a>Installation instructions
+The full local installation can be installed by downloading and running the installation helper script.
 
 1. Download the installation helper script **_start-feder8-full.sh_** for MacOS/Linux or **_start-feder8-full.cmd_** for Windows using the following command:
 
