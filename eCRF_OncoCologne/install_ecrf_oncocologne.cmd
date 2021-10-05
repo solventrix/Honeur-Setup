@@ -1,6 +1,6 @@
 @echo off
 
-DATABASE_NAME=opal
+SET DATABASE_NAME=opal
 
 SET /p POSTGRES_PASSWORD="Please enter a strong password for Postgres: "
 :while-postgres-password-not-correct
@@ -32,11 +32,12 @@ docker volume create static_volume
 
 echo "create database container"
 docker run -d --name honeur_ecrf_postgres --network honeur-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=%POSTGRES_PASSWORD% --restart=always harbor.honeur.org/ecrf/oncocologne/postgres:0.2
-TIMEOUT 5
+TIMEOUT 10
 
-echo "create eCRF app container"
+echo "initialize eCRF database"
 docker run -d --name honeur_ecrf_app --network honeur-net --volume static_volume:/code/entrytool/assets --env OPAL_SUPER_USER_PASSWORD=%OPAL_SUPER_USER_PASSWORD% --env OPAL_DB_USER=postgres --env OPAL_DB_PASSWORD=%POSTGRES_PASSWORD% --env OPAL_DB_NAME=%DATABASE_NAME% --env OPAL_DB_HOST=honeur_ecrf_postgres --env OPAL_DB_PORT=5432 --env OPAL_FLUSH_DB=true --env OPAL_ENABLE_USER_DB=false --env OPAL_ENABLE_LDAP=false harbor.honeur.org/ecrf/oncocologne/app:0.2 gunicorn -b 0.0.0.0:8000 entrytool.wsgi
-TIMEOUT 15
+TIMEOUT 60
+echo "create eCRF app container"
 docker stop honeur_ecrf_app
 docker rm honeur_ecrf_app
 docker run -d --name honeur_ecrf_app --network honeur-net --volume static_volume:/code/entrytool/assets --env OPAL_SUPER_USER_PASSWORD=%OPAL_SUPER_USER_PASSWORD% --env OPAL_DB_USER=postgres --env OPAL_DB_PASSWORD=%POSTGRES_PASSWORD% --env OPAL_DB_NAME=%DATABASE_NAME% --env OPAL_DB_HOST=honeur_ecrf_postgres --env OPAL_DB_PORT=5432 --env OPAL_FLUSH_DB=false --env OPAL_ENABLE_USER_DB=false --env OPAL_ENABLE_LDAP=false --restart=always harbor.honeur.org/ecrf/oncocologne/app:0.2 gunicorn -b 0.0.0.0:8000 entrytool.wsgi

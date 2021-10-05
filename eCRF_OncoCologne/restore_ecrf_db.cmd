@@ -1,6 +1,6 @@
 @echo off
 
-DATABASE_NAME=opal
+SET DATABASE_NAME=opal
 
 SET /p DATABASE_BACKUP_FILE="Please enter the full path of the backup file: "
 :while-backup-file-not-correct
@@ -26,4 +26,4 @@ if "%POSTGRES_PASSWORD%" == "" (
 )
 
 echo Restore database %DATABASE_NAME%
-docker run --network="honeur-net" --rm -e DB_NAME=%DATABASE_NAME% -e PGPASSWORD=%POSTGRES_PASSWORD% -v %DATABASE_BACKUP_FILE%:/opt/database/backup.dump postgres:13.0-alpine sh -c 'set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_restore --clean -h honeur_ecrf_postgres -U postgres -d ${DB_NAME} /opt/database/backup.dump'
+docker run --network="honeur-net" --rm -e DB_NAME=%DATABASE_NAME% -e PGPASSWORD=%POSTGRES_PASSWORD% -v %DATABASE_BACKUP_FILE%:/opt/database/backup.dump postgres:13.0-alpine sh -c "set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_restore --clean -h honeur_ecrf_postgres -U postgres -d ${DB_NAME} /opt/database/backup.dump"
