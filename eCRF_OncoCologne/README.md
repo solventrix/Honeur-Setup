@@ -39,6 +39,7 @@ Linux/MacOS:
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF_OncoCologne/backup_ecrf_db.sh --output backup_ecrf_db.sh && chmod +x backup_ecrf_db.sh
 ```
 2. Run the backup script
+
 Windows:
 ```
 .\backup_ecrf_db.cmd
