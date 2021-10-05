@@ -1662,7 +1662,7 @@ def backup(therapeutic_area):
                                                     'mode': 'rw'
                                                 }
                                             },
-                                            command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; cd /opt; pg_dump --create -h postgres -U postgres -f OHDSI.sql -d OHDSI; CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); tar -czf database/OHDSI_${CURRENT_TIME}.tar.gz OHDSI.sql; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI-backup.gz"\'',
+                                            command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); cd /opt/database; pg_dump --clean --create -h postgres -U postgres -Fc OHDSI > /opt/database/OHDSI_backup_${CURRENT_TIME}.dump; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI_backup.dump"\'',
                                             detach=True)
     for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
