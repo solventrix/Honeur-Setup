@@ -2,7 +2,7 @@
 
 ## Prerequisites
 1. Docker is installed and running.
-2. The user has read access to the ois Docker Hub repository containing the ETL image.
+2. The user has read access to the ois Honeur Harbor repository containing the ETL image.
 3. The HONEUR OMOP CDM database is running in a Docker container named `postgres`:
     * Check this by running `docker ps`. You should see the `postgres` container listed as running and healthy.
     * See [https://github.com/solventrix/Honeur-Setup/blob/master/OMOPCDM/README.md](https://github.com/solventrix/Honeur-Setup/blob/master/README.md) for more info.
