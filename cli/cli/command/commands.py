@@ -1606,6 +1606,26 @@ def clean(therapeutic_area):
         docker_client.volumes.get("pgdata").remove()
     except docker.errors.NotFound:
         pass
+    try:
+        docker_client.volumes.get("cronicle_data").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(therapeutic_area_info.name + "studio_pwsh_modules").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(therapeutic_area_info.name + "studio_py_environment").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(therapeutic_area_info.name + "studio_r_libraries").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get("pwsh_modules").remove()
+    except docker.errors.NotFound:
+        pass
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
