@@ -1,19 +1,27 @@
-read -p "Enter the absolute file path of the database backup (.tar.gz): " DATABASE_BACKUP_FILE
+#!/usr/bin/env bash
+set -e
 
-CURRENT_TIME=$(date "+%Y_%m_%d_%H_%M_%S")
-RESTORE_FOLDER=${PWD}/restore/${CURRENT_TIME}
+DATABASE_NAME=OHDSI
 
-mkdir -p ${RESTORE_FOLDER}
-
-export LANG=en_US.UTF-8
-export LC_ALL=$LANG
-tar -C ${RESTORE_FOLDER} -zxvf ${DATABASE_BACKUP_FILE}
-
-for sql_script in ${RESTORE_FOLDER}/*.sql; do
-    sql_script_name=$(basename -- "$sql_script")
-    DB_NAME="${sql_script_name%%.*}"
-    echo "Restore database $DB_NAME"
-    cat $sql_script | docker exec -i postgres bash -c "source /var/lib/postgresql/envfile/honeur.env; export PGPASSWORD=${POSTGRES_PW}; psql $DB_NAME -U postgres"
+DATABASE_BACKUP_FILE=
+read -p "Please enter the absolute path of the backup file (.dump) to restore: " DATABASE_BACKUP_FILE
+while [[ "$DATABASE_BACKUP_FILE" == "" ]]; do
+    echo "The backup file path cannot be empty"
+    read -p "Please enter the absolute path of the backup file (.dump) to restore: " DATABASE_BACKUP_FILE
 done
 
-rm -rf ${RESTORE_FOLDER}
+if [ -f "$DATABASE_BACKUP_FILE" ]; then
+    echo "$DATABASE_BACKUP_FILE found."
+else
+    echo "$DATABASE_BACKUP_FILE not found!"
+    exit 1
+fi
+
+echo "Restore database $DATABASE_NAME"
+docker run \
+--network="honeur-net" \
+--rm \
+-e DB_NAME=$DATABASE_NAME \
+-v ${DATABASE_BACKUP_FILE}:/opt/database/backup.dump \
+-v shared:/var/lib/shared
+postgres:13 bash -c 'set -e; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; pg_restore --clean -h postgres -U postgres -d ${DB_NAME} /opt/database/backup.dump'
