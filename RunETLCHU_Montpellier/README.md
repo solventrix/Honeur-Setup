@@ -16,11 +16,11 @@
     * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLCHU_Montpellier/runETL.sh --output runETL.sh && chmod +x runETL.sh`
 3. Execute the `runETL.sh` script by running `./runETL.sh` from inside the directory where the script is located.
 4. The script will request for:
-    * the path to the folder that contains the input CSV data file
+    * the path to the folder that contains the input CSV data files
     * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
     * the tag name for the Docker Hub image
     * the verbosity level [DEBUG, INFO, WARNING, ERROR]
-    * the date of last update of the data-export
+    * the date of last update of the data-export, double-quoted, example: "2021-06-30"
 5. The script will run the ETL code and show the output of the code
 6. The `etl_<datetime>.log` log file will be available in the `log` folder. In addition, the following logfiles are also written out:
     * `wrong_dateformat_<datetime>.log`: a list of all the unexpected dateformats and how often they appear.
