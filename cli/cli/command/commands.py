@@ -1610,64 +1610,78 @@ def clean(therapeutic_area):
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def backup(therapeutic_area):
-    print("Creating backup of running database postgres... This could take a while")
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        directory_separator = '/'
-        if is_windows:
-            directory_separator = '\\'
-        if therapeutic_area is None:
-            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
-
+        print("Creating backup of running database postgres... This could take a while")
         try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
+            current_environment = os.getenv('CURRENT_DIRECTORY', '')
+            is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+            directory_separator = '/'
+            if is_windows:
+                directory_separator = '\\'
+            if therapeutic_area is None:
+                therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+            try:
+                docker_client = docker.from_env(timeout=3000)
+            except docker.errors.DockerException:
+                print('Error while fetching docker api... Is docker running?')
+                sys.exit(1)
+
+            therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+            try:
+                ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+            except docker.errors.NotFound:
+                ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
+            install_container = docker_client.containers.get("feder8-installer")
+
+            try:
+                ta_network.connect(install_container)
+            except docker.errors.APIError:
+                pass
+        except KeyboardInterrupt:
             sys.exit(1)
 
-        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
-
         try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+            postgres_container = docker_client.containers.get("postgres")
         except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
+            print("Postgres container not found. Could not create backup")
+            sys.exit(1)
+        postgres_image_tag = postgres_container.attrs['Config']['Image'].split(':')[1]
+        postgres_version = '13'
+        if '9.6' in postgres_image_tag:
+            postgres_version = '9.6'
 
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
-    except KeyboardInterrupt:
-        sys.exit(1)
-
-    try:
-        postgres_container = docker_client.containers.get("postgres")
-    except docker.errors.NotFound:
-        print("Postgres container not found. Could not create backup")
-        sys.exit(1)
-    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1].split('-')[0]
-
-    container = docker_client.containers.run(image="postgres:" + postgres_version,
-                                            remove=False,
-                                            name='postgres-database-backup',
-                                            network=therapeutic_area_info.name + '-net',
-                                            volumes={
-                                                current_environment: {
-                                                    'bind': '/opt/database',
-                                                    'mode': 'rw'
+        container = docker_client.containers.run(image="postgres:" + postgres_version,
+                                                remove=False,
+                                                name='postgres-database-backup',
+                                                network=therapeutic_area_info.name + '-net',
+                                                volumes={
+                                                    current_environment: {
+                                                        'bind': '/opt/database',
+                                                        'mode': 'rw'
+                                                    },
+                                                    'shared': {
+                                                        'bind': '/var/lib/shared',
+                                                        'mode': 'rw'
+                                                    }
                                                 },
-                                                'shared': {
-                                                    'bind': '/var/lib/shared',
-                                                    'mode': 'rw'
-                                                }
-                                            },
-                                            command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); cd /opt/database; pg_dump --clean --create -h postgres -U postgres -Fc OHDSI > /opt/database/OHDSI_backup_${CURRENT_TIME}.dump; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI_backup.dump"\'',
-                                            detach=True)
-    for l in container.logs(stream=True):
+                                                command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); cd /opt/database; pg_dump --clean --create -h postgres -U postgres -Fc OHDSI > /opt/database/OHDSI_backup_${CURRENT_TIME}.dump; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI_backup_${CURRENT_TIME}.dump"\'',
+                                                detach=True)
+        for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
-    container.stop()
-    container.remove(v=True)
+
+        container = docker_client.containers.get(container.attrs['Name'])
+        container.stop()
+        container.remove(v=True)
+
+        if container.attrs['State']['ExitCode'] != 0:
+            print('Something went wrong while taking a backup... Exiting the installation script. If you continue to experience this error, please contact the Feder8 team.')
+            sys.exit(1)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+
 
 @init.command()
 def upgrade_database():
@@ -1676,6 +1690,21 @@ def upgrade_database():
     except docker.errors.DockerException:
         print('Error while fetching docker api... Is docker running?')
         sys.exit(1)
+
+    print('Make sure file permissions are correct...')
+    container = docker_client.containers.run(image="alpine",
+                                            remove=False,
+                                            name='shared-volume-permissions',
+                                            volumes={
+                                                'shared': {
+                                                    'bind': '/var/lib/shared',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            command='ash -c "chown 999:999 /var/lib/shared/honeur.env"',
+                                            detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
 
 
     new_pgdata_volume = docker_client.volumes.create("new-pgdata")
