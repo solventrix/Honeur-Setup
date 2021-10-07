@@ -219,7 +219,8 @@ def config_server(therapeutic_area, email, cli_key):
 @click.option('-k', '--cli-key')
 @click.option('-up', '--user-password')
 @click.option('-ap', '--admin-password')
-def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
+@click.option('-edoh', '--expose-database-on-host')
+def postgres(therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -257,7 +258,8 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         if admin_password is None:
             admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
 
-        expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
+        if expose_database_on_host is None:
+            expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -363,7 +365,10 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
-def local_portal(therapeutic_area, email, cli_key, host):
+@click.option('-u', '--username')
+@click.option('-p', '--password')
+@click.option('-edr', '--enable-docker-runner')
+def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -399,6 +404,16 @@ def local_portal(therapeutic_area, email, cli_key, host):
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
+        if username is None:
+            username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if password is None:
+            password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+        if enable_docker_runner is None:
+            enable_docker_runner = questionary.confirm("Do you want to enable support for Docker based analysis scripts?").unsafe_ask()
+            if enable_docker_runner:
+                enable_docker_runner_string = 'true'
+            else:
+                enable_docker_runner_string = 'false'
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -426,7 +441,9 @@ def local_portal(therapeutic_area, email, cli_key, host):
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
             'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_LOCAL_HOST_NAME': host
+            'FEDER8_LOCAL_HOST_NAME': host,
+            'FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME': username,
+            'FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD': password
         },
         network=network_names[0],
         volumes={
@@ -489,6 +506,9 @@ def local_portal(therapeutic_area, email, cli_key, host):
             'FEDER8_CONFIG_SERVER_HOST': 'config-server',
             'FEDER8_CONFIG_SERVER_PORT': '8080',
             'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
+            'FEDER8_LOCAL_ADMIN_USERNAME': username,
+            'FEDER8_LOCAL_ADMIN_PASSWORD': password,
+            'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
             'SERVER_SERVLET_CONTEXT_PATH': '/portal'
         },
@@ -1801,126 +1821,6 @@ def upgrade_database():
 
     new_pgdata_volume.remove()
 
-
-@init.command()
-@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
-@click.option('-e', '--email')
-@click.option('-k', '--cli-key')
-@click.option('-up', '--user-password')
-@click.option('-ap', '--admin-password')
-@click.option('-h', '--host')
-@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
-@click.option('-lu', '--ldap-url')
-@click.option('-ldn', '--ldap-dn')
-@click.option('-lbdn', '--ldap-base-dn')
-@click.option('-lsu', '--ldap-system-username')
-@click.option('-lsp', '--ldap-system-password')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
-@click.option('-u', '--username')
-@click.option('-p', '--password')
-@click.pass_context
-def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, username, password):
-    try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        if therapeutic_area is None:
-            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
-
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
-
-        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
-
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
-
-        try:
-            docker_client.volumes.get("pgdata")
-            clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
-            if clean_install:
-                backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
-                if backup_pgdata:
-                    ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                ctx.invoke(clean, therapeutic_area=therapeutic_area)
-            else:
-                postgres_container = docker_client.containers.get("postgres")
-                postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
-                if '9.6' in postgres_version:
-                    backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
-                    if backup_pgdata:
-                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database)
-        except docker.errors.NotFound:
-            pass
-
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-        if email is None:
-            email = configuration.get_configuration('feder8.central.service.image-repo-username')
-        if cli_key is None:
-            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-    except KeyboardInterrupt:
-        sys.exit(1)
-
-    ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
-
-    try:
-        if user_password is None:
-            user_password = configuration.get_configuration('feder8.local.datasource.password')
-        if admin_password is None:
-            admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
-        if host is None:
-            host = configuration.get_configuration('feder8.local.host.name')
-
-        if security_method is None:
-            security_method = configuration.get_configuration('feder8.local.security.security-method')
-
-        if security_method == 'LDAP':
-            if ldap_url is None:
-                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-            if ldap_dn is None:
-                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-            if ldap_base_dn is None:
-                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-            if ldap_system_username is None:
-                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-            if ldap_system_password is None:
-                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
-
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
-
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
-
-        if security_method != 'None':
-            if username is None:
-                username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
-
-            if password is None:
-                password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
-    except KeyboardInterrupt:
-        sys.exit(1)
-
-    ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
-    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    if security_method != 'None':
-        ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
-    ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
-
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
@@ -1940,8 +1840,10 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 @click.option('-o', '--organization')
+@click.option('-edr', '--enable-docker-runner')
+@click.option('-edoh', '--expose-database-on-host')
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, enable_docker_runner, expose_database_on_host):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -2025,27 +1927,36 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if notebook_directory is None:
             notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
-        if feder8_studio_directory is None:
-            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+        install_feder8_studio = questionary.confirm("Do you want to install Feder8 Studio?").unsafe_ask()
 
-        if security_method != 'None':
-            if username is None:
-                username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if install_feder8_studio:
+            if feder8_studio_directory is None:
+                feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
 
-            if password is None:
-                password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+        install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
 
-        if organization is None:
-            organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).unsafe_ask()
+        if install_distributed_analytics:
+            if organization is None:
+                organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).unsafe_ask()
+        if username is None:
+            username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if password is None:
+            password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+        if enable_docker_runner is None:
+            enable_docker_runner = questionary.confirm("Do you want to enable support for Docker based analysis scripts?").unsafe_ask()
+        if expose_database_on_host is None:
+            expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
     except KeyboardInterrupt:
         sys.exit(1)
 
-    ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
+    ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
+    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
-    ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
-    ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    if install_distributed_analytics:
+        ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
+    if install_feder8_studio:
+        ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
