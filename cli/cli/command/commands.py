@@ -1369,6 +1369,10 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         volume_names[1]: {
             'bind': '/var/lib/shared',
             'mode': 'ro'
+        },
+        feder8_studio_directory: {
+            'bind': '/opt/data',
+            'mode': 'ro'
         }
     }
     if docker_cert_support:
