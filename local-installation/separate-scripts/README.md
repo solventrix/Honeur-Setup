@@ -102,12 +102,12 @@ The configuration server can be installed by downloading and running the install
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/start-config-server.sh --output start-config-server.sh && chmod +x start-config-server.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/start-config-server.sh --output start-config-server.sh && chmod +x start-config-server.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/start-config-server.cmd --output start-config-server.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/start-config-server.cmd --output start-config-server.cmd
 ```
 
 2. Run the script using the following command:
@@ -139,12 +139,12 @@ The Local Portal can be installed by downloading and running the installation sc
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/start-local-portal.sh --output start-local-portal.sh && chmod +x start-local-portal.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/start-local-portal.sh --output start-local-portal.sh && chmod +x start-local-portal.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/start-local-portal.cmd --output start-local-portal.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/start-local-portal.cmd --output start-local-portal.cmd
 ```
 
 2. Run the script using the following command:
