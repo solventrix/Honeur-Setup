@@ -482,16 +482,10 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
                 'mode': 'rw'
             }
         }
-    if is_mac:
-        volumes['/var/run/docker.sock.raw'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
-    else:
-        volumes['/var/run/docker.sock'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
+    volumes['/var/run/docker.sock.raw'] = {
+        'bind': '/var/run/docker.sock',
+        'mode': 'rw'
+    }
     container = docker_client.containers.run(
         image=local_portal_image,
         name=container_names[0],
