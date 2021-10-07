@@ -1,4 +1,7 @@
 @ECHO off
 
-docker pull harbor-uat.honeur.org/library/install-script:2.0.0
-docker run --rm -it --name feder8-installer -v /var/run/docker.sock:/var/run/docker.sock harbor-uat.honeur.org/library/install-script:2.0.0 feder8 init atlas-webapi
+SET TAG=2.0.1
+SET REGISTRY=harbor-uat.honeur.org
+
+docker pull %REGISTRY%/library/install-script:%TAG%
+docker run --rm -it --name feder8-installer -v /var/run/docker.sock:/var/run/docker.sock %REGISTRY%/library/install-script:%TAG% feder8 init atlas-webapi
