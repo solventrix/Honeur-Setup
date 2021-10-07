@@ -1,5 +1,5 @@
-TAG=${TAG}
-REGISTRY=${REGISTRY}
+TAG=2.0.1
+REGISTRY=harbor-uat.honeur.org
 
 if systemctl show --property ActiveState docker &> /dev/null; then
     DOCKER_CERT_SUPPORT=true
