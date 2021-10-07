@@ -410,10 +410,10 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
         if enable_docker_runner is None:
             enable_docker_runner = questionary.confirm("Do you want to enable support for Docker based analysis scripts?").unsafe_ask()
-            if enable_docker_runner:
-                enable_docker_runner_string = 'true'
-            else:
-                enable_docker_runner_string = 'false'
+        if enable_docker_runner:
+            enable_docker_runner_string = 'true'
+        else:
+            enable_docker_runner_string = 'false'
     except KeyboardInterrupt:
         sys.exit(1)
 
