@@ -1,4 +1,7 @@
 @ECHO off
 
-docker pull harbor.honeur.org/library/install-script:2.0.0
-docker run --rm -it --name feder8-installer -e CURRENT_DIRECTORY=%CD% -e IS_WINDOWS=true -v /var/run/docker.sock:/var/run/docker.sock harbor.honeur.org/library/install-script:2.0.0 feder8 init distributed-analytics
+SET TAG=2.0.1
+SET REGISTRY=harbor.honeur.org
+
+docker pull %REGISTRY%/library/install-script:%TAG%
+docker run --rm -it --name feder8-installer -e CURRENT_DIRECTORY=%CD% -e IS_WINDOWS=true -v /var/run/docker.sock:/var/run/docker.sock %REGISTRY%/library/install-script:%TAG% feder8 init distributed-analytics
