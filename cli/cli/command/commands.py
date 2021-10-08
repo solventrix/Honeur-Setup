@@ -1779,9 +1779,9 @@ def upgrade_database(therapeutic_area, email, cli_key):
     vocab_upgrade_tag = 'pipeline-vocabulary-update-2.0.0'
     vocab_upgrade_image = ':'.join([vocab_upgrade_repo, vocab_upgrade_tag])
 
+    print('Starting vocabulary upgrade... This could take a while.')
     pull_image(docker_client, registry, vocab_upgrade_image, email, cli_key)
 
-    print('Starting vocabulary upgrade... This could take a while.')
     environment_variables = {
         'DB_HOST': 'postgres',
         'THERAPEUTIC_AREA': therapeutic_area_info.name,
