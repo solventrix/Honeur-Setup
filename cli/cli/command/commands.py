@@ -1885,7 +1885,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
                     if backup_pgdata:
                         ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database)
         except docker.errors.NotFound:
             pass
 
