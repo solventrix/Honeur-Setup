@@ -817,7 +817,6 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-        'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
         'FEDER8_LOCAL_HOST_ZEPPELIN-LOG-DIRECTORY': log_directory,
         'FEDER8_LOCAL_HOST_ZEPPELIN-NOTEBOOK-DIRECTORY': notebook_directory
@@ -870,6 +869,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     environment_variables = {
         'ZEPPELIN_NOTEBOOK_DIR': '/notebook',
         'FEDER8_WEBAPI_CENTRAL': 'false',
+        'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
     }
     if security_method == 'LDAP':
         environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
