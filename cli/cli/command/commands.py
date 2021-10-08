@@ -465,7 +465,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     print('Done updating configuration in config-server')
 
     local_portal_repo = '/'.join([registry.registry_url, registry.project, 'local-portal'])
-    local_portal_tag = '2.0.0'
+    local_portal_tag = '2.0.1'
     local_portal_image = ':'.join([local_portal_repo, local_portal_tag])
 
     pull_image(docker_client,registry, local_portal_image, email, cli_key)
