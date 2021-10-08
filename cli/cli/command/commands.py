@@ -1509,7 +1509,7 @@ def nginx(therapeutic_area, email, cli_key):
     print('Done updating configuration in config-server')
 
     nginx_repo = '/'.join([registry.registry_url, registry.project, 'nginx'])
-    nginx_tag = '2.0.4'
+    nginx_tag = '2.0.6'
     nginx_image = ':'.join([nginx_repo, nginx_tag])
 
     pull_image(docker_client, registry, nginx_image, email, cli_key)
