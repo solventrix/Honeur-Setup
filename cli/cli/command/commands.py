@@ -1785,7 +1785,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
     environment_variables = {
         'DB_HOST': 'postgres',
         'THERAPEUTIC_AREA': therapeutic_area_info.name,
-        'THERAPEUTIC_AREA_URL': therapeutic_area_info.registry,
+        'THERAPEUTIC_AREA_URL': registry.registry_url,
         'DOCKER_USERNAME': email,
         'DOCKER_PASSWORD': cli_key
     }
