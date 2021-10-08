@@ -647,7 +647,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
     print('Done updating configuration in config-server')
 
     webapi_repo = '/'.join([registry.registry_url, registry.project, 'webapi'])
-    webapi_tag = '2.9.0-2.0.0'
+    webapi_tag = '2.9.0-2.0.1'
     webapi_image = ':'.join([webapi_repo, webapi_tag])
 
     pull_image(docker_client, registry, webapi_image, email, cli_key)
