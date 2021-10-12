@@ -647,7 +647,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
     print('Done updating configuration in config-server')
 
     webapi_repo = '/'.join([registry.registry_url, registry.project, 'webapi'])
-    webapi_tag = '2.9.0-2.0.0'
+    webapi_tag = '2.9.0-2.0.1'
     webapi_image = ':'.join([webapi_repo, webapi_tag])
 
     pull_image(docker_client, registry, webapi_image, email, cli_key)
@@ -869,6 +869,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     environment_variables = {
         'ZEPPELIN_NOTEBOOK_DIR': '/notebook',
         'FEDER8_WEBAPI_CENTRAL': 'false',
+        'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
     }
     if security_method == 'LDAP':
         environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
@@ -1508,7 +1509,7 @@ def nginx(therapeutic_area, email, cli_key):
     print('Done updating configuration in config-server')
 
     nginx_repo = '/'.join([registry.registry_url, registry.project, 'nginx'])
-    nginx_tag = '2.0.4'
+    nginx_tag = '2.0.6'
     nginx_image = ':'.join([nginx_repo, nginx_tag])
 
     pull_image(docker_client, registry, nginx_image, email, cli_key)
@@ -1728,12 +1729,113 @@ def backup(therapeutic_area):
 
 
 @init.command()
-def upgrade_database():
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def upgrade_database(therapeutic_area, email, cli_key):
     try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        is_mac = os.getenv('IS_MAC', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        try:
+            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
+        except docker.errors.NotFound:
+            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
+        install_container = docker_client.containers.get("feder8-installer")
+
+        try:
+            ta_network.connect(install_container)
+        except docker.errors.APIError:
+            pass
+
+        registry = therapeutic_area_info.registry
+
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
         sys.exit(1)
+
+    network_names = [therapeutic_area.lower() + '-net']
+    container_names = ['pipeline-vocabulary-update']
+
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_containers_and_remove_if_not_exists(docker_client, container_names)
+
+    vocab_upgrade_repo = '/'.join([registry.registry_url, registry.project, 'postgres'])
+    vocab_upgrade_tag = 'pipeline-vocabulary-update-2.0.0'
+    vocab_upgrade_image = ':'.join([vocab_upgrade_repo, vocab_upgrade_tag])
+
+    print('Starting vocabulary upgrade... This could take a while.')
+    pull_image(docker_client, registry, vocab_upgrade_image, email, cli_key)
+
+    environment_variables = {
+        'DB_HOST': 'postgres',
+        'THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'THERAPEUTIC_AREA_URL': registry.registry_url,
+        'DOCKER_USERNAME': email,
+        'DOCKER_PASSWORD': cli_key
+    }
+
+    volumes={
+            'shared': {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            }
+        }
+    if is_mac or is_windows:
+        volumes['/var/run/docker.sock.raw'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
+    else:
+        volumes['/var/run/docker.sock'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
+
+    container = docker_client.containers.run(image=vocab_upgrade_image,
+                                             name=container_names[0],
+                                             remove=False,
+                                             environment=environment_variables,
+                                             network=network_names[0],
+                                             volumes=volumes,
+                                             detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
+    print('Done upgrading vocabulary')
+
+    print('Update vocabulary and custom concepts... This could take a while.')
+    container = docker_client.containers.run(image="alpine",
+                                            remove=False,
+                                            name='shared-volume-permissions',
+                                            volumes={
+                                                'shared': {
+                                                    'bind': '/var/lib/shared',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            command='ash -c "chown 999:999 /var/lib/shared/honeur.env"',
+                                            detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
 
     print('Make sure file permissions are correct...')
     container = docker_client.containers.run(image="alpine",
@@ -1749,6 +1851,8 @@ def upgrade_database():
                                             detach=True)
     for l in container.logs(stream=True):
         print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
 
 
     new_pgdata_volume = docker_client.volumes.create("new-pgdata")
@@ -1791,6 +1895,8 @@ def upgrade_database():
                                             detach=True)
     for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
 
 
     pgdata_volume = docker_client.volumes.get("pgdata")
@@ -1869,6 +1975,12 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         except docker.errors.APIError:
             pass
 
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
         try:
             docker_client.volumes.get("pgdata")
             clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
@@ -1884,16 +1996,9 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
                     if backup_pgdata:
                         ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
         except docker.errors.NotFound:
             pass
-
-
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-        if email is None:
-            email = configuration.get_configuration('feder8.central.service.image-repo-username')
-        if cli_key is None:
-            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
     except KeyboardInterrupt:
         sys.exit(1)
 
