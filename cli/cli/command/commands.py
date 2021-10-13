@@ -316,7 +316,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password, ex
     print('Done updating configuration in config-server')
 
     postgres_repo = '/'.join([registry.registry_url, registry.project, 'postgres'])
-    postgres_tag = '13-omopcdm-5.3.1-webapi-2.9.0-2.0.3'
+    postgres_tag = '13-omopcdm-5.3.1-webapi-2.9.0-2.0.4'
     postgres_image = ':'.join([postgres_repo, postgres_tag])
 
     pull_image(docker_client,registry, postgres_image, email, cli_key)
