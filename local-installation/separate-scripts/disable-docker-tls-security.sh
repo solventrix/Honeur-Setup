@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 unset DOCKER_HOST
 unset DOCKER_TLS_VERIFY
 DOCKER_SERVICE_OVERRIDE="/etc/systemd/system/docker.service.d/override.conf"

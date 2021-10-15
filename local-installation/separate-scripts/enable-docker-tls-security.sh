@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 DOCKER_HOST_IP=172.17.0.1
 DOCKER_SERVICE_DIR="/etc/systemd/system/docker.service.d"
 
