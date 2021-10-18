@@ -3,5 +3,7 @@
 SET TAG=2.0.2
 SET REGISTRY=harbor-uat.honeur.org
 
-docker pull harbor-uat.honeur.org/library/install-script:%TAG%
+docker logout %REGISTRY%
+
+docker pull %REGISTRY%/library/install-script:%TAG%
 docker run --rm -it --name feder8-installer -e CURRENT_DIRECTORY=%CD% -e IS_WINDOWS=true -e DOCKER_CERT_SUPPORT=false -v /var/run/docker.sock:/var/run/docker.sock %REGISTRY%/library/install-script:%TAG% feder8 init full
