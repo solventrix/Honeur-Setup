@@ -1438,10 +1438,10 @@ def clean(therapeutic_area):
                 ta_network.disconnect(container)
 
     cleanup_volumes(docker_client, therapeutic_area_info.name)
-    cleanup_images(docker_client)
+    cleanup_images(docker_client, therapeutic_area_info)
 
 
-def cleanup_volumes(docker_client, therapeutic_area_name):
+def cleanup_volumes(docker_client:DockerClient, therapeutic_area_name):
     try:
         docker_client.volumes.get("shared").remove()
     except docker.errors.NotFound:
@@ -1471,8 +1471,24 @@ def cleanup_volumes(docker_client, therapeutic_area_name):
     except docker.errors.NotFound:
         pass
 
-def cleanup_images(docker_client):
-    pass
+
+def cleanup_images(docker_client:DockerClient, therapeutic_area_info):
+    images = docker_client.images.list()
+    images_to_keep = get_all_feder8_local_image_name_tags(therapeutic_area_info)
+    for image in images:
+        for image_tag in image.tags:
+            if not therapeutic_area_info.name + "/" in image_tag: continue
+            if image_tag in images_to_keep: continue
+            print(f"Removing image {image_tag}")
+            remove_image(docker_client, image_tag)
+
+
+def remove_image(docker_client:DockerClient, image_name_tag):
+    try:
+        docker_client.images.remove(image_name_tag)
+    except:
+        logging.warning(f"Image {image_name_tag} could not be removed")
+
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
