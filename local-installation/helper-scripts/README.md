@@ -65,7 +65,7 @@ On Linux, please download and run the following 2 scripts before running the ins
 
 Download the "Docker certificates generation script":
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
 ```
 
 Run the "Docker certificates generation script":
@@ -75,7 +75,7 @@ Run the "Docker certificates generation script":
 
 Download the "enable Docker TLS security script":
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/enable-docker-tls-security.sh --output enable-docker-tls-security.sh && chmod +x enable-docker-tls-security.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.9/local-installation/separate-scripts/enable-docker-tls-security.sh --output enable-docker-tls-security.sh && chmod +x enable-docker-tls-security.sh
 ```
 
 Run the "enable Docker TLS security script":
