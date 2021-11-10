@@ -94,9 +94,6 @@ The following components will be installed:
 * User Management (only in case authentication is enabled)
 * Proxy server (NGINX)
 
-
-
-
 The local installation can be installed by downloading and running the installation helper script.
 
 1. Download the installation helper script **_start-feder8.sh_** for MacOS/Linux or **_start-feder8.cmd_** for Windows using the following command:
@@ -134,8 +131,8 @@ Windows
 9. The script will prompt to enter a new password for feder8 admin database user.
 10. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine if localhost is entered as hostname.
 11. The script will prompt to enable authentication.  If authentication is enabled (recommended), a username and password will be required to logon into Atlas, Zeppelin, ...  If a LDAP server is available, it is possible to link the local installation to the LDAP server.  It allows users to use the same username and password they use for other local applications. If a LDAP server is not available or cannot be used, it is possible to create local users in the database that is part of the local installation. A User Management application will be installed to manage these local users.  Choose JDBC to enable this authentication type.
-    If the host machine is only accessible to authorized users, "None" can be selected to disable authentication.  
-12. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.  
+    If the host machine is only accessible to authorized users, "None" can be selected to disable authentication.
+12. (OPTIONAL when **_ldap_** is chosen for the installation security) Additional connections details will be asked to connect to the existing LDAP Server.
 13. The script will prompt to enter a directory on the host machine to save the Zeppelin logs and notebooks. Please provide an absolute path.
 14. The script will prompt to ask whether Feder8 Studio should be installed. Feder8 studio provides R Studio server and Visual Studio Code server to allow users to run R and Python code from within a browser.  It's recommended to install Feder8 studio because it allows better integration with the other components. When confirmed to install, the script will prompt to enter a directory on the host machine to save the data for Feder8 Studio. Please provide an absolute path.
 15. The script will prompt to ask whether distributed analytics should be installed. Distributed analytics is required to participate in studies that depend on iterative algorithms on virtually pooled (multi site) data sets.  These components will not be able to run anything without explicit approval for each study where this kind of analysis is used.  It's recommended to install these components. When confirmed to install, the script will prompt to select the name of your organization.

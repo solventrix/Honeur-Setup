@@ -1,9 +1,7 @@
 from cli.globals import Globals
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-from cli.configuration.environment import Environment
 from cli.configuration.questionary_environment import QuestionaryEnvironment
 from cli.configuration.config_server_environment import ConfigurationServerEnvironment
-from config.spring import ConfigClient
 
 
 class ConfigurationController:
