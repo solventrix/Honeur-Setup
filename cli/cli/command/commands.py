@@ -17,8 +17,10 @@ from cli.globals import Globals
 from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
 
-
-# logging.basicConfig(level=logging.WARNING)
+# Init logger
+log = logging.getLogger(__name__)
+log.addHandler(logging.StreamHandler())
+log.setLevel(logging.WARNING)
 
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
@@ -105,7 +107,7 @@ def get_or_create_network(docker_client:DockerClient, therapeutic_area_info):
     try:
         ta_network = docker_client.networks.get(network_name)
     except docker.errors.NotFound:
-        logging.info(f"Create network {network_name}")
+        log.info(f"Create network {network_name}")
         ta_network = docker_client.networks.create(network_name, check_duplicate=True)
     return ta_network
 
@@ -133,7 +135,7 @@ def connect_install_container_to_network(docker_client:DockerClient, therapeutic
     try:
         ta_network.connect(install_container)
     except docker.errors.APIError:
-        logging.debug(f"Unable to connect the install container to the {therapeutic_area_info.name} network")
+        log.debug(f"Unable to connect the install container to the {therapeutic_area_info.name} network")
 
 
 def update_config_on_config_server(docker_client:DockerClient, email, cli_key, therapeutic_area_info, config_update):
@@ -174,9 +176,9 @@ def refresh_config_on_server(docker_client:DockerClient):
         url = 'http://local-portal:8080/portal/actuator/refresh'
         requests.post(url)
     except docker.errors.NotFound:
-        logging.debug("Local portal container not found")
+        log.debug("Local portal container not found")
     except Exception:
-        logging.debug("Config could not be refreshed on server")
+        log.debug("Config could not be refreshed on server")
 
 
 def get_image_name_tag(therapeutic_area_info, name, tag):
@@ -1409,7 +1411,7 @@ def clean(therapeutic_area):
     try:
         ta_network = docker_client.networks.get(ta_network_name)
     except docker.errors.NotFound:
-        logging.warning(f"Network {ta_network_name} not found.")
+        log.warning(f"Network {ta_network_name} not found.")
         return
 
     all_containers = docker_client.containers.list(all=True)
@@ -1504,7 +1506,7 @@ def remove_image(docker_client:DockerClient, image_name_tag):
     try:
         docker_client.images.remove(image_name_tag)
     except:
-        logging.warning(f"Image {image_name_tag} could not be removed")
+        log.warning(f"Image {image_name_tag} could not be removed")
 
 
 @init.command()
