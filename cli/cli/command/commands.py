@@ -1,20 +1,24 @@
-from docker.models.networks import Network
-from cli.registry.registry import Registry
-from cli.configuration.configuration_controller import ConfigurationController
+import logging
+import os
 import sys
 import time
-import logging
-from typing import Container, List
+from typing import List
 
-from docker.client import DockerClient
-from cli.globals import Globals
 import click
-import questionary
 import docker
-import os
+import questionary
 import requests
+from docker.client import DockerClient
+from docker.models.containers import Container
+from docker.models.networks import Network
 
-#logging.basicConfig(level=logging.WARNING)
+from cli.configuration.configuration_controller import ConfigurationController
+from cli.globals import Globals
+from cli.registry.registry import Registry
+from cli.therapeutic_area.therapeutic_area import TherapeuticArea
+
+
+# logging.basicConfig(level=logging.WARNING)
 
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
@@ -104,6 +108,23 @@ def get_or_create_network(docker_client:DockerClient, therapeutic_area_info):
         logging.info(f"Create network {network_name}")
         ta_network = docker_client.networks.create(network_name, check_duplicate=True)
     return ta_network
+
+
+def add_docker_sock_volume_mapping(volumes: dict):
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    is_mac = os.getenv('IS_MAC', 'false') == 'true'
+
+    if is_mac or is_windows:
+        volumes['/var/run/docker.sock.raw'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
+    else:
+        volumes['/var/run/docker.sock'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
+    return volumes
 
 
 def connect_install_container_to_network(docker_client:DockerClient, therapeutic_area_info):
@@ -232,6 +253,10 @@ def get_nginx_image_name_tag(therapeutic_area_info):
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.0')
+
+
+def get_local_backup_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
 
 
 @click.group()
@@ -527,16 +552,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
                 'mode': 'rw'
             }
         }
-    if is_mac or is_windows:
-        volumes['/var/run/docker.sock.raw'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
-    else:
-        volumes['/var/run/docker.sock'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
+    volumes = add_docker_sock_volume_mapping(volumes)
+
     container = docker_client.containers.run(
         image=local_portal_image_name_tag,
         name=container_names[0],
@@ -1494,54 +1511,57 @@ def remove_image(docker_client:DockerClient, image_name_tag):
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def backup(therapeutic_area):
     try:
-        print("Creating backup of running database postgres... This could take a while")
-        try:
-            current_environment = os.getenv('CURRENT_DIRECTORY', '')
-            is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-            directory_separator = '/'
-            if is_windows:
-                directory_separator = '\\'
-            if therapeutic_area is None:
-                therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
-
-            try:
-                docker_client = docker.from_env(timeout=3000)
-            except docker.errors.DockerException:
-                print('Error while fetching docker api... Is docker running?')
-                sys.exit(1)
-
-            therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
-
-            connect_install_container_to_network(docker_client, therapeutic_area_info)
-        except KeyboardInterrupt:
-            sys.exit(1)
+        backup_folder = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        directory_separator = '/'
+        if is_windows:
+            directory_separator = '\\'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
         try:
-            postgres_container = docker_client.containers.get("postgres")
-        except docker.errors.NotFound:
-            print("Postgres container not found. Could not create backup")
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
             sys.exit(1)
-        postgres_image_tag = postgres_container.attrs['Config']['Image'].split(':')[1]
-        postgres_version = '13'
-        if '9.6' in postgres_image_tag:
-            postgres_version = '9.6'
 
-        container = docker_client.containers.run(image="postgres:" + postgres_version,
-                                                remove=False,
-                                                name='postgres-database-backup',
-                                                network=therapeutic_area_info.name + '-net',
-                                                volumes={
-                                                    current_environment: {
-                                                        'bind': '/opt/database',
-                                                        'mode': 'rw'
-                                                    },
-                                                    'shared': {
-                                                        'bind': '/var/lib/shared',
-                                                        'mode': 'rw'
-                                                    }
-                                                },
-                                                command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); cd /opt/database; pg_dump --clean --create -h postgres -U postgres -Fc OHDSI > /opt/database/OHDSI_backup_${CURRENT_TIME}.dump; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI_backup_${CURRENT_TIME}.dump"\'',
-                                                detach=True)
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        backup_database_and_container_files(docker_client, therapeutic_area, backup_folder)
+
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+
+def backup_database_and_container_files(docker_client:DockerClient,
+                                        therapeutic_area_info:TherapeuticArea,
+                                        backup_folder: str):
+    try:
+        print("Creating backup of running containers. This could take a while...")
+
+        environment_variables = {
+            'THERAPEUTIC_AREA': therapeutic_area_info.name,
+            'BACKUP_FOLDER': backup_folder
+        }
+
+        volumes = {
+            backup_folder: {
+                'bind': '/opt/backup',
+                'mode': 'rw'
+            }
+        }
+        volumes = add_docker_sock_volume_mapping(volumes)
+
+        container = docker_client.containers.run(image=get_local_backup_image_name_tag(therapeutic_area_info),
+                                                 remove=False,
+                                                 name='feder8-local-backup',
+                                                 network=therapeutic_area_info.name + '-net',
+                                                 environment=environment_variables,
+                                                 volumes=volumes,
+                                                 detach=True)
         for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
 
@@ -1550,7 +1570,8 @@ def backup(therapeutic_area):
         container.remove(v=True)
 
         if container.attrs['State']['ExitCode'] != 0:
-            print('Something went wrong while taking a backup... Exiting the installation script. If you continue to experience this error, please contact the Feder8 team.')
+            print('Something went wrong while taking a backup. Exiting the installation script. '
+                  'If you continue to experience this error, please contact the Feder8 team.')
             sys.exit(1)
     except Exception as e:
         print(e)
@@ -1608,22 +1629,14 @@ def upgrade_database(therapeutic_area, email, cli_key):
         'DOCKER_PASSWORD': cli_key
     }
 
-    volumes={
+    volumes= {
             'shared': {
                 'bind': '/var/lib/shared',
                 'mode': 'ro'
             }
         }
-    if is_mac or is_windows:
-        volumes['/var/run/docker.sock.raw'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
-    else:
-        volumes['/var/run/docker.sock'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
+
+    volumes = add_docker_sock_volume_mapping(volumes)
 
     container = docker_client.containers.run(image=vocab_upgrade_image_name_tag,
                                              name=container_names[0],
