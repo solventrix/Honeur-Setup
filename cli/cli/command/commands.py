@@ -1515,9 +1515,7 @@ def backup(therapeutic_area):
     try:
         backup_folder = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        directory_separator = '/'
-        if is_windows:
-            directory_separator = '\\'
+
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
                                                   choices=Globals.therapeutic_areas.keys()).unsafe_ask()
@@ -1532,14 +1530,14 @@ def backup(therapeutic_area):
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        backup_database_and_container_files(docker_client, therapeutic_area, backup_folder)
+        backup_database_and_container_files(docker_client, therapeutic_area_info, backup_folder)
 
     except KeyboardInterrupt:
         sys.exit(1)
 
 
-def backup_database_and_container_files(docker_client:DockerClient,
-                                        therapeutic_area_info:TherapeuticArea,
+def backup_database_and_container_files(docker_client: DockerClient,
+                                        therapeutic_area_info: TherapeuticArea,
                                         backup_folder: str):
     try:
         print("Creating backup of running containers. This could take a while...")
