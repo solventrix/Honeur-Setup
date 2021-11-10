@@ -1513,8 +1513,12 @@ def remove_image(docker_client:DockerClient, image_name_tag):
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def backup(therapeutic_area):
     try:
-        backup_folder = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        directory_separator = '/'
+        if is_windows:
+            directory_separator = '\\'
+
+        backup_folder = os.getenv('CURRENT_DIRECTORY', '') + directory_separator + 'backup'
 
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
