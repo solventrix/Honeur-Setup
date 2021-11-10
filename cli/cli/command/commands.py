@@ -218,7 +218,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.2')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
