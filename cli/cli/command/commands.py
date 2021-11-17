@@ -218,7 +218,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.2')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.3')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
@@ -250,7 +250,7 @@ def get_feder8_studio_image_name_tag(therapeutic_area_info):
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.8')
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
@@ -1305,7 +1305,10 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def nginx(therapeutic_area, email, cli_key):
+@click.option('-h', '--host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
+def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -1329,6 +1332,13 @@ def nginx(therapeutic_area, email, cli_key):
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        if host is None:
+            host = configuration.get_configuration('feder8.local.host.name')
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm("Do you want to enable HTTPS in our internal proxy?").unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -1344,7 +1354,9 @@ def nginx(therapeutic_area, email, cli_key):
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_NAME': host,
+        'FEDER8_LOCAL_HOST_SSL-CERT-DIRECTORY': certificate_directory
     }
 
     update_config_on_config_server(docker_client=docker_client,
@@ -1358,21 +1370,32 @@ def nginx(therapeutic_area, email, cli_key):
 
     print('Starting Nginx container...')
     environment_variables = {
-        'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name
+        'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'FEDER8_HOSTNAME': host
     }
+    ports = {
+        '8080/tcp': 80
+    }
+    volumes = {}
+
+    if enable_ssl:
+        environment_variables['FEDER8_SSL_ENABLED']='true'
+        ports['8443/tcp'] = 443
+        volumes[certificate_directory] = {
+            'bind': '/etc/nginx/certs',
+            'mode': 'ro'
+        }
 
     container = docker_client.containers.run(
         image=nginx_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
-        ports={
-            '8080/tcp': 80
-        },
+        ports=ports,
         remove=False,
         environment=environment_variables,
         network=network_names[0],
-        volumes={},
+        volumes=volumes,
         detach=True
     )
 
@@ -1783,8 +1806,10 @@ def upgrade_database(therapeutic_area, email, cli_key):
 @click.option('-o', '--organization')
 @click.option('-edr', '--enable-docker-runner')
 @click.option('-edoh', '--expose-database-on-host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, enable_docker_runner, expose_database_on_host):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -1877,6 +1902,11 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             enable_docker_runner = questionary.confirm("Do you want to enable support for Docker based analysis scripts?").unsafe_ask()
         if expose_database_on_host is None:
             expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm("Do you want to enable HTTPS in our internal proxy?").unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -1890,4 +1920,4 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
     if install_feder8_studio:
         ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
