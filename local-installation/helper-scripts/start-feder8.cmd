@@ -1,6 +1,6 @@
 @ECHO off
 
-SET TAG=2.0.5
+SET TAG=2.0.6
 SET REGISTRY=harbor-uat.honeur.org
 
 docker logout %REGISTRY%

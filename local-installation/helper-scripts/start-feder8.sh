@@ -1,4 +1,4 @@
-TAG=2.0.5
+TAG=2.0.6
 REGISTRY=harbor-uat.honeur.org
 
 if systemctl show --property ActiveState docker &> /dev/null; then
