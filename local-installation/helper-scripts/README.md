@@ -83,6 +83,11 @@ Run the "enable Docker TLS security script":
 ./enable-docker-tls-security.sh
 ```
 
+### Prerequisite for HTTPS support during installation
+During the installation, the script will ask you if you want to enable HTTPS support for the local toolbox. To enable HTTPS during the installation process, you should provide the certificate and private key beforehand. The files should be placed in a folder on the host machine where the installation will run and the files should be named the following:
+* Public certificate (file starting with -----BEGIN CERTIFICATE-----): feder8.crt
+* Private Key (file starting with -----BEGIN PRIVATE KEY-----): feder8.key
+
 ## <a id="installation-instruction"></a>Installation instructions
 The following components will be installed:
 * Postgres v13 database with OMOP CDM pre-loaded (port 5444 can optionally be exposed on the host machine during the installation)
@@ -141,5 +146,7 @@ Windows
 16. The script will prompt to enter a username and password for an administrator account.  The admin account is required to modify the local configuration in the local portal and to create local users in the User Management app.
 17. The script will prompt to ask whether you want to enable support for Docker based analysis scripts.  By enabling this capability, local analysis scripts can be executed as Docker containers.  It makes it much easier to run local analyses.  This feature is also used by the distributed analytics components.  It's recommended to enable this Docker capability.
 18. The script will prompt to ask whether the Postgres database should be made accessible via the host machine on port 5444 or not. Choose No if there is no need to make the database accessible on the local network.
+19. The script will prompt to ask wheter you want to enable HTTPS support. :warning: Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".
+20. The script will prompt to enter a directory on the host machine where the public key certificate file named "feder8.crt" and a private key file named "feder8.key" are located.
 
 Once done, the script will download all docker images and will create the docker volumes and containers.

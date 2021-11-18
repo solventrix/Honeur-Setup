@@ -1335,7 +1335,7 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
         if enable_ssl is None:
-            enable_ssl = questionary.confirm("Do you want to enable HTTPS?").unsafe_ask()
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
         if enable_ssl:
             if certificate_directory is None:
                 certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
@@ -1903,7 +1903,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if expose_database_on_host is None:
             expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
         if enable_ssl is None:
-            enable_ssl = questionary.confirm("Do you want to enable HTTPS?").unsafe_ask()
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
         if enable_ssl:
             if certificate_directory is None:
                 certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')

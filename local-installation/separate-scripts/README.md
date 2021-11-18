@@ -383,6 +383,11 @@ Once done, the script will download the Feder8 Studio docker image and will crea
 ## Proxy server
 The proxy server can be installed by downloading and running the installation script.
 
+### Prerequisite for HTTPS support during installation
+During the installation, the script will ask you if you want to enable HTTPS support for the local toolbox. To enable HTTPS during the installation process, you should provide the certificate and private key beforehand. The files should be placed in a folder on the host machine where the installation will run and the files should be named the following:
+* Public certificate (file starting with -----BEGIN CERTIFICATE-----): feder8.crt
+* Private Key (file starting with -----BEGIN PRIVATE KEY-----): feder8.key
+
 1. Download the installation script (**_start-nginx.sh_** for Linux/MacOS or **_start-nginx.cmd_** for Windows) using the following command:
 
 Linux/MacOS
@@ -414,6 +419,8 @@ Windows
     * https://harbor-uat.phederation.org for PHederation
     * https://harbor-uat.esfurn.org for Esfurn
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
+7. The script will prompt to ask wheter you want to enable HTTPS support. :warning: Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".
+8. The script will prompt to enter a directory on the host machine where the public key certificate file named "feder8.crt" and a private key file named "feder8.key" are located.
 
 Once done, the script will download the proxy server docker image and will create the docker container.
 
