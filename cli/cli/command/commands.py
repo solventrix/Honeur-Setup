@@ -1802,15 +1802,11 @@ def is_pgdata_corrupt():
 
     try:
         postgres_container = docker_client.containers.get("postgres")
-        postgres_running = postgres_container.attrs['State']['Running'] == True
+        postgres_running = postgres_container.attrs['State']['Status'] == 'running'
+        postgres_container.stop()
     except docker.errors.NotFound:
-        print('Postgres container not found... Sanity checks performed directly on pgdata volume.')
         postgres_running = False
         pass
-
-    if postgres_running:
-        print('Postgres sanity check complete... pgdata volume is ok.')
-        return False
 
     pgdata_postgres_version = docker_client.containers.run(image='alpine',
                                                             remove=True,
@@ -1874,6 +1870,12 @@ def is_pgdata_corrupt():
         return True
 
     print('Postgres sanity check complete... pgdata volume is ok.')
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        if postgres_running:
+            postgres_container.start()
+    except docker.errors.NotFound:
+        pass
     return False
 
 def remove_postgres_and_pgdata_volume():
