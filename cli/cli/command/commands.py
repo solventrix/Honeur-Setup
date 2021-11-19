@@ -1785,6 +1785,118 @@ def upgrade_database(therapeutic_area, email, cli_key):
 
     new_pgdata_volume.remove()
 
+
+@init.command()
+def is_pgdata_corrupt():
+    try:
+        docker_client = docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while fetching docker api... Is docker running?')
+        sys.exit(1)
+
+    try:
+        docker_client.volumes.get("pgdata")
+    except docker.errors.NotFound:
+        print('Database volume not found... No sanity checks to be done.')
+        return False
+
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        postgres_running = postgres_container.attrs['State']['Running'] == True
+    except docker.errors.NotFound:
+        print('Postgres container not found... Sanity checks performed directly on pgdata volume.')
+        postgres_running = False
+        pass
+
+    if postgres_running:
+        print('Postgres sanity check complete... pgdata volume is ok.')
+        return False
+
+    pgdata_postgres_version = docker_client.containers.run(image='alpine',
+                                                            remove=True,
+                                                            name='database',
+                                                            volumes={
+                                                                'pgdata': {
+                                                                    'bind': '/opt/data',
+                                                                    'mode': 'ro'
+                                                                }
+                                                            },
+                                                            command='ash -c "cd /opt/data; cat /opt/data/PG_VERSION || echo 0"').rstrip().decode('UTF-8')
+
+    if pgdata_postgres_version.startswith('9.6'):
+        container = docker_client.containers.run(image="postgres:9.6",
+                                                remove=False,
+                                                name='postgres-sanity-check',
+                                                volumes={
+                                                    'pgdata': {
+                                                        'bind': '/var/lib/postgresql/data',
+                                                        'mode': 'rw'
+                                                    }
+                                                },
+                                                detach=True)
+        time.sleep(20)
+
+        container.reload()
+
+        postgres_sanity_check_running = container.attrs['State']['Running'] == True
+        container.stop()
+        container.remove(v=True)
+
+        if not postgres_sanity_check_running:
+            print('Postgres sanity check complete... pgdata volume is corrupt.')
+            return True
+
+    elif pgdata_postgres_version.startswith('13'):
+        container = docker_client.containers.run(image="postgres:13",
+                                                remove=False,
+                                                name='postgres-sanity-check',
+                                                volumes={
+                                                    'pgdata': {
+                                                        'bind': '/var/lib/postgresql/data',
+                                                        'mode': 'rw'
+                                                    }
+                                                },
+                                                detach=True)
+        time.sleep(20)
+
+        container.reload()
+
+        postgres_sanity_check_running = container.attrs['State']['Running'] == True
+        container.stop()
+        container.remove(v=True)
+
+        if not postgres_sanity_check_running:
+            print('Postgres sanity check complete... pgdata volume is corrupt.')
+            return True
+    else:
+        print('Could not determine version of postgres volume')
+        print('Postgres sanity check complete... pgdata volume is corrupt.')
+        return True
+
+    print('Postgres sanity check complete... pgdata volume is ok.')
+    return False
+
+def remove_postgres_and_pgdata_volume():
+    try:
+        docker_client = docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while fetching docker api... Is docker running?')
+        sys.exit(1)
+
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        postgres_container.stop()
+        postgres_container.remove(v=True)
+        print('Stopping and removing postgres container because pgdata volume is connected to this container.')
+    except docker.errors.NotFound:
+        pass
+
+    try:
+        docker_client.volumes.get("pgdata").remove()
+        print('pgdata removed.')
+    except docker.errors.NotFound:
+        pass
+
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
@@ -1834,13 +1946,19 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
         try:
             docker_client.volumes.get("pgdata")
+            pgdata_corrupt = ctx.invoke(is_pgdata_corrupt)
+            if pgdata_corrupt:
+                remove_pgdata = questionary.confirm("pgdata volume is corrupt. This is probably a result of a previous failed installation. Would you like to remove the corrupt pgdata volume?").unsafe_ask()
+                if remove_pgdata:
+                    remove_postgres_and_pgdata_volume()
             clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
             if clean_install:
-                backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
-                if backup_pgdata:
-                    ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                if not pgdata_corrupt:
+                    backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
+                    if backup_pgdata:
+                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
                 ctx.invoke(clean, therapeutic_area=therapeutic_area)
-            else:
+            elif not clean_install and not pgdata_corrupt:
                 postgres_container = docker_client.containers.get("postgres")
                 postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
                 if '9.6' in postgres_version:
@@ -1848,6 +1966,9 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                     if backup_pgdata:
                         ctx.invoke(backup, therapeutic_area=therapeutic_area)
                     ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+            else:
+                print('postgres database volume pgdata is corrupt so the installation cannot continue. Please remove the previous installation using the installation script or manually delete postgres container and pgdata volume.')
+                sys.exit(1)
         except docker.errors.NotFound:
             pass
     except KeyboardInterrupt:
