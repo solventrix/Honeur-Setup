@@ -214,7 +214,7 @@ def get_config_server_image_name_tag(therapeutic_area_info):
 
 
 def get_update_configuration_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'config-server', 'update-configuration-2.0.0')
+    return get_image_name_tag(therapeutic_area_info, 'config-server', 'update-configuration-2.0.1')
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
@@ -234,7 +234,7 @@ def get_webapi_image_name_tag(therapeutic_area_info):
 
 
 def get_zeppelin_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.2')
+    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.3')
 
 
 def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
@@ -727,7 +727,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
     print('Starting Atlas container...')
     environment_variables = {
-        'FEDER8_WEBAPI_URL': 'http://' + host + '/webapi/',
+        'FEDER8_WEBAPI_URL': '//' + host + '/webapi/',
         'FEDER8_ATLAS_CENTRAL': 'false',
     }
     if security_method == 'None':
