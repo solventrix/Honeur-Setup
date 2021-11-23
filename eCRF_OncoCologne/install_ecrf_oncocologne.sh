@@ -39,7 +39,7 @@ docker run -d --name honeur_ecrf_postgres --network honeur-net --volume postgres
 echo "waiting on database container..."
 i=1
 while [[ $i -lt 30 ]] ; do
-   echo "."
+   printf "."
    sleep 1
   (( i += 1 ))
 done
@@ -51,7 +51,7 @@ if $fresh_install; then
   docker run -d --name honeur_ecrf_app --network honeur-net --volume static_volume:/code/entrytool/assets --env OPAL_SUPER_USER_PASSWORD=$OPAL_SUPER_USER_PASSWORD --env OPAL_DB_USER=postgres --env OPAL_DB_PASSWORD=$POSTGRES_PASSWORD --env OPAL_DB_NAME=$DATABASE_NAME --env OPAL_DB_HOST=honeur_ecrf_postgres --env OPAL_DB_PORT=5432 --env OPAL_FLUSH_DB=true --env OPAL_ENABLE_USER_DB=false --env OPAL_ENABLE_LDAP=false harbor.honeur.org/ecrf/oncocologne/app:0.2 gunicorn -b 0.0.0.0:8000 entrytool.wsgi
   i=1
   while [[ $i -lt 120 ]] ; do
-     echo "."
+     printf "."
      sleep 1
     (( i += 1 ))
   done
@@ -63,7 +63,7 @@ echo "start eCRF app container"
 docker run -d --name honeur_ecrf_app --network honeur-net --volume static_volume:/code/entrytool/assets --env OPAL_SUPER_USER_PASSWORD=$OPAL_SUPER_USER_PASSWORD --env OPAL_DB_USER=postgres --env OPAL_DB_PASSWORD=$POSTGRES_PASSWORD --env OPAL_DB_NAME=$DATABASE_NAME --env OPAL_DB_HOST=honeur_ecrf_postgres --env OPAL_DB_PORT=5432 --env OPAL_FLUSH_DB=false --env OPAL_ENABLE_USER_DB=false --env OPAL_ENABLE_LDAP=false --restart=always harbor.honeur.org/ecrf/oncocologne/app:0.2 gunicorn -b 0.0.0.0:8000 entrytool.wsgi
 i=1
 while [[ $i -lt 20 ]] ; do
-   echo "."
+   printf "."
    sleep 1
   (( i += 1 ))
 done
