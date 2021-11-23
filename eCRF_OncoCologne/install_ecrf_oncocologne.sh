@@ -28,7 +28,7 @@ docker pull harbor.honeur.org/ecrf/oncocologne/app:0.2
 docker pull harbor.honeur.org/ecrf/oncocologne/nginx:0.2
 
 echo "create network honeur-net"
-docker network create honeur-net
+docker network create honeur-net || true
 
 echo "create volumes postgres_data and static_volume"
 docker volume create postgres_data
