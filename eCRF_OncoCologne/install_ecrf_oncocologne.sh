@@ -58,6 +58,7 @@ if $fresh_install; then
     (( i += 1 ))
   done
   docker stop honeur_ecrf_app
+  printf "\n"
   docker rm honeur_ecrf_app
 fi
 printf "\n"
