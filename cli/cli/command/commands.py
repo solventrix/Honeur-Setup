@@ -218,7 +218,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.3')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.4')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
@@ -440,12 +440,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password, ex
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={
-            'HONEUR_USER_USERNAME': therapeutic_area_info.name,
-            'HONEUR_USER_PW': user_password,
-            'HONEUR_ADMIN_USER_USERNAME': therapeutic_area_info.name + '_admin',
-            'HONEUR_ADMIN_USER_PW': admin_password
-        },
+        environment={},
         network=network_names[0],
         volumes={
             volume_names[0]: {
@@ -591,13 +586,15 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-lu', '--ldap-url')
 @click.option('-ldn', '--ldap-dn')
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -624,6 +621,12 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
+
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
 
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
@@ -656,6 +659,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_SSL-CERT-DIRECTORY': certificate_directory
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
@@ -727,9 +731,15 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
     print('Starting Atlas container...')
     environment_variables = {
-        'FEDER8_WEBAPI_URL': '//' + host + '/webapi/',
         'FEDER8_ATLAS_CENTRAL': 'false',
     }
+
+    if enable_ssl:
+        environment_variables['FEDER8_WEBAPI_URL'] = 'https://' + host + '/webapi/'
+    else:
+        environment_variables['FEDER8_WEBAPI_URL'] = 'http://' + host + '/webapi/'
+
+
     if security_method == 'None':
         environment_variables['FEDER8_ATLAS_SECURE'] = 'false'
         environment_variables['FEDER8_ATLAS_LDAP_ENABLED'] = 'false'
@@ -2035,7 +2045,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
-    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
