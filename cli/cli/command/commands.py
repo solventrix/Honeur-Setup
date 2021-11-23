@@ -206,7 +206,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.5')
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
