@@ -1815,6 +1815,8 @@ def is_pgdata_corrupt():
         print('Database volume not found... No sanity checks to be done.')
         return False
 
+    print('Postgres pgdata volume found. preparing sanity check on database...')
+
     try:
         postgres_container = docker_client.containers.get("postgres")
         postgres_running = postgres_container.attrs['State']['Status'] == 'running'
