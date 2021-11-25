@@ -201,7 +201,9 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
         get_feder8_studio_image_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
-        get_vocabulary_update_image_name_tag(therapeutic_area_info)
+        get_vocabulary_update_image_name_tag(therapeutic_area_info),
+        get_local_backup_image_name_tag(therapeutic_area_info),
+        get_fix_default_privileges_images_name_tag(therapeutic_area_info)
     ]
 
 
@@ -259,6 +261,9 @@ def get_vocabulary_update_image_name_tag(therapeutic_area_info):
 
 def get_local_backup_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
+
+def get_fix_default_privileges_images_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.0')
 
 
 @click.group()
@@ -1908,6 +1913,62 @@ def remove_postgres_and_pgdata_volume():
         print('pgdata removed.')
     except docker.errors.NotFound:
         pass
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def fix_default_privileges(therapeutic_area, email, cli_key):
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        registry = therapeutic_area_info.registry
+
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    fix_default_privileges_image_tag = get_fix_default_privileges_images_name_tag(therapeutic_area_info)
+
+    # pull_image(docker_client,registry, fix_default_privileges_image_tag, email, cli_key)
+
+    print('Starting fix-default-privileges container...')
+
+    socket_gid = os.stat("/var/run/docker.sock").st_gid
+    volumes = {}
+    volumes = add_docker_sock_volume_mapping(volumes)
+
+    container = docker_client.containers.run(
+        image = fix_default_privileges_image_tag,
+        remove = False,
+        name = 'postgres-fix-default-privileges',
+        volumes = volumes,
+        group_add=[socket_gid, 0],
+        detach = True)
+
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+
+    container.stop()
+    container.remove(v=True)
+
+    print('Done fix-default-privileges container')
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
