@@ -203,7 +203,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_nginx_image_name_tag(therapeutic_area_info),
         get_vocabulary_update_image_name_tag(therapeutic_area_info),
         get_local_backup_image_name_tag(therapeutic_area_info),
-        get_fix_default_privileges_images_name_tag(therapeutic_area_info)
+        get_fix_default_privileges_image_name_tag(therapeutic_area_info)
     ]
 
 
@@ -262,8 +262,20 @@ def get_vocabulary_update_image_name_tag(therapeutic_area_info):
 def get_local_backup_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
 
-def get_fix_default_privileges_images_name_tag(therapeutic_area_info):
+def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.0')
+
+def get_alpine_image_name_tag():
+    return 'alpine:3.15.0'
+
+def get_postgres_9_6_image_name_tag():
+    return 'postgres:9.6'
+
+def get_postgres_13_image_name_tag():
+    return 'postgres:13'
+
+def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
+    return 'tianon/postgres-upgrade:9.6-to-13'
 
 
 @click.group()
@@ -367,7 +379,8 @@ def config_server(therapeutic_area, email, cli_key):
 @click.option('-up', '--user-password')
 @click.option('-ap', '--admin-password')
 @click.option('-edoh', '--expose-database-on-host')
-def postgres(therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
+@click.pass_context
+def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -463,6 +476,8 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password, ex
     print('Done starting postgres container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
+
+    ctx.invoke(fix_default_privileges, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
 
 
 
@@ -1694,7 +1709,10 @@ def upgrade_database(therapeutic_area, email, cli_key):
     print('Done upgrading vocabulary')
 
     print('Update vocabulary and custom concepts... This could take a while.')
-    container = docker_client.containers.run(image="alpine",
+
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='shared-volume-permissions',
                                             volumes={
@@ -1711,7 +1729,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
     container.remove(v=True)
 
     print('Make sure file permissions are correct...')
-    container = docker_client.containers.run(image="alpine",
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='shared-volume-permissions',
                                             volumes={
@@ -1733,7 +1751,9 @@ def upgrade_database(therapeutic_area, email, cli_key):
     postgres_container.stop()
     postgres_container.remove(v=True)
 
-    container = docker_client.containers.run(image="postgres:13",
+    postgres_13_image_tag = get_postgres_13_image_name_tag()
+
+    container = docker_client.containers.run(image=postgres_13_image_tag,
                                             remove=False,
                                             name='postgres',
                                             environment={
@@ -1752,7 +1772,9 @@ def upgrade_database(therapeutic_area, email, cli_key):
     container.stop()
     container.remove(v=True)
 
-    container = docker_client.containers.run(image="tianon/postgres-upgrade:9.6-to-13",
+    tianon_postgres_upgrade_9_6_to_13_image_name_tag = get_tianon_postgres_upgrade_9_6_to_13_image_name_tag()
+
+    container = docker_client.containers.run(image=tianon_postgres_upgrade_9_6_to_13_image_name_tag,
                                             remove=False,
                                             name='postgres-data-upgrade',
                                             volumes={
@@ -1777,7 +1799,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
 
     docker_client.volumes.create("pgdata")
 
-    container = docker_client.containers.run(image="alpine",
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='postgres-data-upgrade',
                                             volumes={
@@ -1825,7 +1847,9 @@ def is_pgdata_corrupt():
         postgres_running = False
         pass
 
-    pgdata_postgres_version = docker_client.containers.run(image='alpine',
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    pgdata_postgres_version = docker_client.containers.run(image=alpine_image_tag,
                                                             remove=True,
                                                             name='database',
                                                             volumes={
@@ -1836,8 +1860,12 @@ def is_pgdata_corrupt():
                                                             },
                                                             command='ash -c "cd /opt/data; cat /opt/data/PG_VERSION || echo 0"').rstrip().decode('UTF-8')
 
+    postgres_9_6_image_name_tag = get_postgres_9_6_image_name_tag()
+    postgres_13_image_name_tag = get_postgres_13_image_name_tag()
+
+
     if pgdata_postgres_version.startswith('9.6'):
-        container = docker_client.containers.run(image="postgres:9.6",
+        container = docker_client.containers.run(image=postgres_9_6_image_name_tag,
                                                 remove=False,
                                                 name='postgres-sanity-check',
                                                 volumes={
@@ -1860,7 +1888,7 @@ def is_pgdata_corrupt():
             return True
 
     elif pgdata_postgres_version.startswith('13'):
-        container = docker_client.containers.run(image="postgres:13",
+        container = docker_client.containers.run(image=postgres_13_image_name_tag,
                                                 remove=False,
                                                 name='postgres-sanity-check',
                                                 volumes={
@@ -1946,9 +1974,9 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    fix_default_privileges_image_tag = get_fix_default_privileges_images_name_tag(therapeutic_area_info)
+    fix_default_privileges_image_tag = get_fix_default_privileges_image_name_tag(therapeutic_area_info)
 
-    # pull_image(docker_client,registry, fix_default_privileges_image_tag, email, cli_key)
+    pull_image(docker_client,registry, fix_default_privileges_image_tag, email, cli_key)
 
     print('Starting fix-default-privileges container...')
 
