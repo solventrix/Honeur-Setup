@@ -1,4 +1,4 @@
-TAG=2.0.8
+TAG=2.0.9
 REGISTRY=harbor-uat.honeur.org
 
 if [[ $OSTYPE == 'darwin'* ]]; then
