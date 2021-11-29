@@ -201,12 +201,14 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
         get_feder8_studio_image_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
-        get_vocabulary_update_image_name_tag(therapeutic_area_info)
+        get_vocabulary_update_image_name_tag(therapeutic_area_info),
+        get_local_backup_image_name_tag(therapeutic_area_info),
+        get_fix_default_privileges_image_name_tag(therapeutic_area_info)
     ]
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.5')
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
@@ -218,7 +220,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.3')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.4')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
@@ -259,6 +261,21 @@ def get_vocabulary_update_image_name_tag(therapeutic_area_info):
 
 def get_local_backup_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
+
+def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.0')
+
+def get_alpine_image_name_tag():
+    return 'alpine:3.15.0'
+
+def get_postgres_9_6_image_name_tag():
+    return 'postgres:9.6'
+
+def get_postgres_13_image_name_tag():
+    return 'postgres:13'
+
+def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
+    return 'tianon/postgres-upgrade:9.6-to-13'
 
 
 @click.group()
@@ -362,7 +379,8 @@ def config_server(therapeutic_area, email, cli_key):
 @click.option('-up', '--user-password')
 @click.option('-ap', '--admin-password')
 @click.option('-edoh', '--expose-database-on-host')
-def postgres(therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
+@click.pass_context
+def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -440,12 +458,7 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password, ex
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={
-            'HONEUR_USER_USERNAME': therapeutic_area_info.name,
-            'HONEUR_USER_PW': user_password,
-            'HONEUR_ADMIN_USER_USERNAME': therapeutic_area_info.name + '_admin',
-            'HONEUR_ADMIN_USER_PW': admin_password
-        },
+        environment={},
         network=network_names[0],
         volumes={
             volume_names[0]: {
@@ -463,6 +476,8 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password, ex
     print('Done starting postgres container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
+
+    ctx.invoke(fix_default_privileges, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
 
 
 
@@ -591,13 +606,15 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-lu', '--ldap-url')
 @click.option('-ldn', '--ldap-dn')
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
         current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
@@ -624,6 +641,12 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
+
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
 
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
@@ -656,6 +679,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_SSL-CERT-DIRECTORY': certificate_directory
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
@@ -727,9 +751,15 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
     print('Starting Atlas container...')
     environment_variables = {
-        'FEDER8_WEBAPI_URL': '//' + host + '/webapi/',
         'FEDER8_ATLAS_CENTRAL': 'false',
     }
+
+    if enable_ssl:
+        environment_variables['FEDER8_WEBAPI_URL'] = 'https://' + host + '/webapi/'
+    else:
+        environment_variables['FEDER8_WEBAPI_URL'] = 'http://' + host + '/webapi/'
+
+
     if security_method == 'None':
         environment_variables['FEDER8_ATLAS_SECURE'] = 'false'
         environment_variables['FEDER8_ATLAS_LDAP_ENABLED'] = 'false'
@@ -1679,7 +1709,10 @@ def upgrade_database(therapeutic_area, email, cli_key):
     print('Done upgrading vocabulary')
 
     print('Update vocabulary and custom concepts... This could take a while.')
-    container = docker_client.containers.run(image="alpine",
+
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='shared-volume-permissions',
                                             volumes={
@@ -1696,7 +1729,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
     container.remove(v=True)
 
     print('Make sure file permissions are correct...')
-    container = docker_client.containers.run(image="alpine",
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='shared-volume-permissions',
                                             volumes={
@@ -1718,7 +1751,9 @@ def upgrade_database(therapeutic_area, email, cli_key):
     postgres_container.stop()
     postgres_container.remove(v=True)
 
-    container = docker_client.containers.run(image="postgres:13",
+    postgres_13_image_tag = get_postgres_13_image_name_tag()
+
+    container = docker_client.containers.run(image=postgres_13_image_tag,
                                             remove=False,
                                             name='postgres',
                                             environment={
@@ -1737,7 +1772,9 @@ def upgrade_database(therapeutic_area, email, cli_key):
     container.stop()
     container.remove(v=True)
 
-    container = docker_client.containers.run(image="tianon/postgres-upgrade:9.6-to-13",
+    tianon_postgres_upgrade_9_6_to_13_image_name_tag = get_tianon_postgres_upgrade_9_6_to_13_image_name_tag()
+
+    container = docker_client.containers.run(image=tianon_postgres_upgrade_9_6_to_13_image_name_tag,
                                             remove=False,
                                             name='postgres-data-upgrade',
                                             volumes={
@@ -1762,7 +1799,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
 
     docker_client.volumes.create("pgdata")
 
-    container = docker_client.containers.run(image="alpine",
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='postgres-data-upgrade',
                                             volumes={
@@ -1800,6 +1837,8 @@ def is_pgdata_corrupt():
         print('Database volume not found... No sanity checks to be done.')
         return False
 
+    print('Postgres pgdata volume found. preparing sanity check on database...')
+
     try:
         postgres_container = docker_client.containers.get("postgres")
         postgres_running = postgres_container.attrs['State']['Status'] == 'running'
@@ -1808,7 +1847,9 @@ def is_pgdata_corrupt():
         postgres_running = False
         pass
 
-    pgdata_postgres_version = docker_client.containers.run(image='alpine',
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    pgdata_postgres_version = docker_client.containers.run(image=alpine_image_tag,
                                                             remove=True,
                                                             name='database',
                                                             volumes={
@@ -1819,8 +1860,12 @@ def is_pgdata_corrupt():
                                                             },
                                                             command='ash -c "cd /opt/data; cat /opt/data/PG_VERSION || echo 0"').rstrip().decode('UTF-8')
 
+    postgres_9_6_image_name_tag = get_postgres_9_6_image_name_tag()
+    postgres_13_image_name_tag = get_postgres_13_image_name_tag()
+
+
     if pgdata_postgres_version.startswith('9.6'):
-        container = docker_client.containers.run(image="postgres:9.6",
+        container = docker_client.containers.run(image=postgres_9_6_image_name_tag,
                                                 remove=False,
                                                 name='postgres-sanity-check',
                                                 volumes={
@@ -1843,7 +1888,7 @@ def is_pgdata_corrupt():
             return True
 
     elif pgdata_postgres_version.startswith('13'):
-        container = docker_client.containers.run(image="postgres:13",
+        container = docker_client.containers.run(image=postgres_13_image_name_tag,
                                                 remove=False,
                                                 name='postgres-sanity-check',
                                                 volumes={
@@ -1898,6 +1943,62 @@ def remove_postgres_and_pgdata_volume():
         print('pgdata removed.')
     except docker.errors.NotFound:
         pass
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def fix_default_privileges(therapeutic_area, email, cli_key):
+    try:
+        current_environment = os.getenv('CURRENT_DIRECTORY', '')
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+        try:
+            docker_client = docker.from_env(timeout=3000)
+        except docker.errors.DockerException:
+            print('Error while fetching docker api... Is docker running?')
+            sys.exit(1)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        registry = therapeutic_area_info.registry
+
+        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    fix_default_privileges_image_tag = get_fix_default_privileges_image_name_tag(therapeutic_area_info)
+
+    pull_image(docker_client,registry, fix_default_privileges_image_tag, email, cli_key)
+
+    print('Starting fix-default-privileges container...')
+
+    socket_gid = os.stat("/var/run/docker.sock").st_gid
+    volumes = {}
+    volumes = add_docker_sock_volume_mapping(volumes)
+
+    container = docker_client.containers.run(
+        image = fix_default_privileges_image_tag,
+        remove = False,
+        name = 'postgres-fix-default-privileges',
+        volumes = volumes,
+        group_add=[socket_gid, 0],
+        detach = True)
+
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+
+    container.stop()
+    container.remove(v=True)
+
+    print('Done fix-default-privileges container')
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -2035,7 +2136,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
-    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
