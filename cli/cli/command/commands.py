@@ -60,28 +60,34 @@ def check_volumes_and_create_if_not_exists(docker_client:DockerClient, volume_na
     return volumes
 
 
-def check_containers_and_remove_if_not_exists(docker_client:DockerClient, container_names:List[str]):
+def check_containers_and_remove_if_not_exists(docker_client: DockerClient,
+                                              therapeutic_area_info: TherapeuticArea,
+                                              container_names: List[str]):
     for container_name in container_names:
         try:
             container = docker_client.containers.get(container_name)
-            print(' '.join([container_name,'is running.']))
-            print(' '.join(['Removing',container_name,'container...']))
+            container_image_name_tag = container.image.tags[0]
+            print(f'{container_name} is running.')
+            print(f'Removing {container_name} container...')
             container.stop()
             container.remove(v=True)
-            print(' '.join(['Done removing',container_name,'container...']))
+            print(f'Done removing {container_name} container...')
+            cleanup_images(docker_client=docker_client,
+                           therapeutic_area_info=therapeutic_area_info,
+                           constraint=container_image_name_tag)
         except:
-            pass
+            logging.debug("check_containers_and_remove_if_not_exists failed")
 
 
 def pull_image(docker_client:DockerClient, registry:Registry, image:str, email:str, cli_key:str):
-    print(' '.join(['Pulling image', image, '...']))
+    print(f'Pulling image {image} ...')
     try:
         docker_client.login(username=email, password=cli_key, registry=registry.registry_url)
     except docker.errors.APIError:
         print('Failed to pull image. Are the correct email and CLI Key provided?')
         sys.exit(1)
     docker_client.images.pull(image)
-    print(' '.join(['Done pulling image', image]))
+    print(f'Done pulling image {image}')
 
 
 def wait_for_healthy_container(docker_client:DockerClient, container:Container, interval:int, timeout:int):
@@ -145,7 +151,7 @@ def update_config_on_config_server(docker_client:DockerClient, email, cli_key, t
     pull_image(docker_client, registry, update_configuration_image_name_tag, email, cli_key)
     # remove old config update container if present
     container_name = 'config-server-update-configuration'
-    check_containers_and_remove_if_not_exists(docker_client, [container_name])
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, [container_name])
     # run config update container
     print('Updating configuration on config-server...')
     network_name = get_network_name(therapeutic_area_info)
@@ -262,17 +268,22 @@ def get_vocabulary_update_image_name_tag(therapeutic_area_info):
 def get_local_backup_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
 
+
 def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.0')
+
 
 def get_alpine_image_name_tag():
     return 'alpine:3.15.0'
 
+
 def get_postgres_9_6_image_name_tag():
     return 'postgres:9.6'
 
+
 def get_postgres_13_image_name_tag():
     return 'postgres:13'
+
 
 def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
     return 'tianon/postgres-upgrade:9.6-to-13'
@@ -306,7 +317,7 @@ def config_server(therapeutic_area, email, cli_key):
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration: ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -320,7 +331,7 @@ def config_server(therapeutic_area, email, cli_key):
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -420,7 +431,7 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -496,7 +507,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         is_mac = os.getenv('IS_MAC', 'false') == 'true'
         if therapeutic_area is None:
-            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
         try:
             docker_client = docker.from_env(timeout=3000)
@@ -536,7 +548,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -671,7 +683,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -852,7 +864,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -986,7 +998,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -1082,7 +1094,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -1234,7 +1246,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -1378,7 +1390,7 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -1544,12 +1556,13 @@ def cleanup_volumes(docker_client:DockerClient, therapeutic_area_name):
         pass
 
 
-def cleanup_images(docker_client:DockerClient, therapeutic_area_info):
+def cleanup_images(docker_client: DockerClient, therapeutic_area_info, constraint: str = None):
     images = docker_client.images.list()
     images_to_keep = get_all_feder8_local_image_name_tags(therapeutic_area_info)
     for image in images:
         for image_tag in image.tags:
             if not therapeutic_area_info.name + "/" in image_tag: continue
+            if constraint and not constraint in image_tag: continue
             if image_tag in images_to_keep: continue
             print(f"Removing image {image_tag}")
             remove_image(docker_client, image_tag)
@@ -1671,7 +1684,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
     container_names = ['pipeline-vocabulary-update']
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     vocab_upgrade_image_name_tag = get_vocabulary_update_image_name_tag(therapeutic_area_info)
 
@@ -1744,7 +1757,6 @@ def upgrade_database(therapeutic_area, email, cli_key):
         print(l.decode('UTF-8'), end='')
     container.stop()
     container.remove(v=True)
-
 
     new_pgdata_volume = docker_client.volumes.create("new-pgdata")
     postgres_container = docker_client.containers.get("postgres")
@@ -1863,7 +1875,6 @@ def is_pgdata_corrupt():
     postgres_9_6_image_name_tag = get_postgres_9_6_image_name_tag()
     postgres_13_image_name_tag = get_postgres_13_image_name_tag()
 
-
     if pgdata_postgres_version.startswith('9.6'):
         container = docker_client.containers.run(image=postgres_9_6_image_name_tag,
                                                 remove=False,
@@ -1923,6 +1934,7 @@ def is_pgdata_corrupt():
         pass
     return False
 
+
 def remove_postgres_and_pgdata_volume():
     try:
         docker_client = docker.from_env(timeout=3000)
@@ -1943,6 +1955,7 @@ def remove_postgres_and_pgdata_volume():
         print('pgdata removed.')
     except docker.errors.NotFound:
         pass
+
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -1999,6 +2012,7 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
     container.remove(v=True)
 
     print('Done fix-default-privileges container')
+
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
