@@ -1,4 +1,4 @@
-TAG=2.0.9
+TAG=2.0.10
 REGISTRY=harbor-uat.honeur.org
 
 docker pull ${REGISTRY}/library/install-script:${TAG}
