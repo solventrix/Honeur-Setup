@@ -1,6 +1,6 @@
 set -e
 
-TAG=2.0.10
+TAG=2.0.11
 REGISTRY=harbor-uat.honeur.org
 
 docker volume create new-pgdata
