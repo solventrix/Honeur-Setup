@@ -254,7 +254,7 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.5')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.6')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
