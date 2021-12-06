@@ -2063,11 +2063,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
         try:
             docker_client.volumes.get("pgdata")
-            pgdata_corrupt = ctx.invoke(is_pgdata_corrupt)
-            if pgdata_corrupt:
-                remove_pgdata = questionary.confirm("pgdata volume is corrupt. This is probably a result of a previous failed installation. Would you like to remove the corrupt pgdata volume?").unsafe_ask()
-                if remove_pgdata:
-                    remove_postgres_and_pgdata_volume()
+            pgdata_corrupt = False
             clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
             if clean_install:
                 if not pgdata_corrupt:
