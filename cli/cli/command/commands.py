@@ -230,7 +230,7 @@ def get_local_portal_image_name_tag(therapeutic_area_info):
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'user-mgmt', '2.0.2')
+    return get_image_name_tag(therapeutic_area_info, 'user-mgmt', '2.0.3')
 
 
 def get_atlas_image_name_tag(therapeutic_area_info):
@@ -254,7 +254,7 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.6')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.7')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
