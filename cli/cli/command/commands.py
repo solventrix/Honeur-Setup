@@ -366,7 +366,8 @@ def config_server(therapeutic_area, email, cli_key):
         remove=False,
         environment={
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-            'SERVER_SERVLET_CONTEXT_PATH': '/config-server'
+            'SERVER_SERVLET_CONTEXT_PATH': '/config-server',
+            'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
         },
         network=network_names[0],
         volumes={
@@ -601,7 +602,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             'FEDER8_LOCAL_ADMIN_PASSWORD': password,
             'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-            'SERVER_SERVLET_CONTEXT_PATH': '/portal'
+            'SERVER_SERVLET_CONTEXT_PATH': '/portal',
+            'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
         },
         network=network_names[0],
         volumes=volumes,
@@ -720,7 +722,8 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
         'DB_HOST': 'postgres',
         'FEDER8_WEBAPI_CENTRAL': 'false',
         'SERVER_CONTEXT_PATH': '/webapi',
-        'SERVER_USE_FORWARD_HEADERS': 'true'
+        'SERVER_USE_FORWARD_HEADERS': 'true',
+        'JAVA_OPTS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'None':
         environment_variables['FEDER8_WEBAPI_SECURE'] = 'false'
@@ -901,6 +904,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         'ZEPPELIN_NOTEBOOK_DIR': '/notebook',
         'FEDER8_WEBAPI_CENTRAL': 'false',
         'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
+        'JAVA_OPTS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'LDAP':
         environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
@@ -1027,7 +1031,8 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         'HONEUR_USERMGMT_PASSWORD': password,
         'DATASOURCE_DRIVER_CLASS_NAME': 'org.postgresql.Driver',
         'DATASOURCE_URL': 'jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi',
-        'WEBAPI_ADMIN_USERNAME': 'ohdsi_admin_user'
+        'WEBAPI_ADMIN_USERNAME': 'ohdsi_admin_user',
+        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
         image=user_management_image_name_tag,
@@ -1151,7 +1156,8 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_ANALYTICS_ORGANIZATION': organization,
-        'FEDER8_DATA_DIRECTORY': volume_names[0]
+        'FEDER8_DATA_DIRECTORY': volume_names[0],
+        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
         image=distributed_analytics_remote_image_name_tag,
@@ -1291,7 +1297,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'HONEUR_THERAPEUTIC_AREA_URL': therapeutic_area_info.registry.registry_url,
         'HONEUR_THERAPEUTIC_AREA_UPPERCASE': therapeutic_area_info.name.upper(),
-        'AUTHENTICATION_METHOD': security_method.lower()
+        'AUTHENTICATION_METHOD': security_method.lower(),
+        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'LDAP':
         environment_variables['HONEUR_STUDIO_LDAP_URL'] = '/'.join([ldap_url,ldap_base_dn])
