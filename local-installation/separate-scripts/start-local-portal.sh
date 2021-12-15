@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 TAG=2.0.12
 REGISTRY=harbor-uat.honeur.org
 

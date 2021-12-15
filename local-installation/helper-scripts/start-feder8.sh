@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 TAG=2.0.12
 REGISTRY=harbor-uat.honeur.org
 
@@ -7,7 +9,7 @@ else
     DOCKER_CERT_SUPPORT=false
 fi
 
-if [ $OSTYPE == 'darwin'* ]; then
+if [[ $OSTYPE == 'darwin'* ]]; then
   IS_MAC=true
 else
   IS_MAC=false
