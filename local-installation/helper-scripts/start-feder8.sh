@@ -1,4 +1,4 @@
-TAG=2.0.11
+TAG=2.0.12
 REGISTRY=harbor-uat.honeur.org
 
 if systemctl show --property ActiveState docker &> /dev/null; then
@@ -7,7 +7,7 @@ else
     DOCKER_CERT_SUPPORT=false
 fi
 
-if [[ $OSTYPE == 'darwin'* ]]; then
+if [ $OSTYPE == 'darwin'* ]; then
   IS_MAC=true
 else
   IS_MAC=false
