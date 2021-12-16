@@ -2,7 +2,7 @@
 Setlocal EnableDelayedExpansion
 
 SET VERSION=2.4
-SET TAG=omop-cdm-custom-concepts-update-%VERSION%
+SET TAG=omopcdm-update-custom-concepts-%VERSION%
 
 set argumentCount=0
 for %%x in (%*) do (

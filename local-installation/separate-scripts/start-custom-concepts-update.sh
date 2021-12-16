@@ -5,7 +5,7 @@ cr=$(echo $'\n.')
 cr=${cr%.}
 
 VERSION=2.4
-TAG=omop-cdm-custom-concepts-update-$VERSION
+TAG=omopcdm-update-custom-concepts-$VERSION
 
 read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
 while [[ "$FEDER8_THERAPEUTIC_AREA" != "honeur" && "$FEDER8_THERAPEUTIC_AREA" != "phederation" && "$FEDER8_THERAPEUTIC_AREA" != "esfurn" && "$FEDER8_THERAPEUTIC_AREA" != "athena" && "$FEDER8_THERAPEUTIC_AREA" != "" ]]; do
