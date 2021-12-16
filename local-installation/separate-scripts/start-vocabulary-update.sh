@@ -4,7 +4,7 @@ set -e
 cr=$(echo $'\n.')
 cr=${cr%.}
 
-VERSION=2.0.0
+VERSION=2.0.1
 TAG=pipeline-vocabulary-update-$VERSION
 
 read -p 'Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: ' FEDER8_THERAPEUTIC_AREA
