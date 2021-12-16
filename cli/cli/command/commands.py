@@ -262,7 +262,7 @@ def get_nginx_image_name_tag(therapeutic_area_info):
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.0')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.1')
 
 
 def get_local_backup_image_name_tag(therapeutic_area_info):
