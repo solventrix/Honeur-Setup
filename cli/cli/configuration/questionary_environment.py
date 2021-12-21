@@ -12,5 +12,7 @@ class QuestionaryEnvironment(Environment):
         self.is_windows = is_windows
 
     def get_configuration(self, key:str) -> str:
-        question:Question = Globals.all_questions[key]
+        question:Question = Globals.get_question(key)
+        if not question:
+            return None
         return question.ask(self.therapeutic_area, self.current_directory, self.is_windows)

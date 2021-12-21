@@ -34,3 +34,6 @@ class Globals:
         'feder8.local.security.user-mgmt-username': SingleChoiceQuestion('Enter the administrator username?', 'admin'),
         'feder8.local.security.user-mgmt-password': SingleChoiceQuestion('Enter the administrator password?', 'admin'),
     }
+
+    def get_question(key):
+        return Globals.all_questions.get(key)

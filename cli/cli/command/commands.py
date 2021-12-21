@@ -12,15 +12,29 @@ from docker.client import DockerClient
 from docker.models.containers import Container
 from docker.models.networks import Network
 
-from cli.configuration.configuration_controller import ConfigurationController
+from cli.configuration.ConfigurationController import ConfigurationController
 from cli.globals import Globals
 from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
+from cli.configuration.DockerClientFacade import DockerClientFacade
+from cli.pipeline.CustomConceptsUpdatePipeline import CustomConceptsUpdatePipeline
 
 # Init logger
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.WARNING)
+
+
+def get_docker_client() -> DockerClient:
+    try:
+        return docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while connecting to docker...Is docker running?')
+        sys.exit(1)
+
+
+def get_docker_client_facade(therapeutic_area_info: TherapeuticArea, email, cli_key) -> DockerClientFacade:
+    return DockerClientFacade(therapeutic_area_info, email, cli_key)
 
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
@@ -135,7 +149,7 @@ def add_docker_sock_volume_mapping(volumes: dict):
     return volumes
 
 
-def connect_install_container_to_network(docker_client:DockerClient, therapeutic_area_info):
+def connect_install_container_to_network(docker_client: DockerClient, therapeutic_area_info):
     ta_network = get_or_create_network(docker_client, therapeutic_area_info)
     install_container = docker_client.containers.get("feder8-installer")
     try:
@@ -289,6 +303,28 @@ def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
     return 'tianon/postgres-upgrade:9.6-to-13'
 
 
+def get_configuration(therapeutic_area) -> ConfigurationController:
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    if not therapeutic_area:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+    return ConfigurationController(therapeutic_area, current_environment, is_windows)
+
+
+def get_image_repo_credentials(therapeutic_area, email=None, cli_key=None, configuration: ConfigurationController=None):
+    if email and cli_key:
+        return email, cli_key
+    if not configuration:
+        configuration = get_configuration(therapeutic_area)
+    return configuration.get_image_repo_credentials()
+
+
+def get_database_connection_details(therapeutic_area, configuration: ConfigurationController=None):
+    if not configuration:
+        configuration = get_configuration(therapeutic_area)
+    return configuration.get_database_connection_details()
+
+
 @click.group()
 def init():
     """Initialize command for different components."""
@@ -300,16 +336,10 @@ def init():
 @click.option('-k', '--cli-key')
 def config_server(therapeutic_area, email, cli_key):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -317,11 +347,8 @@ def config_server(therapeutic_area, email, cli_key):
 
         registry = therapeutic_area_info.registry
 
-        configuration: ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-        if email is None:
-            email = configuration.get_configuration('feder8.central.service.image-repo-username')
-        if cli_key is None:
-            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -394,16 +421,10 @@ def config_server(therapeutic_area, email, cli_key):
 @click.pass_context
 def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -411,7 +432,7 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -504,18 +525,11 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 @click.option('-edr', '--enable-docker-runner')
 def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        is_mac = os.getenv('IS_MAC', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
                                                   choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -523,7 +537,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -630,16 +644,10 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 @click.option('-lsp', '--ldap-system-password')
 def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -647,7 +655,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -815,16 +823,10 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
 @click.option('-lsp', '--ldap-system-password')
 def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -832,7 +834,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -959,16 +961,10 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 @click.option('-p', '--password')
 def user_management(therapeutic_area, email, cli_key, username, password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -976,7 +972,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
 
         security_method = configuration.get_configuration('feder8.local.security.security-method')
         if security_method == 'None':
@@ -1063,16 +1059,10 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-o', '--organization')
 def distributed_analytics(therapeutic_area, email, cli_key, organization):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1080,7 +1070,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
 
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
@@ -1195,18 +1185,12 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 @click.option('-lsp', '--ldap-system-password')
 def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
 
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1214,7 +1198,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -1359,16 +1343,10 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-cd', '--certificate-directory')
 def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1376,7 +1354,7 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -1457,16 +1435,10 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def clean(therapeutic_area):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1597,11 +1569,7 @@ def backup(therapeutic_area):
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
                                                   choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1659,19 +1627,31 @@ def backup_database_and_container_files(docker_client: DockerClient,
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
+def update_custom_concepts(therapeutic_area, email, cli_key):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+        connect_install_container_to_network(get_docker_client(), therapeutic_area_info)
+        email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+    except KeyboardInterrupt:
+        sys.exit(1)
+    pipeline = CustomConceptsUpdatePipeline(
+        docker_client=get_docker_client_facade(therapeutic_area_info, email, cli_key),
+        db_connection_details=get_database_connection_details(therapeutic_area))
+    pipeline.execute()
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
 def upgrade_database(therapeutic_area, email, cli_key):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        is_mac = os.getenv('IS_MAC', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1679,7 +1659,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -1844,11 +1824,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
 
 @init.command()
 def is_pgdata_corrupt():
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
-        sys.exit(1)
+    docker_client = get_docker_client()
 
     try:
         docker_client.volumes.get("pgdata")
@@ -1943,11 +1919,7 @@ def is_pgdata_corrupt():
 
 
 def remove_postgres_and_pgdata_volume():
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
-        sys.exit(1)
+    docker_client = get_docker_client()
 
     try:
         postgres_container = docker_client.containers.get("postgres")
@@ -1970,15 +1942,10 @@ def remove_postgres_and_pgdata_volume():
 @click.option('-k', '--cli-key')
 def fix_default_privileges(therapeutic_area, email, cli_key):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -1986,7 +1953,7 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -2047,22 +2014,16 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
 @click.pass_context
 def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
