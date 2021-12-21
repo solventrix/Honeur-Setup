@@ -1473,11 +1473,14 @@ def clean(therapeutic_area):
             continue
         else:
             print('Stopping and removing ' + container.attrs['Name'])
-            container.stop()
+            try:
+                container.stop()
+            except:
+                logging.info(f"Container {container.attrs['Name']} could not be stopped")
             try:
                 container.remove(v=True)
             except docker.errors.NotFound:
-                pass
+                logging.info(f"Container {container.attrs['Name']} not found")
     all_containers = docker_client.containers.list(all=True)
     for container in all_containers:
         networks_of_container = list(container.attrs['NetworkSettings']['Networks'].keys())
