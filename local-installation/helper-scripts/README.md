@@ -35,8 +35,9 @@ The docker images required to run the full setup are located on a central reposi
 
   * For HONEUR: https://portal-uat.honeur.org
   * For PHederation: https://portal-uat.phederation.org
-  * For Esfurn: https://portal-uat.esfurn.org
-  * For Athena: https://portal-uat.athenafederation.org
+  * For ESFURN: https://portal-uat.esfurn.org
+  * For ATHENA: https://portal-uat.athenafederation.org
+  * For LupusNet: https://portal-uat.lupusnet.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -54,12 +55,23 @@ Only the Feder8 central services should be accessible from within the local inst
   * https://harbor-uat.phederation.org
   * https://catalogue-uat.phederation.org
   * https://distributed-analytics-uat.phederation.org
-* For Esfurn: 
+* For ESFURN: 
   * https://cas-uat.esfurn.org
   * https://harbor-uat.esfurn.org
   * https://catalogue-uat.esfurn.org
   * https://distributed-analytics-uat.esfurn.org
+* For ATHENA:
+  * https://cas-uat.athenafederation.org
+  * https://harbor-uat.athenafederation.org
+  * https://catalogue-uat.athenafederation.org
+  * https://distributed-analytics-uat.athenafederation.org
+* For LupusNet:
+  * https://cas-uat.lupusnet.org
+  * https://harbor-uat.lupusnet.org
+  * https://catalogue-uat.lupusnet.org
+  * https://distributed-analytics-uat.lupusnet.org
 
+    
 ### Prerequisite for installations on Linux
 On Linux, please download and run the following 2 scripts before running the installation script:
 
@@ -129,7 +141,8 @@ Windows
     1. HONEUR for https://portal-uat.honeur.org
     2. PHederation for https://portal-uat.phederation.org
     3. ESFURN for https://portal-uat.esfurn.org
-    4. Athena for https://portal-uat.athenafederation.org
+    4. ATHENA for https://portal-uat.athenafederation.org
+    5. LupusNet for https://portal-uat.lupusnet.org
 4. If a previous installation is present, the script will ask to remove the previous installation.  Choose Yes if the ETL will be re-executed after the re-installation.
 5. If a previous installation is present, the script will ask to create a backup of the Postgres database.  Choose Yes if there is no recent backup of the database.
 6. The script will prompt to enter the email address of the account you use to login on the central platform.
