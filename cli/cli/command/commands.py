@@ -275,7 +275,7 @@ def get_task_manager_image_name_tag(therapeutic_area_info):
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.8')
+    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.9')
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
