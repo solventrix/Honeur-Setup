@@ -1,17 +1,40 @@
-from docker.models.networks import Network
-from cli.registry.registry import Registry
-from cli.configuration.configuration_controller import ConfigurationController
+import logging
+import os
 import sys
 import time
-from typing import Container, List
+from typing import List
 
-from docker.client import DockerClient
-from cli.globals import Globals
 import click
-import questionary
 import docker
-import os
+import questionary
 import requests
+from docker.client import DockerClient
+from docker.models.containers import Container
+from docker.models.networks import Network
+
+from cli.configuration.ConfigurationController import ConfigurationController
+from cli.globals import Globals
+from cli.registry.registry import Registry
+from cli.therapeutic_area.therapeutic_area import TherapeuticArea
+from cli.configuration.DockerClientFacade import DockerClientFacade
+from cli.pipeline.CustomConceptsUpdatePipeline import CustomConceptsUpdatePipeline
+
+# Init logger
+log = logging.getLogger(__name__)
+log.addHandler(logging.StreamHandler())
+log.setLevel(logging.WARNING)
+
+
+def get_docker_client() -> DockerClient:
+    try:
+        return docker.from_env(timeout=3000)
+    except docker.errors.DockerException:
+        print('Error while connecting to docker...Is docker running?')
+        sys.exit(1)
+
+
+def get_docker_client_facade(therapeutic_area_info: TherapeuticArea, email, cli_key) -> DockerClientFacade:
+    return DockerClientFacade(therapeutic_area_info, email, cli_key)
 
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
@@ -21,6 +44,7 @@ def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, 
         for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
     return container
+
 
 def check_networks_and_create_if_not_exists(docker_client:DockerClient, network_names:List[str]):
     networks:List[Network] = []
@@ -35,6 +59,7 @@ def check_networks_and_create_if_not_exists(docker_client:DockerClient, network_
             networks.append(existing_network[0])
     return networks
 
+
 def check_volumes_and_create_if_not_exists(docker_client:DockerClient, volume_names:List[str]):
     volumes:List[Network] = []
     for volume_name in volume_names:
@@ -48,27 +73,36 @@ def check_volumes_and_create_if_not_exists(docker_client:DockerClient, volume_na
             volumes.append(existing_volume[0])
     return volumes
 
-def check_containers_and_remove_if_not_exists(docker_client:DockerClient, container_names:List[str]):
+
+def check_containers_and_remove_if_not_exists(docker_client: DockerClient,
+                                              therapeutic_area_info: TherapeuticArea,
+                                              container_names: List[str]):
     for container_name in container_names:
         try:
             container = docker_client.containers.get(container_name)
-            print(' '.join([container_name,'is running.']))
-            print(' '.join(['Removing',container_name,'container...']))
+            container_image_name_tag = container.image.tags[0]
+            print(f'{container_name} is running.')
+            print(f'Removing {container_name} container...')
             container.stop()
             container.remove(v=True)
-            print(' '.join(['Done removing',container_name,'container...']))
+            print(f'Done removing {container_name} container...')
+            cleanup_images(docker_client=docker_client,
+                           therapeutic_area_info=therapeutic_area_info,
+                           constraint=container_image_name_tag)
         except:
-            pass
+            logging.debug("check_containers_and_remove_if_not_exists failed")
+
 
 def pull_image(docker_client:DockerClient, registry:Registry, image:str, email:str, cli_key:str):
-    print(' '.join(['Pulling image', image, '...']))
+    print(f'Pulling image {image} ...')
     try:
         docker_client.login(username=email, password=cli_key, registry=registry.registry_url)
     except docker.errors.APIError:
         print('Failed to pull image. Are the correct email and CLI Key provided?')
         sys.exit(1)
     docker_client.images.pull(image)
-    print(' '.join(['Done pulling image', image]))
+    print(f'Done pulling image {image}')
+
 
 def wait_for_healthy_container(docker_client:DockerClient, container:Container, interval:int, timeout:int):
     print(' '.join(['Waiting for', container.name, 'to become healthy...']))
@@ -83,6 +117,214 @@ def wait_for_healthy_container(docker_client:DockerClient, container:Container, 
     print(' '.join([container.name, 'is healthy']))
     return True
 
+
+def get_network_name(therapeutic_area_info):
+    return therapeutic_area_info.name + "-net"
+
+
+def get_or_create_network(docker_client:DockerClient, therapeutic_area_info):
+    network_name = get_network_name(therapeutic_area_info)
+    try:
+        ta_network = docker_client.networks.get(network_name)
+    except docker.errors.NotFound:
+        log.info(f"Create network {network_name}")
+        ta_network = docker_client.networks.create(network_name, check_duplicate=True)
+    return ta_network
+
+
+def add_docker_sock_volume_mapping(volumes: dict):
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    is_mac = os.getenv('IS_MAC', 'false') == 'true'
+
+    if is_mac or is_windows:
+        volumes['/var/run/docker.sock.raw'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
+    else:
+        volumes['/var/run/docker.sock'] = {
+            'bind': '/var/run/docker.sock',
+            'mode': 'rw'
+        }
+    return volumes
+
+
+def connect_install_container_to_network(docker_client: DockerClient, therapeutic_area_info):
+    ta_network = get_or_create_network(docker_client, therapeutic_area_info)
+    install_container = docker_client.containers.get("feder8-installer")
+    try:
+        ta_network.connect(install_container)
+    except docker.errors.APIError:
+        log.debug(f"Unable to connect the install container to the {therapeutic_area_info.name} network")
+
+
+def update_config_on_config_server(docker_client:DockerClient, email, cli_key, therapeutic_area_info, config_update):
+    # pull config update image
+    update_configuration_image_name_tag = get_update_configuration_image_name_tag(therapeutic_area_info)
+    registry = therapeutic_area_info.registry
+    pull_image(docker_client, registry, update_configuration_image_name_tag, email, cli_key)
+    # remove old config update container if present
+    container_name = 'config-server-update-configuration'
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, [container_name])
+    # run config update container
+    print('Updating configuration on config-server...')
+    network_name = get_network_name(therapeutic_area_info)
+    volume_name = 'feder8-config-server'
+    run_container(
+        docker_client=docker_client,
+        image=update_configuration_image_name_tag,
+        remove=True,
+        name=container_name,
+        environment=config_update,
+        network=network_name,
+        volumes={
+            volume_name: {
+                'bind': '/home/feder8/config-repo',
+                'mode': 'rw'
+            }
+        },
+        detach=True,
+        show_logs=True)
+    # refresh config on server
+    refresh_config_on_server(docker_client)
+    print('Done updating configuration on config-server')
+
+
+def refresh_config_on_server(docker_client:DockerClient):
+    try:
+        docker_client.containers.get("local-portal")
+        url = 'http://local-portal:8080/portal/actuator/refresh'
+        requests.post(url)
+    except docker.errors.NotFound:
+        log.debug("Local portal container not found")
+    except Exception:
+        log.debug("Config could not be refreshed on server")
+
+
+def get_image_name_tag(therapeutic_area_info, name, tag):
+    registry = therapeutic_area_info.registry
+    image_name = '/'.join([registry.registry_url, registry.project, name])
+    return ':'.join([image_name, tag])
+
+
+def get_all_feder8_local_image_name_tags(therapeutic_area_info):
+    return [
+        get_postgres_image_name_tag(therapeutic_area_info),
+        get_config_server_image_name_tag(therapeutic_area_info),
+        get_update_configuration_image_name_tag(therapeutic_area_info),
+        get_local_portal_image_name_tag(therapeutic_area_info),
+        get_user_mgmt_image_name_tag(therapeutic_area_info),
+        get_atlas_image_name_tag(therapeutic_area_info),
+        get_webapi_image_name_tag(therapeutic_area_info),
+        get_zeppelin_image_name_tag(therapeutic_area_info),
+        get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info),
+        get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
+        get_feder8_studio_image_name_tag(therapeutic_area_info),
+        get_nginx_image_name_tag(therapeutic_area_info),
+        get_vocabulary_update_image_name_tag(therapeutic_area_info),
+        get_local_backup_image_name_tag(therapeutic_area_info),
+        get_fix_default_privileges_image_name_tag(therapeutic_area_info)
+    ]
+
+
+def get_postgres_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.5')
+
+
+def get_config_server_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'config-server', '2.0.1')
+
+
+def get_update_configuration_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'config-server', 'update-configuration-2.0.1')
+
+
+def get_local_portal_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.5')
+
+
+def get_user_mgmt_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'user-mgmt', '2.0.3')
+
+
+def get_atlas_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'atlas', '2.9.0-2.0.0')
+
+
+def get_webapi_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.1')
+
+
+def get_zeppelin_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.3')
+
+
+def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'r-server-2.0.4')
+
+
+def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.4')
+
+
+def get_feder8_studio_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.7')
+
+
+def get_nginx_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.8')
+
+
+def get_vocabulary_update_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.1')
+
+
+def get_local_backup_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
+
+
+def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.0')
+
+
+def get_alpine_image_name_tag():
+    return 'alpine:3.15.0'
+
+
+def get_postgres_9_6_image_name_tag():
+    return 'postgres:9.6'
+
+
+def get_postgres_13_image_name_tag():
+    return 'postgres:13'
+
+
+def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
+    return 'tianon/postgres-upgrade:9.6-to-13'
+
+
+def get_configuration(therapeutic_area) -> ConfigurationController:
+    current_environment = os.getenv('CURRENT_DIRECTORY', '')
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    if not therapeutic_area:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+    return ConfigurationController(therapeutic_area, current_environment, is_windows)
+
+
+def get_image_repo_credentials(therapeutic_area, email=None, cli_key=None, configuration: ConfigurationController=None):
+    if email and cli_key:
+        return email, cli_key
+    if not configuration:
+        configuration = get_configuration(therapeutic_area)
+    return configuration.get_image_repo_credentials()
+
+
+def get_database_connection_details(therapeutic_area, configuration: ConfigurationController=None):
+    if not configuration:
+        configuration = get_configuration(therapeutic_area)
+    return configuration.get_database_connection_details()
+
+
 @click.group()
 def init():
     """Initialize command for different components."""
@@ -94,37 +336,19 @@ def init():
 @click.option('-k', '--cli-key')
 def config_server(therapeutic_area, email, cli_key):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-        if email is None:
-            email = configuration.get_configuration('feder8.central.service.image-repo-username')
-        if cli_key is None:
-            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -132,71 +356,45 @@ def config_server(therapeutic_area, email, cli_key):
     volume_names = ['feder8-config-server']
     container_names = ['config-server', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
+    config_update = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url + "/oidc",
+        'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
+        'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'qoV2hPEWQjz5mRat',
+        'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
+        'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
+        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-URL': '${feder8.local.host.portal-url}/' + therapeutic_area_info.name + '-studio',
+        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-CONTAINER-URL': 'http://' + therapeutic_area_info.name + '-studio:8080/' + therapeutic_area_info.name + '-studio'
+    }
 
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Updating configuration in config-server...')
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment={
-            'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_CENTRAL_SERVICE_OAUTH-ISSUER-URI': 'https://' + therapeutic_area_info.cas_url + "/oidc",
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-ID': 'feder8-local',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-CLIENT-SECRET': 'qoV2hPEWQjz5mRat',
-            'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
-            'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
-            'FEDER8_LOCAL_HOST_FEDER8-STUDIO-URL': '${feder8.local.host.portal-url}/' + therapeutic_area_info.name + '-studio',
-            'FEDER8_LOCAL_HOST_FEDER8-STUDIO-CONTAINER-URL': 'http://' + therapeutic_area_info.name + '-studio:8080/' + therapeutic_area_info.name + '-studio'
-        },
-        network=network_names[0],
-        volumes={
-            volume_names[0]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+    config_server_image_tag = get_config_server_image_name_tag(therapeutic_area_info)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
-
-    print('Done updating configuration in config-server')
-
-    config_server_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    config_server_tag = '2.0.0'
-    config_server_image = ':'.join([config_server_repo, config_server_tag])
-
-    pull_image(docker_client,registry, config_server_image, email, cli_key)
+    pull_image(docker_client,registry, config_server_image_tag, email, cli_key)
 
     print('Starting config-server container...')
     container = docker_client.containers.run(
-        image=config_server_image,
+        image=config_server_image_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
         environment={
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-            'SERVER_SERVLET_CONTEXT_PATH': '/config-server'
+            'SERVER_SERVLET_CONTEXT_PATH': '/config-server',
+            'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
         },
         network=network_names[0],
         volumes={
@@ -219,35 +417,22 @@ def config_server(therapeutic_area, email, cli_key):
 @click.option('-k', '--cli-key')
 @click.option('-up', '--user-password')
 @click.option('-ap', '--admin-password')
-def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
+@click.option('-edoh', '--expose-database-on-host')
+@click.pass_context
+def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_password, expose_database_on_host):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -257,7 +442,8 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
         if admin_password is None:
             admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
 
-        expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
+        if expose_database_on_host is None:
+            expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -265,80 +451,47 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
     volume_names = ['pgdata', 'shared', 'feder8-config-server']
     container_names = ['postgres', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
+    config_update = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_DATASOURCE_HOST': container_names[0],
+        'FEDER8_LOCAL_DATASOURCE_NAME': 'OHDSI',
+        'FEDER8_LOCAL_DATASOURCE_PORT': '5432',
+        'FEDER8_LOCAL_DATASOURCE_USERNAME': therapeutic_area_info.name,
+        'FEDER8_LOCAL_DATASOURCE_PASSWORD': user_password,
+        'FEDER8_LOCAL_DATASOURCE_ADMIN-USERNAME': therapeutic_area_info.name + '_admin',
+        'FEDER8_LOCAL_DATASOURCE_ADMIN-PASSWORD': admin_password,
+    }
 
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Updating configuration in config-server...')
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment={
-            'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_LOCAL_DATASOURCE_HOST': container_names[0],
-            'FEDER8_LOCAL_DATASOURCE_NAME': 'OHDSI',
-            'FEDER8_LOCAL_DATASOURCE_PORT': '5432',
-            'FEDER8_LOCAL_DATASOURCE_USERNAME': therapeutic_area_info.name,
-            'FEDER8_LOCAL_DATASOURCE_PASSWORD': user_password,
-            'FEDER8_LOCAL_DATASOURCE_ADMIN-USERNAME': therapeutic_area_info.name + '_admin',
-            'FEDER8_LOCAL_DATASOURCE_ADMIN-PASSWORD': admin_password,
-        },
-        network=network_names[0],
-        volumes={
-            volume_names[2]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+    postgres_image_name_tag = get_postgres_image_name_tag(therapeutic_area_info)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
-
-    print('Done updating configuration in config-server')
-
-    postgres_repo = '/'.join([registry.registry_url, registry.project, 'postgres'])
-    postgres_tag = '13-omopcdm-5.3.1-webapi-2.9.0-2.0.3'
-    postgres_image = ':'.join([postgres_repo, postgres_tag])
-
-    pull_image(docker_client,registry, postgres_image, email, cli_key)
+    pull_image(docker_client,registry, postgres_image_name_tag, email, cli_key)
 
     print('Starting postgres container...')
-    docker_client
 
     ports = {}
     if expose_database_on_host:
         ports['5432/tcp'] = 5444
 
     container = docker_client.containers.run(
-        image=postgres_image,
+        image=postgres_image_name_tag,
         name=container_names[0],
         ports=ports,
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment={
-            'HONEUR_USER_USERNAME': therapeutic_area_info.name,
-            'HONEUR_USER_PW': user_password,
-            'HONEUR_ADMIN_USER_USERNAME': therapeutic_area_info.name + '_admin',
-            'HONEUR_ADMIN_USER_PW': admin_password
-        },
+        environment={},
         network=network_names[0],
         volumes={
             volume_names[0]: {
@@ -357,48 +510,50 @@ def postgres(therapeutic_area, email, cli_key, user_password, admin_password):
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    ctx.invoke(fix_default_privileges, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+
+
+
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
-def local_portal(therapeutic_area, email, cli_key, host):
+@click.option('-u', '--username')
+@click.option('-p', '--password')
+@click.option('-edr', '--enable-docker-runner')
+def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        is_mac = os.getenv('IS_MAC', 'false') == 'true'
         if therapeutic_area is None:
-            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
+        if username is None:
+            username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if password is None:
+            password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+        if enable_docker_runner is None:
+            enable_docker_runner = questionary.confirm("Do you want to enable support for Docker based analysis scripts?").unsafe_ask()
+        if enable_docker_runner:
+            enable_docker_runner_string = 'true'
+        else:
+            enable_docker_runner_string = 'false'
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -406,52 +561,28 @@ def local_portal(therapeutic_area, email, cli_key, host):
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['local-portal', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
+    config_update = {
+        'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_NAME': host,
+        'FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME': username,
+        'FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD': password
+    }
 
-    print('Updating configuration in config-server...')
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment={
-            'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-            'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-            'FEDER8_LOCAL_HOST_NAME': host
-        },
-        network=network_names[0],
-        volumes={
-            volume_names[1]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    local_portal_image_name_tag = get_local_portal_image_name_tag(therapeutic_area_info)
 
-    print('Done updating configuration in config-server')
-
-    local_portal_repo = '/'.join([registry.registry_url, registry.project, 'local-portal'])
-    local_portal_tag = '2.0.1'
-    local_portal_image = ':'.join([local_portal_repo, local_portal_tag])
-
-    pull_image(docker_client,registry, local_portal_image, email, cli_key)
+    pull_image(docker_client,registry, local_portal_image_name_tag, email, cli_key)
 
     print('Starting local-portal container...')
     socket_gid = os.stat("/var/run/docker.sock").st_gid
@@ -465,18 +596,10 @@ def local_portal(therapeutic_area, email, cli_key, host):
                 'mode': 'rw'
             }
         }
-    if is_mac:
-        volumes['/var/run/docker.sock.raw'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
-    else:
-        volumes['/var/run/docker.sock'] = {
-            'bind': '/var/run/docker.sock',
-            'mode': 'rw'
-        }
+    volumes = add_docker_sock_volume_mapping(volumes)
+
     container = docker_client.containers.run(
-        image=local_portal_image,
+        image=local_portal_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -489,8 +612,12 @@ def local_portal(therapeutic_area, email, cli_key, host):
             'FEDER8_CONFIG_SERVER_HOST': 'config-server',
             'FEDER8_CONFIG_SERVER_PORT': '8080',
             'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
+            'FEDER8_LOCAL_ADMIN_USERNAME': username,
+            'FEDER8_LOCAL_ADMIN_PASSWORD': password,
+            'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-            'SERVER_SERVLET_CONTEXT_PATH': '/portal'
+            'SERVER_SERVLET_CONTEXT_PATH': '/portal',
+            'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
         },
         network=network_names[0],
         volumes=volumes,
@@ -507,41 +634,28 @@ def local_portal(therapeutic_area, email, cli_key, host):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-lu', '--ldap-url')
 @click.option('-ldn', '--ldap-dn')
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -549,6 +663,12 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
+
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
 
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
@@ -571,73 +691,47 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_LOCAL_HOST_NAME': host,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_SSL-CERT-DIRECTORY': certificate_directory
     }
     if security_method == 'None':
-        environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+        config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
     else:
         if security_method == 'LDAP':
-            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
         else:
-            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
 
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[2],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[1]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    webapi_image_name_tag = get_webapi_image_name_tag(therapeutic_area_info)
 
-    print('Done updating configuration in config-server')
-
-    webapi_repo = '/'.join([registry.registry_url, registry.project, 'webapi'])
-    webapi_tag = '2.9.0-2.0.0'
-    webapi_image = ':'.join([webapi_repo, webapi_tag])
-
-    pull_image(docker_client, registry, webapi_image, email, cli_key)
+    pull_image(docker_client, registry, webapi_image_name_tag, email, cli_key)
 
     print('Starting WebAPI container...')
     environment_variables = {
         'DB_HOST': 'postgres',
         'FEDER8_WEBAPI_CENTRAL': 'false',
         'SERVER_CONTEXT_PATH': '/webapi',
-        'SERVER_USE_FORWARD_HEADERS': 'true'
+        'SERVER_USE_FORWARD_HEADERS': 'true',
+        'JAVA_OPTS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'None':
         environment_variables['FEDER8_WEBAPI_SECURE'] = 'false'
@@ -654,7 +748,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
             environment_variables['FEDER8_WEBAPI_AUTH_METHOD'] = 'jdbc'
 
     container = docker_client.containers.run(
-        image=webapi_image,
+        image=webapi_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -674,16 +768,21 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
-    atlas_repo = '/'.join([registry.registry_url, registry.project, 'atlas'])
-    atlas_tag = '2.9.0-2.0.0'
-    atlas_image = ':'.join([atlas_repo, atlas_tag])
-    pull_image(docker_client,registry, atlas_image, email, cli_key)
+    atlas_image_name_tag = get_atlas_image_name_tag(therapeutic_area_info)
+
+    pull_image(docker_client,registry, atlas_image_name_tag, email, cli_key)
 
     print('Starting Atlas container...')
     environment_variables = {
-        'FEDER8_WEBAPI_URL': 'http://' + host + '/webapi/',
         'FEDER8_ATLAS_CENTRAL': 'false',
     }
+
+    if enable_ssl:
+        environment_variables['FEDER8_WEBAPI_URL'] = 'https://' + host + '/webapi/'
+    else:
+        environment_variables['FEDER8_WEBAPI_URL'] = 'http://' + host + '/webapi/'
+
+
     if security_method == 'None':
         environment_variables['FEDER8_ATLAS_SECURE'] = 'false'
         environment_variables['FEDER8_ATLAS_LDAP_ENABLED'] = 'false'
@@ -694,7 +793,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
         else:
             environment_variables['FEDER8_ATLAS_LDAP_ENABLED'] = 'false'
     container = docker_client.containers.run(
-        image=atlas_image,
+        image=atlas_image_name_tag,
         name=container_names[1],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -724,33 +823,18 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, security_method, ldap_u
 @click.option('-lsp', '--ldap-system-password')
 def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -783,17 +867,11 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = ['zeppelin', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
@@ -802,53 +880,33 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         'FEDER8_LOCAL_HOST_ZEPPELIN-NOTEBOOK-DIRECTORY': notebook_directory
     }
     if security_method == 'None':
-        environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+        config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
     else:
         if security_method == 'LDAP':
-            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
         else:
-            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
 
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[2]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    zeppelin_image_name_tag = get_zeppelin_image_name_tag(therapeutic_area_info)
 
-    print('Done updating configuration in config-server')
-
-    zeppelin_repo = '/'.join([registry.registry_url, registry.project, 'zeppelin'])
-    zeppelin_tag = '0.8.2-2.0.1'
-    zeppelin_image = ':'.join([zeppelin_repo, zeppelin_tag])
-
-    pull_image(docker_client, registry, zeppelin_image, email, cli_key)
+    pull_image(docker_client, registry, zeppelin_image_name_tag, email, cli_key)
 
     print('Starting Zeppelin container...')
     environment_variables = {
         'ZEPPELIN_NOTEBOOK_DIR': '/notebook',
         'FEDER8_WEBAPI_CENTRAL': 'false',
+        'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
+        'JAVA_OPTS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'LDAP':
         environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
@@ -862,7 +920,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         environment_variables['LDAP_BASE_DN'] = 'cn=\{0\},dc=example,dc=org'
 
     container = docker_client.containers.run(
-        image=zeppelin_image,
+        image=zeppelin_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -903,33 +961,18 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 @click.option('-p', '--password')
 def user_management(therapeutic_area, email, cli_key, username, password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
 
         security_method = configuration.get_configuration('feder8.local.security.security-method')
         if security_method == 'None':
@@ -953,18 +996,11 @@ def user_management(therapeutic_area, email, cli_key, username, password):
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['user-mgmt', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
@@ -972,36 +1008,15 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         'FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME': username,
         'FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD': password
     }
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[1]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Done updating configuration in config-server')
+    user_management_image_name_tag = get_user_mgmt_image_name_tag(therapeutic_area_info)
 
-    user_management_repo = '/'.join([registry.registry_url, registry.project, 'user-mgmt'])
-    user_management_tag = '2.0.2'
-    user_management_image = ':'.join([user_management_repo, user_management_tag])
-
-    pull_image(docker_client, registry, user_management_image, email, cli_key)
+    pull_image(docker_client, registry, user_management_image_name_tag, email, cli_key)
 
     print('Starting User Management container...')
     environment_variables = {
@@ -1012,10 +1027,11 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         'HONEUR_USERMGMT_PASSWORD': password,
         'DATASOURCE_DRIVER_CLASS_NAME': 'org.postgresql.Driver',
         'DATASOURCE_URL': 'jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi',
-        'WEBAPI_ADMIN_USERNAME': 'ohdsi_admin_user'
+        'WEBAPI_ADMIN_USERNAME': 'ohdsi_admin_user',
+        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
-        image=user_management_image,
+        image=user_management_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -1187,33 +1203,18 @@ def task_manager(therapeutic_area, email, cli_key, host, rstudio_upload_dir, vsc
 @click.option('-o', '--organization')
 def distributed_analytics(therapeutic_area, email, cli_key, organization):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
 
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
@@ -1230,57 +1231,30 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     volume_names = ['feder8-data', 'feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
     }
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[2],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[1]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Done updating configuration in config-server')
+    distributed_analytics_r_server_image_name_tag = get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info)
 
-    distributed_analytics_r_server_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
-    distributed_analytics_r_server_tag = 'r-server-2.0.4'
-    distributed_analytics_r_server_image = ':'.join([distributed_analytics_r_server_repo, distributed_analytics_r_server_tag])
-
-    pull_image(docker_client, registry, distributed_analytics_r_server_image, email, cli_key)
+    pull_image(docker_client, registry, distributed_analytics_r_server_image_name_tag, email, cli_key)
 
     print('Starting Distributed Analytics R Server container...')
     environment_variables = {}
     container = docker_client.containers.run(
-        image=distributed_analytics_r_server_image,
+        image=distributed_analytics_r_server_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -1300,11 +1274,9 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
-    distributed_analytics_remote_repo = '/'.join([registry.registry_url, registry.project, 'distributed-analytics'])
-    distributed_analytics_remote_tag = 'remote-2.0.3'
-    distributed_analytics_remote_image = ':'.join([distributed_analytics_remote_repo, distributed_analytics_remote_tag])
+    distributed_analytics_remote_image_name_tag = get_distributed_analytics_remote_image_name_tag(therapeutic_area_info)
 
-    pull_image(docker_client, registry, distributed_analytics_remote_image, email, cli_key)
+    pull_image(docker_client, registry, distributed_analytics_remote_image_name_tag, email, cli_key)
 
     print('Starting Distributed Analytics Remote container...')
     environment_variables = {
@@ -1318,10 +1290,11 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_ANALYTICS_ORGANIZATION': organization,
-        'FEDER8_DATA_DIRECTORY': volume_names[0]
+        'FEDER8_DATA_DIRECTORY': volume_names[0],
+        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
-        image=distributed_analytics_remote_image,
+        image=distributed_analytics_remote_image_name_tag,
         name=container_names[1],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -1356,35 +1329,20 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 @click.option('-lsp', '--ldap-system-password')
 def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
 
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -1420,17 +1378,11 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_LOCAL_HOST_NAME': host,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
@@ -1439,52 +1391,31 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'FEDER8_LOCAL_HOST_FEDER8-STUDIO-DIRECTORY': feder8_studio_directory
     }
     if security_method == 'None':
-        environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+        config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
     else:
         if security_method == 'LDAP':
-            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
-            environment_variables['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-USERNAME'] = ldap_system_username
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
         else:
-            environment_variables['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[2]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Done updating configuration in config-server')
+    feder8_studio_image_name_tag = get_feder8_studio_image_name_tag(therapeutic_area_info)
 
-    feder8_studio_repo = '/'.join([registry.registry_url, registry.project, 'feder8-studio'])
-    feder8_studio_tag = '2.0.5'
-    feder8_studio_image = ':'.join([feder8_studio_repo, feder8_studio_tag])
-
-    pull_image(docker_client, registry, feder8_studio_image, email, cli_key)
+    pull_image(docker_client, registry, feder8_studio_image_name_tag, email, cli_key)
 
     print('Starting Feder8 Studio container...')
 
     environment_variables = {
-        'TAG': feder8_studio_tag,
+        'TAG': feder8_studio_image_name_tag,
         'APPLICATION_LOGS_TO_STDOUT': 'false',
         'SITE_NAME': therapeutic_area_info.name + 'studio',
         'CONTENT_PATH': feder8_studio_directory,
@@ -1494,7 +1425,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'HONEUR_THERAPEUTIC_AREA_URL': therapeutic_area_info.registry.registry_url,
         'HONEUR_THERAPEUTIC_AREA_UPPERCASE': therapeutic_area_info.name.upper(),
-        'AUTHENTICATION_METHOD': security_method.lower()
+        'AUTHENTICATION_METHOD': security_method.lower(),
+        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'LDAP':
         environment_variables['HONEUR_STUDIO_LDAP_URL'] = '/'.join([ldap_url,ldap_base_dn])
@@ -1513,6 +1445,10 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         volume_names[1]: {
             'bind': '/var/lib/shared',
             'mode': 'ro'
+        },
+        feder8_studio_directory: {
+            'bind': '/opt/data',
+            'mode': 'ro'
         }
     }
     if docker_cert_support:
@@ -1526,7 +1462,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
             'mode': 'rw'
         }
     container = docker_client.containers.run(
-        image=feder8_studio_image,
+        image=feder8_studio_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -1546,39 +1482,34 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def nginx(therapeutic_area, email, cli_key):
+@click.option('-h', '--host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
+def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_directory):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        if host is None:
+            host = configuration.get_configuration('feder8.local.host.name')
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -1586,70 +1517,56 @@ def nginx(therapeutic_area, email, cli_key):
     volume_names = ['feder8-config-server']
     container_names = ['nginx', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_NAME': host,
+        'FEDER8_LOCAL_HOST_SSL-CERT-DIRECTORY': certificate_directory
     }
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[0]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Done updating configuration in config-server')
+    nginx_image_name_tag = get_nginx_image_name_tag(therapeutic_area_info)
 
-    nginx_repo = '/'.join([registry.registry_url, registry.project, 'nginx'])
-    nginx_tag = '2.0.5'
-    nginx_image = ':'.join([nginx_repo, nginx_tag])
-
-    pull_image(docker_client, registry, nginx_image, email, cli_key)
+    pull_image(docker_client, registry, nginx_image_name_tag, email, cli_key)
 
     print('Starting Nginx container...')
     environment_variables = {
-        'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name
+        'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'FEDER8_HOSTNAME': host
     }
+    ports = {
+        '8080/tcp': 80
+    }
+    volumes = {}
+
+    if enable_ssl:
+        environment_variables['FEDER8_SSL_ENABLED']='true'
+        ports['8443/tcp'] = 443
+        volumes[certificate_directory] = {
+            'bind': '/etc/nginx/certs',
+            'mode': 'ro'
+        }
 
     container = docker_client.containers.run(
-        image=nginx_image,
+        image=nginx_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
-        ports={
-            '8080/tcp': 80
-        },
+        ports=ports,
         remove=False,
         environment=environment_variables,
         network=network_names[0],
-        volumes={},
+        volumes=volumes,
         detach=True
     )
 
@@ -1662,29 +1579,14 @@ def nginx(therapeutic_area, email, cli_key):
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def clean(therapeutic_area):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         confirm_continue = questionary.confirm("This script is about to delete everything installed related to " + therapeutic_area + ". Are you sure to continue?").unsafe_ask()
 
@@ -1697,6 +1599,7 @@ def clean(therapeutic_area):
     try:
         ta_network = docker_client.networks.get(ta_network_name)
     except docker.errors.NotFound:
+        log.warning(f"Network {ta_network_name} not found.")
         return
 
     all_containers = docker_client.containers.list(all=True)
@@ -1714,11 +1617,14 @@ def clean(therapeutic_area):
             continue
         else:
             print('Stopping and removing ' + container.attrs['Name'])
-            container.stop()
+            try:
+                container.stop()
+            except:
+                logging.info(f"Container {container.attrs['Name']} could not be stopped")
             try:
                 container.remove(v=True)
             except docker.errors.NotFound:
-                pass
+                logging.info(f"Container {container.attrs['Name']} not found")
     all_containers = docker_client.containers.list(all=True)
     for container in all_containers:
         networks_of_container = list(container.attrs['NetworkSettings']['Networks'].keys())
@@ -1741,7 +1647,11 @@ def clean(therapeutic_area):
                 print('disconnecting config-server from ' + ta_network_name)
                 ta_network.disconnect(container)
 
+    cleanup_volumes(docker_client, therapeutic_area_info.name)
+    cleanup_images(docker_client, therapeutic_area_info)
 
+
+def cleanup_volumes(docker_client:DockerClient, therapeutic_area_name):
     try:
         docker_client.volumes.get("shared").remove()
     except docker.errors.NotFound:
@@ -1750,84 +1660,246 @@ def clean(therapeutic_area):
         docker_client.volumes.get("pgdata").remove()
     except docker.errors.NotFound:
         pass
+    try:
+        docker_client.volumes.get("cronicle_data").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(therapeutic_area_name + "studio_pwsh_modules").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(therapeutic_area_name + "studio_py_environment").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(therapeutic_area_name + "studio_r_libraries").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get("pwsh_modules").remove()
+    except docker.errors.NotFound:
+        pass
+
+
+def cleanup_images(docker_client: DockerClient, therapeutic_area_info, constraint: str = None):
+    images = docker_client.images.list()
+    images_to_keep = get_all_feder8_local_image_name_tags(therapeutic_area_info)
+    for image in images:
+        for image_tag in image.tags:
+            if not therapeutic_area_info.name + "/" in image_tag: continue
+            if constraint and not constraint in image_tag: continue
+            if image_tag in images_to_keep: continue
+            print(f"Removing image {image_tag}")
+            remove_image(docker_client, image_tag)
+
+
+def remove_image(docker_client:DockerClient, image_name_tag):
+    try:
+        docker_client.images.remove(image_name_tag)
+    except:
+        log.warning(f"Image {image_name_tag} could not be removed")
+
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 def backup(therapeutic_area):
-    print("Creating backup of running database postgres... This could take a while")
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         directory_separator = '/'
         if is_windows:
             directory_separator = '\\'
-        if therapeutic_area is None:
-            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        backup_folder = os.getenv('CURRENT_DIRECTORY', '') + directory_separator + 'backup'
+
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        backup_database_and_container_files(docker_client, therapeutic_area_info, backup_folder)
+
     except KeyboardInterrupt:
         sys.exit(1)
 
-    try:
-        postgres_container = docker_client.containers.get("postgres")
-    except docker.errors.NotFound:
-        print("Postgres container not found. Could not create backup")
-        sys.exit(1)
-    postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1].split('-')[0]
 
-    container = docker_client.containers.run(image="postgres:" + postgres_version,
+def backup_database_and_container_files(docker_client: DockerClient,
+                                        therapeutic_area_info: TherapeuticArea,
+                                        backup_folder: str):
+    try:
+        print("Creating backup of running containers. This could take a while...")
+
+        environment_variables = {
+            'THERAPEUTIC_AREA': therapeutic_area_info.name,
+            'BACKUP_FOLDER': backup_folder
+        }
+
+        volumes = {
+            backup_folder: {
+                'bind': '/opt/backup',
+                'mode': 'rw'
+            }
+        }
+        volumes = add_docker_sock_volume_mapping(volumes)
+
+        container = docker_client.containers.run(image=get_local_backup_image_name_tag(therapeutic_area_info),
+                                                 remove=False,
+                                                 name='feder8-local-backup',
+                                                 network=therapeutic_area_info.name + '-net',
+                                                 environment=environment_variables,
+                                                 volumes=volumes,
+                                                 detach=True)
+        for l in container.logs(stream=True):
+            print(l.decode('UTF-8'), end='')
+
+        container = docker_client.containers.get(container.attrs['Name'])
+        container.stop()
+        container.remove(v=True)
+
+        if container.attrs['State']['ExitCode'] != 0:
+            print('Something went wrong while taking a backup. Exiting the installation script. '
+                  'If you continue to experience this error, please contact the Feder8 team.')
+            sys.exit(1)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def update_custom_concepts(therapeutic_area, email, cli_key):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+        connect_install_container_to_network(get_docker_client(), therapeutic_area_info)
+        email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+    except KeyboardInterrupt:
+        sys.exit(1)
+    pipeline = CustomConceptsUpdatePipeline(
+        docker_client=get_docker_client_facade(therapeutic_area_info, email, cli_key),
+        db_connection_details=get_database_connection_details(therapeutic_area))
+    pipeline.execute()
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def upgrade_database(therapeutic_area, email, cli_key):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        docker_client = get_docker_client()
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        registry = therapeutic_area_info.registry
+
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    network_names = [therapeutic_area.lower() + '-net']
+    container_names = ['pipeline-vocabulary-update']
+
+    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
+
+    vocab_upgrade_image_name_tag = get_vocabulary_update_image_name_tag(therapeutic_area_info)
+
+    print('Starting vocabulary upgrade... This could take a while.')
+    pull_image(docker_client, registry, vocab_upgrade_image_name_tag, email, cli_key)
+
+    environment_variables = {
+        'DB_HOST': 'postgres',
+        'THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'THERAPEUTIC_AREA_URL': registry.registry_url,
+        'DOCKER_USERNAME': email,
+        'DOCKER_PASSWORD': cli_key
+    }
+
+    volumes= {
+            'shared': {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            }
+        }
+
+    volumes = add_docker_sock_volume_mapping(volumes)
+
+    container = docker_client.containers.run(image=vocab_upgrade_image_name_tag,
+                                             name=container_names[0],
+                                             remove=False,
+                                             environment=environment_variables,
+                                             network=network_names[0],
+                                             volumes=volumes,
+                                             detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
+    print('Done upgrading vocabulary')
+
+    print('Update vocabulary and custom concepts... This could take a while.')
+
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
-                                            name='postgres-database-backup',
-                                            network=therapeutic_area_info.name + '-net',
+                                            name='shared-volume-permissions',
                                             volumes={
-                                                current_environment: {
-                                                    'bind': '/opt/database',
-                                                    'mode': 'rw'
-                                                },
                                                 'shared': {
                                                     'bind': '/var/lib/shared',
                                                     'mode': 'rw'
                                                 }
                                             },
-                                            command='bash -c \'set -e -o pipefail; echo "backing up OHDSI database... This could take a while"; source /var/lib/shared/honeur.env; export PGPASSWORD=${POSTGRES_PW}; cd /opt; pg_dump --create -h postgres -U postgres -f OHDSI.sql -d OHDSI; CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); tar -czf database/OHDSI_${CURRENT_TIME}.tar.gz OHDSI.sql; echo "Done backing up OHDSI database. File can be found at ' + current_environment + directory_separator + 'OHDSI-backup.gz"\'',
+                                            command='ash -c "chown 999:999 /var/lib/shared/honeur.env"',
                                             detach=True)
     for l in container.logs(stream=True):
-            print(l.decode('UTF-8'), end='')
+        print(l.decode('UTF-8'), end='')
     container.stop()
     container.remove(v=True)
 
-@init.command()
-def upgrade_database():
-    try:
-        docker_client = docker.from_env(timeout=3000)
-    except docker.errors.DockerException:
-        print('Error while fetching docker api... Is docker running?')
-        sys.exit(1)
-
+    print('Make sure file permissions are correct...')
+    container = docker_client.containers.run(image=alpine_image_tag,
+                                            remove=False,
+                                            name='shared-volume-permissions',
+                                            volumes={
+                                                'shared': {
+                                                    'bind': '/var/lib/shared',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            command='ash -c "chown 999:999 /var/lib/shared/honeur.env"',
+                                            detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
 
     new_pgdata_volume = docker_client.volumes.create("new-pgdata")
     postgres_container = docker_client.containers.get("postgres")
     postgres_container.stop()
     postgres_container.remove(v=True)
 
-    container = docker_client.containers.run(image="postgres:13",
+    postgres_13_image_tag = get_postgres_13_image_name_tag()
+
+    container = docker_client.containers.run(image=postgres_13_image_tag,
                                             remove=False,
                                             name='postgres',
                                             environment={
@@ -1846,7 +1918,9 @@ def upgrade_database():
     container.stop()
     container.remove(v=True)
 
-    container = docker_client.containers.run(image="tianon/postgres-upgrade:9.6-to-13",
+    tianon_postgres_upgrade_9_6_to_13_image_name_tag = get_tianon_postgres_upgrade_9_6_to_13_image_name_tag()
+
+    container = docker_client.containers.run(image=tianon_postgres_upgrade_9_6_to_13_image_name_tag,
                                             remove=False,
                                             name='postgres-data-upgrade',
                                             volumes={
@@ -1862,6 +1936,8 @@ def upgrade_database():
                                             detach=True)
     for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
 
 
     pgdata_volume = docker_client.volumes.get("pgdata")
@@ -1869,7 +1945,7 @@ def upgrade_database():
 
     docker_client.volumes.create("pgdata")
 
-    container = docker_client.containers.run(image="alpine",
+    container = docker_client.containers.run(image=alpine_image_tag,
                                             remove=False,
                                             name='postgres-data-upgrade',
                                             volumes={
@@ -1894,69 +1970,137 @@ def upgrade_database():
 
 
 @init.command()
+def is_pgdata_corrupt():
+    docker_client = get_docker_client()
+
+    try:
+        docker_client.volumes.get("pgdata")
+    except docker.errors.NotFound:
+        print('Database volume not found... No sanity checks to be done.')
+        return False
+
+    print('Postgres pgdata volume found. preparing sanity check on database...')
+
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        postgres_running = postgres_container.attrs['State']['Status'] == 'running'
+        postgres_container.stop()
+    except docker.errors.NotFound:
+        postgres_running = False
+        pass
+
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    pgdata_postgres_version = docker_client.containers.run(image=alpine_image_tag,
+                                                            remove=True,
+                                                            name='database',
+                                                            volumes={
+                                                                'pgdata': {
+                                                                    'bind': '/opt/data',
+                                                                    'mode': 'ro'
+                                                                }
+                                                            },
+                                                            command='ash -c "cd /opt/data; cat /opt/data/PG_VERSION || echo 0"').rstrip().decode('UTF-8')
+
+    postgres_9_6_image_name_tag = get_postgres_9_6_image_name_tag()
+    postgres_13_image_name_tag = get_postgres_13_image_name_tag()
+
+    if pgdata_postgres_version.startswith('9.6'):
+        container = docker_client.containers.run(image=postgres_9_6_image_name_tag,
+                                                remove=False,
+                                                name='postgres-sanity-check',
+                                                volumes={
+                                                    'pgdata': {
+                                                        'bind': '/var/lib/postgresql/data',
+                                                        'mode': 'rw'
+                                                    }
+                                                },
+                                                detach=True)
+        time.sleep(20)
+
+        container.reload()
+
+        postgres_sanity_check_running = container.attrs['State']['Running'] == True
+        container.stop()
+        container.remove(v=True)
+
+        if not postgres_sanity_check_running:
+            print('Postgres sanity check complete... pgdata volume is corrupt.')
+            return True
+
+    elif pgdata_postgres_version.startswith('13'):
+        container = docker_client.containers.run(image=postgres_13_image_name_tag,
+                                                remove=False,
+                                                name='postgres-sanity-check',
+                                                volumes={
+                                                    'pgdata': {
+                                                        'bind': '/var/lib/postgresql/data',
+                                                        'mode': 'rw'
+                                                    }
+                                                },
+                                                detach=True)
+        time.sleep(20)
+
+        container.reload()
+
+        postgres_sanity_check_running = container.attrs['State']['Running'] == True
+        container.stop()
+        container.remove(v=True)
+
+        if not postgres_sanity_check_running:
+            print('Postgres sanity check complete... pgdata volume is corrupt.')
+            return True
+    else:
+        print('Could not determine version of postgres volume')
+        print('Postgres sanity check complete... pgdata volume is corrupt.')
+        return True
+
+    print('Postgres sanity check complete... pgdata volume is ok.')
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        if postgres_running:
+            postgres_container.start()
+    except docker.errors.NotFound:
+        pass
+    return False
+
+
+def remove_postgres_and_pgdata_volume():
+    docker_client = get_docker_client()
+
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        postgres_container.stop()
+        postgres_container.remove(v=True)
+        print('Stopping and removing postgres container because pgdata volume is connected to this container.')
+    except docker.errors.NotFound:
+        pass
+
+    try:
+        docker_client.volumes.get("pgdata").remove()
+        print('pgdata removed.')
+    except docker.errors.NotFound:
+        pass
+
+
+@init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-@click.option('-up', '--user-password')
-@click.option('-ap', '--admin-password')
-@click.option('-h', '--host')
-@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
-@click.option('-lu', '--ldap-url')
-@click.option('-ldn', '--ldap-dn')
-@click.option('-lbdn', '--ldap-base-dn')
-@click.option('-lsu', '--ldap-system-username')
-@click.option('-lsp', '--ldap-system-password')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
-@click.option('-u', '--username')
-@click.option('-p', '--password')
-@click.pass_context
-def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, username, password):
+def fix_default_privileges(therapeutic_area, email, cli_key):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        registry = therapeutic_area_info.registry
 
-        try:
-            docker_client.volumes.get("pgdata")
-            clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
-            if clean_install:
-                backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
-                if backup_pgdata:
-                    ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                ctx.invoke(clean, therapeutic_area=therapeutic_area)
-            else:
-                postgres_container = docker_client.containers.get("postgres")
-                postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
-                if '9.6' in postgres_version:
-                    backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
-                    if backup_pgdata:
-                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database)
-        except docker.errors.NotFound:
-            pass
-
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -1964,53 +2108,32 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
     except KeyboardInterrupt:
         sys.exit(1)
 
-    ctx.invoke(config_server, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    fix_default_privileges_image_tag = get_fix_default_privileges_image_name_tag(therapeutic_area_info)
 
-    try:
-        if user_password is None:
-            user_password = configuration.get_configuration('feder8.local.datasource.password')
-        if admin_password is None:
-            admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
-        if host is None:
-            host = configuration.get_configuration('feder8.local.host.name')
+    pull_image(docker_client,registry, fix_default_privileges_image_tag, email, cli_key)
 
-        if security_method is None:
-            security_method = configuration.get_configuration('feder8.local.security.security-method')
+    print('Starting fix-default-privileges container...')
 
-        if security_method == 'LDAP':
-            if ldap_url is None:
-                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
-            if ldap_dn is None:
-                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
-            if ldap_base_dn is None:
-                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
-            if ldap_system_username is None:
-                ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
-            if ldap_system_password is None:
-                ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
+    socket_gid = os.stat("/var/run/docker.sock").st_gid
+    volumes = {}
+    volumes = add_docker_sock_volume_mapping(volumes)
 
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
+    container = docker_client.containers.run(
+        image = fix_default_privileges_image_tag,
+        remove = False,
+        name = 'postgres-fix-default-privileges',
+        volumes = volumes,
+        group_add=[socket_gid, 0],
+        detach = True)
 
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
 
-        if security_method != 'None':
-            if username is None:
-                username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+    container.stop()
+    container.remove(v=True)
 
-            if password is None:
-                password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
-    except KeyboardInterrupt:
-        sys.exit(1)
+    print('Done fix-default-privileges container')
 
-    ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
-    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    if security_method != 'None':
-        ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
-    ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -2031,60 +2154,55 @@ def essentials(ctx, therapeutic_area, email, cli_key, user_password, admin_passw
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 @click.option('-o', '--organization')
-@click.option('-rud', '--rstudio-upload-dir')
-@click.option('-vud', '--vscode-upload-dir')
+@click.option('-edr', '--enable-docker-runner')
+@click.option('-edoh', '--expose-database-on-host')
+@click.option('-es', '--enable-ssl')
+@click.option('-cd', '--certificate-directory')
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, rstudio_upload_dir, vscode_upload_dir):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
         try:
             docker_client.volumes.get("pgdata")
+            pgdata_corrupt = ctx.invoke(is_pgdata_corrupt)
+            if pgdata_corrupt:
+                remove_pgdata = questionary.confirm("pgdata volume is corrupt. This is probably a result of a previous failed installation. Would you like to remove the corrupt pgdata volume?").unsafe_ask()
+                if remove_pgdata:
+                    remove_postgres_and_pgdata_volume()
             clean_install = questionary.confirm("A previous installation was found on your system. Would you like to remove the previous installation?").unsafe_ask()
             if clean_install:
-                backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
-                if backup_pgdata:
-                    ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                if not pgdata_corrupt:
+                    backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
+                    if backup_pgdata:
+                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
                 ctx.invoke(clean, therapeutic_area=therapeutic_area)
-            else:
+            elif not clean_install and not pgdata_corrupt:
                 postgres_container = docker_client.containers.get("postgres")
                 postgres_version = postgres_container.attrs['Config']['Image'].split(':')[1]
                 if '9.6' in postgres_version:
                     backup_pgdata = questionary.confirm("The new installation will provide an upgraded database. Would you like to create a backup file of your database before upgrading?").unsafe_ask()
                     if backup_pgdata:
                         ctx.invoke(backup, therapeutic_area=therapeutic_area)
-                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area)
+                    ctx.invoke(upgrade_database, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+            else:
+                print('postgres database volume pgdata is corrupt so the installation cannot continue. Please remove the previous installation using the installation script or manually delete postgres container and pgdata volume.')
+                sys.exit(1)
         except docker.errors.NotFound:
             pass
-
-
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-        if email is None:
-            email = configuration.get_configuration('feder8.central.service.image-repo-username')
-        if cli_key is None:
-            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -2118,28 +2236,41 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if notebook_directory is None:
             notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
-        if feder8_studio_directory is None:
-            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+        install_feder8_studio = questionary.confirm("Do you want to install Feder8 Studio?").unsafe_ask()
 
-        if security_method != 'None':
-            if username is None:
-                username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if install_feder8_studio:
+            if feder8_studio_directory is None:
+                feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
 
-            if password is None:
-                password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+        install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
 
-        if organization is None:
-            organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).unsafe_ask()
+        if install_distributed_analytics:
+            if organization is None:
+                organization = questionary.select("Name of organization?", choices=therapeutic_area_info.organizations).unsafe_ask()
+        if username is None:
+            username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+        if password is None:
+            password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+        if enable_docker_runner is None:
+            enable_docker_runner = questionary.confirm("Do you want to enable support for Docker based analysis scripts?").unsafe_ask()
+        if expose_database_on_host is None:
+            expose_database_on_host = questionary.confirm("Do you want to expose the postgres database on your host through port 5444?").unsafe_ask()
+        if enable_ssl is None:
+            enable_ssl = questionary.confirm('Do you want to enable HTTPS? Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".').unsafe_ask()
+        if enable_ssl:
+            if certificate_directory is None:
+                certificate_directory = configuration.get_configuration('feder8.local.host.ssl-cert-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
-    ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host)
-    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
+    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
+    ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
-    ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
-    ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, rstudio_upload_dir=rstudio_upload_dir, vscode_upload_dir=vscode_upload_dir)
-    ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    if install_distributed_analytics:
+        ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
+    if install_feder8_studio:
+        ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)

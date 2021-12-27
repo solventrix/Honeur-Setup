@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 DOCKER_HOST_IP=172.17.0.1
 DOCKER_SERVICE_DIR="/etc/systemd/system/docker.service.d"
 
@@ -16,7 +18,7 @@ unset DOCKER_TLS_VERIFY
 echo "01a. Create policy file"
 echo -n "" > $CERTIFICATE_FOLDER/policy.json
 echo '{"name":"full-access","users":["", "host"],"actions":[""]}' >> $CERTIFICATE_FOLDER/policy.json
-echo '{"name":"honeur-studio","users":["honeur-studio"],"actions":["container_create","container_inspect","container_logs","container_start","container_delete","network_connect","network_disconnect"]}' >> $CERTIFICATE_FOLDER/policy.json
+echo '{"name":"honeur-studio","users":["feder8"],"actions":["container_create","container_inspect","container_logs","container_start","container_delete","network_connect","network_disconnect"]}' >> $CERTIFICATE_FOLDER/policy.json
 echo "01b. Stop and remove authorization broker container if exists"
 docker stop authz-broker > /dev/null 2>&1 || true
 docker rm authz-broker > /dev/null 2>&1 || true

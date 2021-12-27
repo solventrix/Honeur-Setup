@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eux
 
-VERSION=2.0.1
+VERSION=2.0.13
 TAG=$VERSION
 
-docker build --pull --rm -f "Dockerfile" -t feder8/install-script:$TAG "."
+docker build --no-cache --pull --rm -f "Dockerfile" -t feder8/install-script:$TAG "."

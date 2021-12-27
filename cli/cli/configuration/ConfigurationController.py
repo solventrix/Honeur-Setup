@@ -1,9 +1,8 @@
 from cli.globals import Globals
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
-from cli.configuration.environment import Environment
 from cli.configuration.questionary_environment import QuestionaryEnvironment
 from cli.configuration.config_server_environment import ConfigurationServerEnvironment
-from config.spring import ConfigClient
+from cli.configuration.DatabaseConnectionDetails import DatabaseConnectionDetails
 
 
 class ConfigurationController:
@@ -18,3 +17,18 @@ class ConfigurationController:
         if response == '':
             response = self.question_environment.get_configuration(key)
         return response
+
+    def get_image_repo_credentials(self):
+        email = self.get_configuration('feder8.central.service.image-repo-username')
+        cli_key = self.get_configuration('feder8.central.service.image-repo-key')
+        return email, cli_key
+
+    def get_database_connection_details(self):
+        return DatabaseConnectionDetails(
+            db_host = 'postgres',
+            db_port = '5432',
+            db_name='OHDSI',
+            db_username=self.get_configuration('feder8.local.datasource.admin-username'),
+            db_password=self.get_configuration('feder8.local.datasource.admin-password'),
+            db_schema=self.get_configuration('feder8.local.datasource.vocabulary-schema')
+        )

@@ -1,4 +1,8 @@
+#!/usr/bin/env bash
 set -e
+
+TAG=2.0.12
+REGISTRY=harbor-dev.honeur.org
 
 docker volume create new-pgdata
 
@@ -18,5 +22,5 @@ docker run --rm -it -v new-pgdata:/from -v pgdata:/to alpine ash -c "cd /from ; 
 
 docker volume remove new-pgdata
 
-docker pull harbor-dev.honeur.org/library/install-script:2.0.1
-docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock harbor-dev.honeur.org/library/install-script:2.0.1 feder8 init postgres
+docker pull ${REGISTRY}/library/install-script:${TAG}
+docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock ${REGISTRY}/library/install-script:${TAG} feder8 init postgres
