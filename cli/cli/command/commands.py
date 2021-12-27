@@ -270,6 +270,9 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.7')
 
+def get_task_manager_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.0')
+
 
 def get_nginx_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.8')
@@ -1055,51 +1058,47 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-@click.option('-h', '--host')
+@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
+@click.option('-au', '--admin-username')
+@click.option('-ap', '--admin-password')
+@click.option('-fsd', '--feder8-studio-directory')
 @click.option('-rud', '--rstudio-upload-dir')
 @click.option('-vud', '--vscode-upload-dir')
-def task_manager(therapeutic_area, email, cli_key, host, rstudio_upload_dir, vscode_upload_dir):
+def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, security_method, admin_username, admin_password, rstudio_upload_dir, vscode_upload_dir):
     try:
-        current_environment = os.getenv('CURRENT_DIRECTORY', '')
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
-        try:
-            docker_client = docker.from_env(timeout=3000)
-        except docker.errors.DockerException:
-            print('Error while fetching docker api... Is docker running?')
-            sys.exit(1)
+        docker_client = get_docker_client()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        try:
-            ta_network = docker_client.networks.get(therapeutic_area_info.name + "-net")
-        except docker.errors.NotFound:
-            ta_network = docker_client.networks.create(therapeutic_area_info.name + "-net", check_duplicate=True)
-        install_container = docker_client.containers.get("feder8-installer")
-
-        try:
-            ta_network.connect(install_container)
-        except docker.errors.APIError:
-            pass
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
 
-        configuration:ConfigurationController = ConfigurationController(therapeutic_area, current_environment, is_windows)
-
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
-        if host is None:
-            host = configuration.get_configuration("feder8.local.host.name")
+
+        if feder8_studio_directory is None:
+            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
 
         if rstudio_upload_dir is None:
             rstudio_upload_dir = 'r-scripts'
         if vscode_upload_dir is None:
             vscode_upload_dir = 'scripts'
 
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
+
+        if security_method == 'LDAP':
+            if admin_username is None:
+                admin_username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
+            if admin_password is None:
+                admin_password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -1107,52 +1106,34 @@ def task_manager(therapeutic_area, email, cli_key, host, rstudio_upload_dir, vsc
     volume_names = ['feder8-config-server']
     container_names = ['task-manager', 'config-server-update-configuration']
 
-    networks = check_networks_and_create_if_not_exists(docker_client, network_names)
-    volumes = check_volumes_and_create_if_not_exists(docker_client, volume_names)
-    check_containers_and_remove_if_not_exists(docker_client, container_names)
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
-    init_config_repo = '/'.join([registry.registry_url, registry.project, 'config-server'])
-    init_config_tag = 'update-configuration-2.0.1'
-    init_config_image = ':'.join([init_config_repo, init_config_tag])
-    pull_image(docker_client,registry, init_config_image, email, cli_key)
-
-    print('Updating configuration in config-server...')
-    environment_variables = {
+    config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
     }
-    run_container(
-        docker_client=docker_client,
-        image=init_config_image,
-        remove=True,
-        name=container_names[1],
-        environment=environment_variables,
-        network=network_names[0],
-        volumes={
-            volume_names[0]: {
-                'bind': '/home/feder8/config-repo',
-                'mode': 'rw'
-            }
-        },
-        detach=True,
-        show_logs=True)
+    if security_method == 'None':
+        config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+    else:
+        if security_method == 'LDAP':
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            config_update['FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME'] = admin_username,
+            config_update['FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD'] = admin_password
+        else:
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
 
-    try:
-        docker_client.containers.get("local-portal")
-        url = 'http://local-portal:8080/portal/actuator/refresh'
-        requests.post(url)
-    except docker.errors.NotFound:
-        pass
+    update_config_on_config_server(docker_client=docker_client,
+                                   email=email, cli_key=cli_key,
+                                   therapeutic_area_info=therapeutic_area_info,
+                                   config_update=config_update)
 
-    print('Done updating configuration in config-server')
+    task_manager_image_name_tag = get_task_manager_image_name_tag(therapeutic_area_info)
 
-    task_manager_repo = '/'.join([registry.registry_url, registry.project, 'task-manager'])
-    task_manager_tag = '2.0.0'
-    task_manager_image = ':'.join([task_manager_repo, task_manager_tag])
-
-    pull_image(docker_client, registry, task_manager_image, email, cli_key)
+    pull_image(docker_client, registry, task_manager_image_name_tag, email, cli_key)
 
     print('Starting Task Manager container...')
     environment_variables = {
@@ -1170,11 +1151,21 @@ def task_manager(therapeutic_area, email, cli_key, host, rstudio_upload_dir, vsc
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'SERVER_SERVLET_CONTEXT_PATH': '/task-manager',
     }
+    if security_method == 'LDAP':
+        environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
+        environment_variables['FEDER8_IN_MEMORY_AUTH_ENABLED'] = 'true'
+        environment_variables['FEDER8_IN_MEMORY_AUTH_USERNAME'] = admin_username
+        environment_variables['FEDER8_IN_MEMORY_AUTH_PASSWORD'] = admin_password
+    elif security_method == 'JDBC':
+        environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
+        environment_variables['FEDER8_IN_MEMORY_AUTH_ENABLED'] = 'false'
+    else:
+        environment_variables['FEDER8_SECURITY_ENABLED'] = 'false'
 
-    studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory') + '/sites/' + therapeutic_area_info.name + 'studio'
+    studio_directory = feder8_studio_directory + '/sites/' + therapeutic_area_info.name + 'studio'
 
     container = docker_client.containers.run(
-        image=task_manager_image,
+        image=task_manager_image_name_tag,
         name=container_names[0],
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
@@ -2273,4 +2264,5 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
     if install_feder8_studio:
         ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, feder8_studio_directory=feder8_studio_directory, security_method=security_method, admin_username=username, admin_password=password, rstudio_upload_dir=None, vscode_upload_dir=None)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
