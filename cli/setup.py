@@ -34,7 +34,8 @@ setup(
         'questionary==1.10.0',
         'config-client==0.12.0',
         'six==1.16.0',
-        'StringGenerator==0.4.4'
+        'StringGenerator==0.4.4',
+        'psycopg2-binary==2.9.2'
     ],
     extras_require={
         'dev': [

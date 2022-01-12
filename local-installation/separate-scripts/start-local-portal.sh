@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TAG=2.0.12
+TAG=2.0.13
 REGISTRY=harbor.honeur.org
 
 if [[ $OSTYPE == 'darwin'* ]]; then

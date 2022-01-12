@@ -35,7 +35,7 @@ The docker images required to run the full setup are located on a central reposi
 
   * For HONEUR: https://portal.honeur.org
   * For PHederation: https://portal.phederation.org
-  * For Esfurn: https://portal.esfurn.org
+  * For ESFURN: https://portal.esfurn.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -53,7 +53,7 @@ Only the Feder8 central services should be accessible from within the local inst
   * https://harbor.phederation.org
   * https://catalogue.phederation.org
   * https://distributed-analytics.phederation.org
-* For Esfurn: 
+* For ESFURN: 
   * https://cas.esfurn.org
   * https://harbor.esfurn.org
   * https://catalogue.esfurn.org
