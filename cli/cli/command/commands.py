@@ -1580,6 +1580,9 @@ def backup(therapeutic_area, email, cli_key):
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
+        if email is None:
+            email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+
         backup_database_and_container_files(docker_client=docker_client, email=email, cli_key=cli_key,
                                             therapeutic_area_info=therapeutic_area_info,
                                             backup_folder=backup_folder)
