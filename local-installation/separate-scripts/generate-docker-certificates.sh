@@ -2,7 +2,10 @@
 # Script to protect the Docker daemon socket by use of TLS (HTTPS)
 # Peter Moorthamer - 25/Feb/2021
 
-DOCKER_HOST_IP=172.17.0.1
+DOCKER_HOSTNAME=$HOSTNAME
+read -p "Enter / confirm the DNS name or hostname of this server [$HOSTNAME]: " DOCKER_HOSTNAME
+DOCKER_HOSTNAME=${DOCKER_HOSTNAME:-$HOSTNAME}
+
 VALIDITY_DAYS=730
 CERTIFICATE_FOLDER=certificates
 
@@ -30,16 +33,16 @@ read -p "Enter password for CA certificate [$GEN_CA_PWD]: " CA_PWD
 CA_PWD=${CA_PWD:-$GEN_CA_PWD}
 openssl genrsa -aes256 -out ca-key.pem -passout pass:$CA_PWD 4096
 echo "01b. Create ca.pem"
-openssl req -new -passin pass:$CA_PWD -x509 -days $VALIDITY_DAYS -subj "/C=BE/ST=Antwerp/L=Beerse/O=FEDER8/OU=Data Sciences/CN=$DOCKER_HOST_IP" -key ca-key.pem -sha256 -out ca.pem
+openssl req -new -passin pass:$CA_PWD -x509 -days $VALIDITY_DAYS -subj "/C=BE/ST=Antwerp/L=Beerse/O=FEDER8/OU=Data Sciences/CN=$DOCKER_HOSTNAME" -key ca-key.pem -sha256 -out ca.pem
 
 # Create server keys
 echo "02a. Create server-key.pem"
 openssl genrsa -out server-key.pem 4096
 echo "02b. Create server.csr"
-openssl req -subj "/CN=$DOCKER_HOST_IP" -sha256 -new -key server-key.pem -out server.csr
+openssl req -subj "/CN=$DOCKER_HOSTNAME" -sha256 -new -key server-key.pem -out server.csr
 echo "02c. Create server-cert.pem"
 echo -n "" > extfile.cnf
-echo subjectAltName = DNS:$DOCKER_HOST_IP,IP:$DOCKER_HOST_IP,IP:127.0.0.1 >> extfile.cnf
+echo subjectAltName = DNS:$DOCKER_HOSTNAME,IP:127.0.0.1 >> extfile.cnf
 echo extendedKeyUsage = serverAuth >> extfile.cnf
 openssl x509 -req -passin pass:$CA_PWD -days $VALIDITY_DAYS -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf
 

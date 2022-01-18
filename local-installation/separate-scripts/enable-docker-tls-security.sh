@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-DOCKER_HOST_IP=172.17.0.1
 DOCKER_SERVICE_DIR="/etc/systemd/system/docker.service.d"
+DOCKER_HOST_IP=172.17.0.1
+DOCKER_HOSTNAME=$HOSTNAME
+read -p "Enter / confirm the DNS name or hostname of this server [$HOSTNAME]: " DOCKER_HOSTNAME
+DOCKER_HOSTNAME=${DOCKER_HOSTNAME:-$HOSTNAME}
 
 read -p "Enter the folder containing the certificates [$PWD/certificates]: " CERTIFICATE_FOLDER
 CERTIFICATE_FOLDER=${CERTIFICATE_FOLDER:-$PWD/certificates}
@@ -40,7 +43,7 @@ echo "02. Secure Docker service"
 echo -n "" > override.conf
 echo "[Service]" >> override.conf
 echo "ExecStart=" >> override.conf
-echo "ExecStart=/usr/bin/dockerd --tlsverify --tlscacert=$CERTIFICATE_FOLDER/ca.pem --tlscert=$CERTIFICATE_FOLDER/server-cert.pem --tlskey=$CERTIFICATE_FOLDER/server-key.pem -H=$DOCKER_HOST_IP:2376 -H fd:// --containerd=/run/containerd/containerd.sock --authorization-plugin=authz-broker \$OPTIONS \$DOCKER_STORAGE_OPTIONS \$DOCKER_ADD_RUNTIMES" >> override.conf
+echo "ExecStart=/usr/bin/dockerd --tlsverify --tlscacert=$CERTIFICATE_FOLDER/ca.pem --tlscert=$CERTIFICATE_FOLDER/server-cert.pem --tlskey=$CERTIFICATE_FOLDER/server-key.pem -H=0.0.0.0:2376 -H fd:// --containerd=/run/containerd/containerd.sock --authorization-plugin=authz-broker \$OPTIONS \$DOCKER_STORAGE_OPTIONS \$DOCKER_ADD_RUNTIMES" >> override.conf
 sudo cp override.conf $DOCKER_SERVICE_DIR"/override.conf"
 echo "Restarting Docker..."
 sudo systemctl daemon-reload
@@ -53,5 +56,5 @@ cp -v $CERTIFICATE_FOLDER/host-client-key.pem ~/.docker/key.pem
 cp -v $CERTIFICATE_FOLDER/host-client-cert.pem ~/.docker/cert.pem
 cp -v $CERTIFICATE_FOLDER/ca.pem ~/.docker
 export DOCKER_HOST_IP=172.17.0.1
-export DOCKER_HOST=tcp://$DOCKER_HOST_IP:2376 DOCKER_TLS_VERIFY=1
+export DOCKER_HOST=tcp://$DOCKER_HOSTNAME:2376 DOCKER_TLS_VERIFY=1
 #echo "export DOCKER_HOST=tcp://$DOCKER_HOST_IP:2376 DOCKER_TLS_VERIFY=1" >> ~/.bashrc
