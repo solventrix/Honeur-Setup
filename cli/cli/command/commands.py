@@ -1695,7 +1695,9 @@ def remove_image(docker_client:DockerClient, image_name_tag):
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
-def backup(therapeutic_area):
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def backup(therapeutic_area, email, cli_key):
     try:
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         directory_separator = '/'
@@ -1714,17 +1716,25 @@ def backup(therapeutic_area):
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        backup_database_and_container_files(docker_client, therapeutic_area_info, backup_folder)
+        if email is None:
+            email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+
+        backup_database_and_container_files(docker_client=docker_client, email=email, cli_key=cli_key,
+                                            therapeutic_area_info=therapeutic_area_info,
+                                            backup_folder=backup_folder)
 
     except KeyboardInterrupt:
         sys.exit(1)
 
 
-def backup_database_and_container_files(docker_client: DockerClient,
+def backup_database_and_container_files(docker_client: DockerClient, email, cli_key,
                                         therapeutic_area_info: TherapeuticArea,
                                         backup_folder: str):
     try:
         print("Creating backup of running containers. This could take a while...")
+
+        registry = therapeutic_area_info.registry
+        pull_image(docker_client, registry, get_local_backup_image_name_tag(therapeutic_area_info), email, cli_key)
 
         environment_variables = {
             'THERAPEUTIC_AREA': therapeutic_area_info.name,
@@ -1971,7 +1981,7 @@ def is_pgdata_corrupt():
         print('Database volume not found... No sanity checks to be done.')
         return False
 
-    print('Postgres pgdata volume found. preparing sanity check on database...')
+    print('Postgres pgdata volume found. Preparing sanity check on database...')
 
     try:
         postgres_container = docker_client.containers.get("postgres")
@@ -2180,7 +2190,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                 if not pgdata_corrupt:
                     backup_pgdata = questionary.confirm("Would you like to create a backup file of your database first?").unsafe_ask()
                     if backup_pgdata:
-                        ctx.invoke(backup, therapeutic_area=therapeutic_area)
+                        ctx.invoke(backup, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
                 ctx.invoke(clean, therapeutic_area=therapeutic_area)
             elif not clean_install and not pgdata_corrupt:
                 postgres_container = docker_client.containers.get("postgres")
