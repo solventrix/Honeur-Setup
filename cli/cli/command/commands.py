@@ -240,7 +240,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.6')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.7')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
@@ -269,6 +269,7 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.7')
+
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.0')
@@ -1185,7 +1186,6 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
     print('Done starting Task Manager container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
-
 
 
 @init.command()
