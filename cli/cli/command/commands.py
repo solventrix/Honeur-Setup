@@ -328,6 +328,31 @@ def get_database_connection_details(therapeutic_area, configuration: Configurati
         configuration = get_configuration(therapeutic_area)
     return configuration.get_database_connection_details()
 
+def create_or_update_host_folder_with_correct_ownership(directory: str, owner: int, group: int):
+    docker_client = get_docker_client()
+
+    alpine_image_tag = get_alpine_image_name_tag()
+
+    print('Create or update folder permissions for ' + directory + ' on host machine ...')
+
+    container = docker_client.containers.run(image=alpine_image_tag,
+                                            remove=False,
+                                            name='create-update-folder-permissions',
+                                            volumes={
+                                                directory: {
+                                                    'bind': '/opt/folder',
+                                                    'mode': 'rw'
+                                                }
+                                            },
+                                            command='ash -c "chown -R ' + str(owner) + ':' + str(group) + ' /opt/folder"',
+                                            detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+    container.stop()
+    container.remove(v=True)
+
+    print('Done creating or updating folder permissions for ' + directory + ' on host machine ...')
+
 
 @click.group()
 def init():
@@ -1165,6 +1190,7 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'false'
 
     studio_directory = feder8_studio_directory + '/sites/' + therapeutic_area_info.name + 'studio'
+    create_or_update_host_folder_with_correct_ownership(studio_directory, 54321, 54321)
 
     container = docker_client.containers.run(
         image=task_manager_image_name_tag,
@@ -1453,6 +1479,9 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
             'bind': '/var/run/docker.sock',
             'mode': 'rw'
         }
+
+    create_or_update_host_folder_with_correct_ownership(feder8_studio_directory, 54321, 54321)
+
     container = docker_client.containers.run(
         image=feder8_studio_image_name_tag,
         name=container_names[0],
