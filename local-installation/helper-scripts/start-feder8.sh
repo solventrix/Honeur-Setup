@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TAG=2.0.14
+TAG=2.0.15
 REGISTRY=harbor-dev.honeur.org
 
 if systemctl show --property ActiveState docker &> /dev/null; then
