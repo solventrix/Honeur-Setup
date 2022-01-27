@@ -228,7 +228,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.5')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.7')
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
@@ -276,7 +276,7 @@ def get_nginx_image_name_tag(therapeutic_area_info):
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.2')
 
 
 def get_local_backup_image_name_tag(therapeutic_area_info):
