@@ -264,11 +264,11 @@ def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
 
 
 def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.5')
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.8')
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
@@ -1298,16 +1298,13 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     print('Starting Distributed Analytics Remote container...')
     environment_variables = {
-        'DISTRIBUTED_SERVICE_CLIENT_HOST': therapeutic_area_info.distributed_analytics_url,
-        'DISTRIBUTED_SERVICE_CLIENT_BIND': '',
-        'LOCAL_CONFIGURATION_CLIENT_HOST': 'local-portal',
-        'LOCAL_CONFIGURATION_CLIENT_BIND': 'portal',
-        'LOCAL_CONFIGURATION_CLIENT_API': 'api',
+        'LOCAL_PORTAL_CLIENT_HOST': 'local-portal',
+        'LOCAL_PORTAL_CLIENT_BIND': 'portal',
+        'LOCAL_PORTAL_CLIENT_API': 'api',
         'R_SERVER_CLIENT_HOST': 'distributed-analytics-r-server',
         'R_SERVER_CLIENT_PORT': '8080',
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
-        'FEDER8_ANALYTICS_ORGANIZATION': organization,
         'FEDER8_DATA_DIRECTORY': volume_names[0],
         'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
