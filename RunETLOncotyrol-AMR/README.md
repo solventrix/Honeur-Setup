@@ -21,6 +21,7 @@
     * the tag name for the Docker Hub image
     * the verbosity level [DEBUG, INFO, WARNING, ERROR]
     * the filename
+    * the date of last update of the data-export, double-quoted, example: "2021-06-30"
 5. The script will run the ETL code and show the output of the code
 6. The `etl.log` log file will be available in the `log` folder
 7. Review the log file to verify that there is no patient-level information.
