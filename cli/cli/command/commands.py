@@ -25,6 +25,10 @@ log.addHandler(logging.StreamHandler())
 log.setLevel(logging.WARNING)
 
 
+def get_default_feder8_central_environment() -> str:
+    return "DEV"
+
+
 def get_docker_client() -> DockerClient:
     try:
         return docker.from_env(timeout=3000)
@@ -644,6 +648,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             'FEDER8_LOCAL_ADMIN_USERNAME': username,
             'FEDER8_LOCAL_ADMIN_PASSWORD': password,
             'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
+            'FEDER8_CENTRAL_SERVICE_ENVIRONMENT': get_default_feder8_central_environment(),
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
             'SERVER_SERVLET_CONTEXT_PATH': '/portal',
             'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
