@@ -1260,6 +1260,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
+        'FEDER8_LOCAL_ORGANIZATION': organization,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
