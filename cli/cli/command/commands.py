@@ -1303,6 +1303,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     pull_image(docker_client, registry, distributed_analytics_remote_image_name_tag, email, cli_key)
 
     print('Starting Distributed Analytics Remote container...')
+    data_directory = '/home/feder8/data'
     environment_variables = {
         'LOCAL_PORTAL_CLIENT_HOST': 'local-portal',
         'LOCAL_PORTAL_CLIENT_BIND': 'portal',
@@ -1311,7 +1312,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         'R_SERVER_CLIENT_PORT': '8080',
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
-        'FEDER8_DATA_DIRECTORY': volume_names[0],
+        'FEDER8_DATA_DIRECTORY': data_directory,
         'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
@@ -1324,7 +1325,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         network=network_names[0],
         volumes={
             volume_names[0]: {
-                'bind': '/home/feder8/data',
+                'bind': data_directory,
                 'mode': 'rw'
             }
         },
