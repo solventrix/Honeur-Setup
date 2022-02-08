@@ -1313,6 +1313,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         'DOCKER_RUNNER_CLIENT_HOST': 'local-portal',
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_DATA_DIRECTORY': data_directory,
+        'FEDER8_DATA_DOCKER_VOLUME': volume_names[0],
         'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
