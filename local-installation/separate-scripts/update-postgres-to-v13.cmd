@@ -1,7 +1,7 @@
 @ECHO off
 
 SET TAG=2.0.16
-SET REGISTRY=harbor-dev.honeur.org
+SET REGISTRY=harbor-uat.honeur.org
 
 docker volume create new-pgdata
 

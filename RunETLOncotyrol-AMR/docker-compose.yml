@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   etl:
-    image: harbor-dev.honeur.org/etl-oncotyrol/etl:current
+    image: harbor-uat.honeur.org/etl-oncotyrol/etl:current
     volumes:
       - "./log:/log"
       - "data_folder:/data"
