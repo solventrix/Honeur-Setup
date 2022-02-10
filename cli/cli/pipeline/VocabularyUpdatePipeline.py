@@ -106,7 +106,7 @@ class VoacabularyUpdatePipeline:
         return self._docker_client.get_image_name_tag('postgres', 'omopcdm-update-vocabulary-2.0.0')
 
     def get_update_custom_concepts_image_name_tag(self):
-        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-update-custom-concepts-2.4')
+        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-update-custom-concepts-2.5')
 
     def get_rebuild_concept_hierarchy_image_name_tag(self):
         return self._docker_client.get_image_name_tag('postgres', 'results-rebuild-concept-hierarchy-2.0.1')
