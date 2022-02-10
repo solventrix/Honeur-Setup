@@ -276,7 +276,7 @@ def get_feder8_studio_image_name_tag(therapeutic_area_info):
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.0')
+    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.1')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
