@@ -1057,6 +1057,8 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         'DATASOURCE_DRIVER_CLASS_NAME': 'org.postgresql.Driver',
         'DATASOURCE_URL': 'jdbc:postgresql://postgres:5432/OHDSI?currentSchema=webapi',
         'WEBAPI_ADMIN_USERNAME': 'ohdsi_admin_user',
+        'FEDER8_THERAPEUTIC_AREA_FAVICON_LOCATION': '/images/' + therapeutic_area_info.name + '-favicon.ico',
+        'FEDER8_THERAPEUTIC_AREA_LOGO_LOCATION': '/images/' + therapeutic_area_info.name + '-logo.png',
         'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     container = docker_client.containers.run(
@@ -1177,7 +1179,9 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_IS_CENTRAL': 'false',
         'SERVER_SERVLET_CONTEXT_PATH': '/task-manager',
-        'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name
+        'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
+        'FEDER8_THERAPEUTIC_AREA_FAVICON_LOCATION': '/images/' + therapeutic_area_info.name + '-favicon.ico',
+        'FEDER8_THERAPEUTIC_AREA_LOGO_LOCATION': '/images/' + therapeutic_area_info.name + '-logo.png',
     }
     if security_method == 'LDAP':
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
