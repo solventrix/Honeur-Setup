@@ -809,13 +809,8 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
     print('Starting Atlas container...')
     environment_variables = {
         'FEDER8_ATLAS_CENTRAL': 'false',
+        'FEDER8_WEBAPI_URL': '/webapi/'
     }
-
-    if enable_ssl:
-        environment_variables['FEDER8_WEBAPI_URL'] = 'https://' + host + '/webapi/'
-    else:
-        environment_variables['FEDER8_WEBAPI_URL'] = 'http://' + host + '/webapi/'
-
 
     if security_method == 'None':
         environment_variables['FEDER8_ATLAS_SECURE'] = 'false'
