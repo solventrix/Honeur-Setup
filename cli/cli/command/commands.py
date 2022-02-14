@@ -292,7 +292,7 @@ def get_local_backup_image_name_tag(therapeutic_area_info):
 
 
 def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.0')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.1')
 
 
 def get_alpine_image_name_tag():
