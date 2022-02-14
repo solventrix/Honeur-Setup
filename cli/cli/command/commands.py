@@ -1182,6 +1182,7 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_IS_CENTRAL': 'false',
         'SERVER_SERVLET_CONTEXT_PATH': '/task-manager',
+        'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name
     }
     if security_method == 'LDAP':
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
