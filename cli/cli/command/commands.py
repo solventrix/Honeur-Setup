@@ -260,7 +260,7 @@ def get_webapi_image_name_tag(therapeutic_area_info):
 
 
 def get_zeppelin_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.3')
+    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.4')
 
 
 def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
