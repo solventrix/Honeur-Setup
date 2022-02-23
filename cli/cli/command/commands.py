@@ -566,6 +566,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
+        central_portal_uri = f"https://{therapeutic_area_info.portal_url}"
+
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
@@ -603,6 +605,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_CENTRAL_SERVICE_PORTAL-BASE-URI': central_portal_uri,
         'FEDER8_LOCAL_HOST_NAME': host,
         'FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME': username,
         'FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD': password
