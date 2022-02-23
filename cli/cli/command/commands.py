@@ -1185,6 +1185,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
         'FEDER8_THERAPEUTIC_AREA_FAVICON_LOCATION': '/images/' + therapeutic_area_info.name + '-favicon.ico',
         'FEDER8_THERAPEUTIC_AREA_LOGO_LOCATION': '/images/' + therapeutic_area_info.name + '-logo.png',
+        'FEDER8_THERAPEUTIC_AREA_LIGHT_THEME_COLOR': therapeutic_area_info.light_theme,
+        'FEDER8_THERAPEUTIC_AREA_DARK_THEME_COLOR': therapeutic_area_info.dark_theme
     }
     if security_method == 'LDAP':
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
