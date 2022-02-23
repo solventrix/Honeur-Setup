@@ -33,11 +33,11 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images required to run the full setup are located on a central repository. Make sure you have an account on our central platform before trying to run the local setup installation scripts:
 
-  * For HONEUR: https://portal-uat.honeur.org
-  * For PHederation: https://portal-uat.phederation.org
-  * For ESFURN: https://portal-uat.esfurn.org
-  * For ATHENA: https://portal-uat.athenafederation.org
-  * For LupusNet: https://portal-uat.lupusnet.org
+  * For HONEUR: https://portal-dev.honeur.org
+  * For PHederation: https://portal-dev.phederation.org
+  * For ESFURN: https://portal-dev.esfurn.org
+  * For ATHENA: https://portal-dev.athenafederation.org
+  * For LupusNet: https://portal-dev.lupusnet.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -46,30 +46,30 @@ The Feder8 local installation should only be accessible on the local network.  A
 Only the Feder8 central services should be accessible from within the local installation:
 
 * For HONEUR: 
-  * https://cas-uat.honeur.org
-  * https://harbor-uat.honeur.org
-  * https://catalogue-uat.honeur.org
-  * https://distributed-analytics-uat.honeur.org
+  * https://cas-dev.honeur.org
+  * https://harbor-dev.honeur.org
+  * https://catalogue-dev.honeur.org
+  * https://distributed-analytics-dev.honeur.org
 * For PHederation: 
-  * https://cas-uat.phederation.org
-  * https://harbor-uat.phederation.org
-  * https://catalogue-uat.phederation.org
-  * https://distributed-analytics-uat.phederation.org
+  * https://cas-dev.phederation.org
+  * https://harbor-dev.phederation.org
+  * https://catalogue-dev.phederation.org
+  * https://distributed-analytics-dev.phederation.org
 * For ESFURN: 
-  * https://cas-uat.esfurn.org
-  * https://harbor-uat.esfurn.org
-  * https://catalogue-uat.esfurn.org
-  * https://distributed-analytics-uat.esfurn.org
+  * https://cas-dev.esfurn.org
+  * https://harbor-dev.esfurn.org
+  * https://catalogue-dev.esfurn.org
+  * https://distributed-analytics-dev.esfurn.org
 * For ATHENA:
-  * https://cas-uat.athenafederation.org
-  * https://harbor-uat.athenafederation.org
-  * https://catalogue-uat.athenafederation.org
-  * https://distributed-analytics-uat.athenafederation.org
+  * https://cas-dev.athenafederation.org
+  * https://harbor-dev.athenafederation.org
+  * https://catalogue-dev.athenafederation.org
+  * https://distributed-analytics-dev.athenafederation.org
 * For LupusNet:
-  * https://cas-uat.lupusnet.org
-  * https://harbor-uat.lupusnet.org
-  * https://catalogue-uat.lupusnet.org
-  * https://distributed-analytics-uat.lupusnet.org
+  * https://cas-dev.lupusnet.org
+  * https://harbor-dev.lupusnet.org
+  * https://catalogue-dev.lupusnet.org
+  * https://distributed-analytics-dev.lupusnet.org
 
     
 ### Prerequisite for installations on Linux
@@ -77,7 +77,7 @@ On Linux, please download and run the following 2 scripts before running the ins
 
 Download the "Docker certificates generation script":
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
 ```
 
 Run the "Docker certificates generation script":
@@ -87,7 +87,7 @@ Run the "Docker certificates generation script":
 
 Download the "enable Docker TLS security script":
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/local-installation/separate-scripts/enable-docker-tls-security.sh --output enable-docker-tls-security.sh && chmod +x enable-docker-tls-security.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/separate-scripts/enable-docker-tls-security.sh --output enable-docker-tls-security.sh && chmod +x enable-docker-tls-security.sh
 ```
 
 Run the "enable Docker TLS security script":
@@ -118,12 +118,12 @@ The local installation can be installed by downloading and running the installat
 
 MacOS/Linux
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/local-installation/helper-scripts/start-feder8.sh --output start-feder8.sh && chmod +x start-feder8.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/helper-scripts/start-feder8.sh --output start-feder8.sh && chmod +x start-feder8.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/local-installation/helper-scripts/start-feder8.cmd --output start-feder8.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/local-installation/helper-scripts/start-feder8.cmd --output start-feder8.cmd
 ```
 
 2. Run the script using the following command:
@@ -138,15 +138,15 @@ Windows
 .\start-feder8.cmd
 ```
 3. The script will ask for the applicable therapeutic area. Please choose the therapeutic area that corresponds with the credentials you received:
-    1. HONEUR for https://portal-uat.honeur.org
-    2. PHederation for https://portal-uat.phederation.org
-    3. ESFURN for https://portal-uat.esfurn.org
-    4. ATHENA for https://portal-uat.athenafederation.org
-    5. LupusNet for https://portal-uat.lupusnet.org
+    1. HONEUR for https://portal-dev.honeur.org
+    2. PHederation for https://portal-dev.phederation.org
+    3. ESFURN for https://portal-dev.esfurn.org
+    4. ATHENA for https://portal-dev.athenafederation.org
+    5. LupusNet for https://portal-dev.lupusnet.org
 4. If a previous installation is present, the script will ask to remove the previous installation.  Choose Yes if the ETL will be re-executed after the re-installation.
 5. If a previous installation is present, the script will ask to create a backup of the Postgres database.  Choose Yes if there is no recent backup of the database.
 6. The script will prompt to enter the email address of the account you use to login on the central platform.
-7. The script will prompt to enter your CLI secret for pulling our Docker images. This secret can be found on our central image repository. Surf to the central registry (https://harbor-uat.honeur.org for HONEUR, https://harbor-uat.phederation.org for PHederation, https://harbor-uat.esfurn.org for Esfurn) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name in the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
+7. The script will prompt to enter your CLI secret for pulling our Docker images. This secret can be found on our central image repository. Surf to the central registry (https://harbor-dev.honeur.org for HONEUR, https://harbor-dev.phederation.org for PHederation, https://harbor-dev.esfurn.org for Esfurn) and login using the button \"LOGIN VIA OIDC PROVIDER\". Then click your account name in the top right corner of the screen and click \"User Profile\". Copy the CLI secret by clicking the copy symbol next to the text field.
 8. The script will prompt to enter a new password for feder8 database user.
 9. The script will prompt to enter a new password for feder8 admin database user.
 10. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine if localhost is entered as hostname.

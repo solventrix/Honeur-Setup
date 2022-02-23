@@ -30,7 +30,7 @@ docker rm honeur_ecrf_postgres
 docker volume rm postgres_data
 docker volume create postgres_data
 echo "re-create database container"
-docker run -d --name honeur_ecrf_postgres --network honeur-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart=always -p 5432:5432 harbor-uat.honeur.org/ecrf/oncocologne/postgres:0.2
+docker run -d --name honeur_ecrf_postgres --network honeur-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart=always -p 5432:5432 harbor-dev.honeur.org/ecrf/oncocologne/postgres:0.2
 sleep 5s
 
 for sql_script in ${RESTORE_FOLDER}/*.sql; do

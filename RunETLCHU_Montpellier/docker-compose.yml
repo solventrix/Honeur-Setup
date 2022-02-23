@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   etl:
-    image: harbor-uat.honeur.org/etl-montpellier/etl:image_tag
+    image: harbor-dev.honeur.org/etl-montpellier/etl:image_tag
     volumes:
       - "./log:/log"
       - "data_folder:/data"

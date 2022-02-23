@@ -26,7 +26,7 @@ log.setLevel(logging.WARNING)
 
 
 def get_default_feder8_central_environment() -> str:
-    return "UAT"
+    return "DEV"
 
 
 def get_docker_client() -> DockerClient:
