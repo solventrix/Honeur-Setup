@@ -174,7 +174,7 @@ def connect_install_container_to_network(docker_client: DockerClient, therapeuti
     try:
         ta_network.connect(install_container)
     except docker.errors.APIError:
-        log.debug(f"Unable to connect the install container to the {therapeutic_area_info.name} network")
+        log.debug(f"Unable to connect the install container to the feder8-net network")
 
 
 def update_config_on_config_server(docker_client:DockerClient, email, cli_key, therapeutic_area_info, config_update):
@@ -399,7 +399,8 @@ def config_server(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-config-server']
     container_names = ['config-server', 'config-server-update-configuration']
 
@@ -496,7 +497,8 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['pgdata', 'shared', 'feder8-config-server']
     container_names = ['postgres', 'config-server-update-configuration']
 
@@ -614,7 +616,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['local-portal', 'config-server-update-configuration']
 
@@ -673,8 +676,9 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     }
 
     if docker_cert_support:
-        environment_variables['PROXY_DOCKER_URL'] = 'https://172.17.0.1:2376'
-        environment_variables['PROXY_DOCKER_CERT_PATH'] = '/home/feder8/certs'
+        environment_variables['DOCKER_HOST'] = 'https://172.17.0.1:2376'
+        environment_variables['DOCKER_TLS_VERIFY'] = '1'
+        environment_variables['DOCKER_CERT_PATH'] = '/home/feder8/certs'
 
     if docker_cert_support:
         volumes[feder8_certificate_directory] = {
@@ -761,7 +765,8 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
@@ -934,7 +939,8 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = ['zeppelin', 'config-server-update-configuration']
 
@@ -1065,7 +1071,8 @@ def user_management(therapeutic_area, email, cli_key, username, password):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['user-mgmt', 'config-server-update-configuration']
 
@@ -1176,7 +1183,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-config-server']
     container_names = ['task-manager', 'config-server-update-configuration']
 
@@ -1300,7 +1308,8 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-data', 'feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
@@ -1449,7 +1458,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
 
@@ -1593,7 +1603,8 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-config-server']
     container_names = ['nginx', 'config-server-update-configuration']
 
@@ -1914,7 +1925,8 @@ def upgrade_database(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     container_names = ['pipeline-vocabulary-update']
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
