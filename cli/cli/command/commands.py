@@ -573,8 +573,6 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 @click.option('-p', '--password')
 @click.option('-edr', '--enable-docker-runner')
 def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner):
-    docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
-
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
@@ -609,8 +607,6 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             enable_docker_runner_string = 'true'
         else:
             enable_docker_runner_string = 'false'
-        if docker_cert_support:
-            feder8_certificate_directory = configuration.get_configuration('feder8.local.host.docker-cert-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -645,44 +641,16 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     print('Starting local-portal container...')
     socket_gid = os.stat("/var/run/docker.sock").st_gid
     volumes={
-        volume_names[0]: {
-            'bind': '/var/lib/shared',
-            'mode': 'ro'
-        },
-        volume_names[1]: {
-            'bind': '/home/feder8/config-repo',
-            'mode': 'rw'
+            volume_names[0]: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            },
+            volume_names[1]: {
+                'bind': '/home/feder8/config-repo',
+                'mode': 'rw'
+            }
         }
-    }
-
-    environment_variables = {
-        'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
-        'FEDER8_THERAPEUTIC_AREA_LIGHT_THEME_COLOR': therapeutic_area_info.light_theme,
-        'FEDER8_THERAPEUTIC_AREA_DARK_THEME_COLOR': therapeutic_area_info.dark_theme,
-        'FEDER8_CONFIG_SERVER_USERNAME': 'root',
-        'FEDER8_CONFIG_SERVER_HOST': 'config-server',
-        'FEDER8_CONFIG_SERVER_PORT': '8080',
-        'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
-        'FEDER8_LOCAL_ADMIN_USERNAME': username,
-        'FEDER8_LOCAL_ADMIN_PASSWORD': password,
-        'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
-        'FEDER8_CENTRAL_SERVICE_ENVIRONMENT': get_default_feder8_central_environment(),
-        'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
-        'SERVER_SERVLET_CONTEXT_PATH': '/portal',
-        'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
-    }
-
-    if docker_cert_support:
-        environment_variables['PROXY_DOCKER_URL'] = 'https://172.17.0.1:2376'
-        environment_variables['PROXY_DOCKER_CERT_PATH'] = '/home/feder8/certs'
-
-    if docker_cert_support:
-        volumes[feder8_certificate_directory] = {
-            'bind': '/home/feder8/certs',
-            'mode': 'rw'
-        }
-    else:
-        volumes = add_docker_sock_volume_mapping(volumes)
+    volumes = add_docker_sock_volume_mapping(volumes)
 
     container = docker_client.containers.run(
         image=local_portal_image_name_tag,
@@ -690,7 +658,22 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
         restart_policy={"Name": "always"},
         security_opt=['no-new-privileges'],
         remove=False,
-        environment=environment_variables,
+        environment={
+            'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
+            'FEDER8_THERAPEUTIC_AREA_LIGHT_THEME_COLOR': therapeutic_area_info.light_theme,
+            'FEDER8_THERAPEUTIC_AREA_DARK_THEME_COLOR': therapeutic_area_info.dark_theme,
+            'FEDER8_CONFIG_SERVER_USERNAME': 'root',
+            'FEDER8_CONFIG_SERVER_HOST': 'config-server',
+            'FEDER8_CONFIG_SERVER_PORT': '8080',
+            'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
+            'FEDER8_LOCAL_ADMIN_USERNAME': username,
+            'FEDER8_LOCAL_ADMIN_PASSWORD': password,
+            'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
+            'FEDER8_CENTRAL_SERVICE_ENVIRONMENT': get_default_feder8_central_environment(),
+            'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
+            'SERVER_SERVLET_CONTEXT_PATH': '/portal',
+            'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
+        },
         network=network_names[0],
         volumes=volumes,
         group_add=[socket_gid, 0],
