@@ -399,7 +399,8 @@ def config_server(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-config-server']
     container_names = ['config-server', 'config-server-update-configuration']
 
@@ -496,7 +497,8 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['pgdata', 'shared', 'feder8-config-server']
     container_names = ['postgres', 'config-server-update-configuration']
 
@@ -610,7 +612,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['local-portal', 'config-server-update-configuration']
 
@@ -744,7 +747,8 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
@@ -917,7 +921,8 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = ['zeppelin', 'config-server-update-configuration']
 
@@ -1048,7 +1053,8 @@ def user_management(therapeutic_area, email, cli_key, username, password):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['user-mgmt', 'config-server-update-configuration']
 
@@ -1159,7 +1165,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-config-server']
     container_names = ['task-manager', 'config-server-update-configuration']
 
@@ -1283,7 +1290,8 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-data', 'feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
@@ -1432,7 +1440,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
 
@@ -1576,7 +1585,8 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     volume_names = ['feder8-config-server']
     container_names = ['nginx', 'config-server-update-configuration']
 
@@ -1897,7 +1907,8 @@ def upgrade_database(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [get_network_name()]
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
     container_names = ['pipeline-vocabulary-update']
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
