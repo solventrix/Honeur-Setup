@@ -15,6 +15,9 @@ class Globals:
         "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal-uat.lupusnet.org', 'catalogue-uat.lupusnet.org', 'distributed-analytics-uat.lupusnet.org', 'cas-uat.lupusnet.org', Registry('harbor-uat.lupusnet.org', 'lupus'), ['Janssen', 'Registry 1', 'Registry 2', 'LupusnetTestOrg1', 'LupusnetTestOrg2', 'LupusnetTestOrg3', 'LupusnetTestOrg4', 'LupusnetTestOrg5', 'LupusnetTestOrg6'])
     }
 
+    def get_environment():
+        return "UAT"
+
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
         'feder8.central.service.image-repo-username': SingleChoiceQuestion('Enter email address used to login to FEDER8_PORTAL_URL?', ''),
