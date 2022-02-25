@@ -677,7 +677,6 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
     if docker_cert_support:
         environment_variables['DOCKER_HOST'] = 'tcp://172.17.0.1:2376'
-        environment_variables['DOCKER_TLS_VERIFY'] = '1'
         environment_variables['DOCKER_CERT_PATH'] = '/home/feder8/certs'
 
     if docker_cert_support:
