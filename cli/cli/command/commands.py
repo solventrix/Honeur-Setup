@@ -40,10 +40,13 @@ def get_docker_client() -> DockerClient:
 def get_docker_client_facade(therapeutic_area_info: TherapeuticArea, email, cli_key) -> DockerClientFacade:
     return DockerClientFacade(therapeutic_area_info, email, cli_key)
 
+def get_network_name():
+    return "feder8-net"
 
-def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, network:str, volumes, detach:bool, show_logs:bool):
+def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, volumes, detach:bool, show_logs:bool):
+    network_name = get_network_name()
     container = docker_client.containers.run(
-        image, remove=remove, name=name, environment=environment, network=network, volumes=volumes, detach=detach)
+        image, remove=remove, name=name, environment=environment, network=network_name, volumes=volumes, detach=detach)
     if show_logs:
         for l in container.logs(stream=True):
             print(l.decode('UTF-8'), end='')
@@ -96,6 +99,22 @@ def check_containers_and_remove_if_not_exists(docker_client: DockerClient,
         except:
             logging.debug("check_containers_and_remove_if_not_exists failed")
 
+def ta_specific_docker_network_exists(docker_client: DockerClient):
+    for therapeutic_area_key in Globals.therapeutic_areas.keys():
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area_key]
+        if therapeutic_area_info.name != 'feder8':
+            try:
+                therapeutic_area_network = docker_client.networks.get(therapeutic_area_info.name + '-net')
+                return True
+            except docker.errors.NotFound:
+                pass
+    return False
+
+def validate_correct_docker_network(docker_client: DockerClient):
+    if ta_specific_docker_network_exists(docker_client):
+        print("We notice that you have an outdated setup installed. This seperate script is not compatible with this older version of your setup. Please run the full installer to update all components. You can follow the installation instruction at https://github.com/solventrix/Honeur-Setup/tree/release/1.10/local-installation/helper-scripts#installation-instruction")
+        sys.exit(1)
+
 
 def pull_image(docker_client:DockerClient, registry:Registry, image:str, email:str, cli_key:str):
     print(f'Pulling image {image} ...')
@@ -122,18 +141,14 @@ def wait_for_healthy_container(docker_client:DockerClient, container:Container, 
     return True
 
 
-def get_network_name(therapeutic_area_info):
-    return therapeutic_area_info.name + "-net"
-
-
 def get_or_create_network(docker_client:DockerClient, therapeutic_area_info):
-    network_name = get_network_name(therapeutic_area_info)
+    network_name = get_network_name()
     try:
-        ta_network = docker_client.networks.get(network_name)
+        network = docker_client.networks.get(network_name)
     except docker.errors.NotFound:
         log.info(f"Create network {network_name}")
-        ta_network = docker_client.networks.create(network_name, check_duplicate=True)
-    return ta_network
+        network = docker_client.networks.create(network_name, check_duplicate=True)
+    return network
 
 
 def add_docker_sock_volume_mapping(volumes: dict):
@@ -172,7 +187,6 @@ def update_config_on_config_server(docker_client:DockerClient, email, cli_key, t
     check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, [container_name])
     # run config update container
     print('Updating configuration on config-server...')
-    network_name = get_network_name(therapeutic_area_info)
     volume_name = 'feder8-config-server'
     run_container(
         docker_client=docker_client,
@@ -180,7 +194,6 @@ def update_config_on_config_server(docker_client:DockerClient, email, cli_key, t
         remove=True,
         name=container_name,
         environment=config_update,
-        network=network_name,
         volumes={
             volume_name: {
                 'bind': '/home/feder8/config-repo',
@@ -357,7 +370,6 @@ def create_or_update_host_folder_with_correct_ownership(directory: str, owner: i
 
     print('Done creating or updating folder permissions for ' + directory + ' on host machine ...')
 
-
 @click.group()
 def init():
     """Initialize command for different components."""
@@ -374,6 +386,8 @@ def config_server(therapeutic_area, email, cli_key):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -385,7 +399,7 @@ def config_server(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['feder8-config-server']
     container_names = ['config-server', 'config-server-update-configuration']
 
@@ -459,6 +473,8 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -480,7 +496,7 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['pgdata', 'shared', 'feder8-config-server']
     container_names = ['postgres', 'config-server-update-configuration']
 
@@ -564,6 +580,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         central_portal_uri = f"https://{therapeutic_area_info.portal_url}"
@@ -592,7 +610,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['local-portal', 'config-server-update-configuration']
 
@@ -686,6 +704,8 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -724,7 +744,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
@@ -860,6 +880,8 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -895,7 +917,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = ['zeppelin', 'config-server-update-configuration']
 
@@ -998,6 +1020,8 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1024,7 +1048,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['shared', 'feder8-config-server']
     container_names = ['user-mgmt', 'config-server-update-configuration']
 
@@ -1102,6 +1126,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1133,7 +1159,7 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['feder8-config-server']
     container_names = ['task-manager', 'config-server-update-configuration']
 
@@ -1236,6 +1262,8 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1255,7 +1283,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['feder8-data', 'feder8-config-server']
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
@@ -1364,6 +1392,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1402,7 +1432,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['feder8-data', 'shared', 'feder8-config-server']
     container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
 
@@ -1523,6 +1553,8 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1544,7 +1576,7 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     volume_names = ['feder8-config-server']
     container_names = ['nginx', 'config-server-update-configuration']
 
@@ -1615,6 +1647,8 @@ def clean(therapeutic_area):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1626,7 +1660,7 @@ def clean(therapeutic_area):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    ta_network_name = therapeutic_area_info.name + '-net'
+    ta_network_name = get_network_name()
     try:
         ta_network = docker_client.networks.get(ta_network_name)
     except docker.errors.NotFound:
@@ -1751,6 +1785,8 @@ def backup(therapeutic_area, email, cli_key):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1788,10 +1824,12 @@ def backup_database_and_container_files(docker_client: DockerClient, email, cli_
         }
         volumes = add_docker_sock_volume_mapping(volumes)
 
+        feder8_network = get_network_name()
+
         container = docker_client.containers.run(image=get_local_backup_image_name_tag(therapeutic_area_info),
                                                  remove=False,
                                                  name='feder8-local-backup',
-                                                 network=therapeutic_area_info.name + '-net',
+                                                 network=feder8_network,
                                                  environment=environment_variables,
                                                  volumes=volumes,
                                                  detach=True)
@@ -1820,7 +1858,9 @@ def update_custom_concepts(therapeutic_area, email, cli_key):
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
-        connect_install_container_to_network(get_docker_client(), therapeutic_area_info)
+        docker_client = get_docker_client()
+        validate_correct_docker_network(docker_client)
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
         email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
     except KeyboardInterrupt:
         sys.exit(1)
@@ -1841,6 +1881,8 @@ def upgrade_database(therapeutic_area, email, cli_key):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -1855,7 +1897,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
     except KeyboardInterrupt:
         sys.exit(1)
 
-    network_names = [therapeutic_area.lower() + '-net']
+    network_names = [get_network_name()]
     container_names = ['pipeline-vocabulary-update']
 
     networks = check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -2014,6 +2056,8 @@ def upgrade_database(therapeutic_area, email, cli_key):
 def is_pgdata_corrupt():
     docker_client = get_docker_client()
 
+    validate_correct_docker_network(docker_client)
+
     try:
         docker_client.volumes.get("pgdata")
     except docker.errors.NotFound:
@@ -2135,6 +2179,8 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
 
         docker_client = get_docker_client()
 
+        validate_correct_docker_network(docker_client)
+
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
@@ -2180,6 +2226,33 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
 
 
 @init.command()
+def update_feder8_network():
+    docker_client = get_docker_client()
+    network_name = get_network_name()
+
+    feder8_network = check_networks_and_create_if_not_exists(docker_client, [network_name])[0]
+    
+    for therapeutic_area_key in Globals.therapeutic_areas.keys():
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area_key]
+        if therapeutic_area_info.name != 'feder8':
+            try:
+                therapeutic_area_network = docker_client.networks.get(therapeutic_area_info.name + '-net')
+                attached_containers = therapeutic_area_network.containers
+                for container in attached_containers:
+                    try:
+                        feder8_network.connect(container)
+                    except docker.errors.APIError as e:
+                        if "already exists" in str(e):
+                            pass
+                        else:
+                            raise e
+                    therapeutic_area_network.disconnect(container)
+                therapeutic_area_network.remove()
+            except docker.errors.NotFound:
+                pass
+
+
+@init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
@@ -2209,6 +2282,8 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
         docker_client = get_docker_client()
+
+        ctx.invoke(update_feder8_network)
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
@@ -2319,3 +2394,4 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, feder8_studio_directory=feder8_studio_directory, security_method=security_method, admin_username=username, admin_password=password, rstudio_upload_dir=None, vscode_upload_dir=None)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
+

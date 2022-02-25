@@ -58,7 +58,7 @@ docker run \
 -v shared:/var/lib/shared \
 -v /var/run/docker.sock:/var/run/docker.sock \
 --env-file pipeline-vocabulary-update.env \
---network honeur-net \
+--network feder8-net \
 $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
 
 echo "Clean up helper files"

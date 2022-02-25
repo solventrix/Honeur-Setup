@@ -10,7 +10,7 @@ services:
       - shared-qa:/var/lib/postgresql/envfileshared
     restart: always
     networks:
-      - honeur-net
+      - feder8-net
     command:
       - /bin/sh
       - -c
@@ -29,7 +29,7 @@ services:
     depends_on:
       - postgres-qa
     networks:
-      - honeur-net
+      - feder8-net
     command:
       - /bin/bash
       - -c
@@ -38,8 +38,8 @@ services:
           python -u source_creation.py conf/setup.yml
 
 networks:
-  honeur-net:
-    name: honeur-net
+  feder8-net:
+    name: feder8-net
 
 volumes:
   pgdata-qa:

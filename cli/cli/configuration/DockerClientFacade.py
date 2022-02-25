@@ -32,7 +32,7 @@ class DockerClientFacade:
         return self._docker_client
 
     def get_network_name(self):
-        return self._therapeutic_area_info.name.lower() + "-net"
+        return "feder8-net"
 
     def get_image_name_tag(self, name, tag):
         image_name = '/'.join([self.registry.registry_url, self.registry.project, name])
