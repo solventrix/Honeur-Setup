@@ -268,7 +268,7 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.8')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
@@ -1277,6 +1277,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'CONTENT_PATH': feder8_studio_directory,
         'USERID': '54321',
         'DOMAIN_NAME': host,
+        'SESSION_TIMEOUT': 43200,
+        'CONTAINER_WAIT_TIME': 720000,
         'HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER': volume_names[0],
         'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'HONEUR_THERAPEUTIC_AREA_URL': therapeutic_area_info.registry.registry_url,
