@@ -8,10 +8,13 @@ from typing import Dict
 
 class Globals:
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Leicester Royal Infirmary','DOS','CLLEAR','RMG','iOMEDICO','OIS','EMMOS','Janssen','GMV','Oncotyrol','CHU Montpellier','CHU Lille','Cancer Centre London']),
+        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['Leicester Royal Infirmary','DOS','CLLEAR','RMG','iOMEDICO','OIS','EMMOS','Janssen','GMV','Oncotyrol','CHU Montpellier','CHU Lille','Cancer Centre London', 'CHU Dijon']),
         "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Actelion','Janssen']),
         "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Janssen'])
     }
+
+    def get_environment():
+        return "PRD"
 
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
