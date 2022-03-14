@@ -100,7 +100,7 @@ def check_containers_and_remove_if_not_exists(docker_client: DockerClient,
 def pull_image(docker_client:DockerClient, registry:Registry, image:str, email:str, cli_key:str):
     print(f'Pulling image {image} ...')
     try:
-        docker_client.login(username=email, password=cli_key, registry=registry.registry_url)
+        docker_client.login(username=email, password=cli_key, registry=registry.registry_url, reauth=True)
     except docker.errors.APIError:
         print('Failed to pull image. Are the correct email and CLI Key provided?')
         sys.exit(1)
