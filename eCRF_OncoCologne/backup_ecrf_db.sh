@@ -17,7 +17,7 @@ create_db_dump () {
   PGPASSWORD=$2
   echo "Create dump of database $DB_NAME from postgres"
   docker run \
-  --network="honeur-net" \
+  --network="feder8-net" \
   --rm \
   -e DB_NAME=$DB_NAME \
   -e PGPASSWORD=$PGPASSWORD \

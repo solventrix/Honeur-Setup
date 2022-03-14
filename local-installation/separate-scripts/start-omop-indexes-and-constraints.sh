@@ -48,8 +48,8 @@ echo "Stop and remove omop-indexes-and-constraints container if exists"
 docker stop omop-indexes-and-constraints > /dev/null 2>&1 || true
 docker rm omop-indexes-and-constraints > /dev/null 2>&1 || true
 
-echo "Create $FEDER8_THERAPEUTIC_AREA-net network if it does not exists"
-docker network create --driver bridge $FEDER8_THERAPEUTIC_AREA-net > /dev/null 2>&1 || true
+echo "Create feder8-net network if it does not exists"
+docker network create --driver bridge feder8-net > /dev/null 2>&1 || true
 
 echo "Pull $FEDER8_THERAPEUTIC_AREA/postgres:$TAG from https://$FEDER8_THERAPEUTIC_AREA_URL. This could take a while if not present on machine"
 echo "$FEDER8_CLI_SECRET" | docker login https://$FEDER8_THERAPEUTIC_AREA_URL --username $FEDER8_EMAIL_ADDRESS --password-stdin
@@ -60,7 +60,7 @@ docker run \
 --name "omop-indexes-and-constraints" \
 --env-file omop-indexes-and-constraints.env \
 -v "shared:/var/lib/shared:ro" \
---network ${FEDER8_THERAPEUTIC_AREA}-net \
+--network feder8-net \
 $FEDER8_THERAPEUTIC_AREA_URL/$FEDER8_THERAPEUTIC_AREA/postgres:$TAG
 
 echo "Clean up helper files"

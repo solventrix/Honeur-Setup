@@ -19,7 +19,7 @@ fi
 
 echo "Restore database $DATABASE_NAME"
 docker run \
---network="honeur-net" \
+--network="feder8-net" \
 --rm \
 -e DB_NAME=$DATABASE_NAME \
 -v ${DATABASE_BACKUP_FILE}:/opt/database/backup.dump \

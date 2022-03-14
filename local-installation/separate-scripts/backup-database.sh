@@ -10,7 +10,7 @@ create_db_dump () {
   DB_NAME=$1
   echo "Create dump of database $DB_NAME from postgres"
   docker run \
-  --network="honeur-net" \
+  --network="feder8-net" \
   --rm \
   -e DB_NAME=$DB_NAME \
   -v "shared:/var/lib/shared:ro" \

@@ -15,7 +15,7 @@ Rem create database dump
 IF not exist %BACKUP_FOLDER% ( mkdir %BACKUP_FOLDER% && echo %BACKUP_FOLDER% created )
 echo Create dump of database %DATABASE_NAME% from postgres.  Backup file will be stored under %BACKUP_FOLDER%
 docker run \
---network="honeur-net" \
+--network="feder8-net" \
 --rm \
 -e DB_NAME=%DATABASE_NAME% \
 -e PGPASSWORD=%POSTGRES_PASSWORD% \
