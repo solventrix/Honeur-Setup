@@ -9,7 +9,7 @@ services:
     external_links:
       - postgres
     networks:
-      - honeur-net
+      - feder8-net
     command:
       - /bin/bash
       - -c
@@ -18,8 +18,8 @@ services:
           python -u source_deletion.py conf/setup.yml
 
 networks:
-  honeur-net:
-    name: honeur-net
+  feder8-net:
+    name: feder8-net
   
 volumes:
   shared-qa:

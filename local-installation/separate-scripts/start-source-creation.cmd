@@ -102,8 +102,8 @@ echo Stop and remove webapi-source-delete container if exists
 docker stop webapi-source-add >nul 2>&1
 docker rm webapi-source-add >nul 2>&1
 
-echo Create %FEDER8_THERAPEUTIC_AREA%-net network if it does not exists
-docker network create --driver bridge %FEDER8_THERAPEUTIC_AREA%-net >nul 2>&1
+echo Create feder8-net network if it does not exists
+docker network create --driver bridge feder8-net >nul 2>&1
 
 echo Pull %FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% from https://%FEDER8_THERAPEUTIC_AREA_URL%. This could take a while if not present on machine
 docker login https://%FEDER8_THERAPEUTIC_AREA_URL% --username %FEDER8_EMAIL_ADDRESS% --password %FEDER8_CLI_SECRET%
@@ -115,7 +115,7 @@ docker run ^
 --rm ^
 -v %FEDER8_SHARED_SECRETS_VOLUME_NAME%:/var/lib/shared ^
 --env-file webapi-source-add.env ^
---network %FEDER8_THERAPEUTIC_AREA%-net ^
+--network feder8-net ^
 %FEDER8_THERAPEUTIC_AREA_URL%/%FEDER8_THERAPEUTIC_AREA%/postgres:%TAG% >nul 2>&1
 
 echo Clean up helper files

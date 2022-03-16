@@ -52,7 +52,7 @@ echo "Run $FEDER8_THERAPEUTIC_AREA/scheduled-backup:$VERSION container. This cou
 docker run \
   --name "backup-$DB_NAME" \
   --restart on-failure:5 \
-  --network="$FEDER8_THERAPEUTIC_AREA-net" \
+  --network="feder8-net" \
   -e DB_NAME=$DB_NAME \
   -v "shared:/var/lib/shared:ro" \
   -v ${BACKUP_FOLDER}:/backup \

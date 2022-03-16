@@ -17,7 +17,7 @@ services:
         target: /var/lib/postgresql/envfileshared
     restart: always
     networks:
-      - honeur-net
+      - feder8-net
     command:
       - /bin/bash
       - -c
@@ -26,8 +26,8 @@ services:
           docker-entrypoint.sh postgres
 
 networks:
-  honeur-net:
-    name: honeur-net
+  feder8-net:
+    name: feder8-net
 
 volumes:
   pgdata:
