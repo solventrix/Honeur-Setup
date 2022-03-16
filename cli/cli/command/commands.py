@@ -40,8 +40,10 @@ def get_docker_client() -> DockerClient:
 def get_docker_client_facade(therapeutic_area_info: TherapeuticArea, email, cli_key) -> DockerClientFacade:
     return DockerClientFacade(therapeutic_area_info, email, cli_key)
 
+
 def get_network_name():
     return "feder8-net"
+
 
 def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, volumes, detach:bool, show_logs:bool):
     network_name = get_network_name()
@@ -237,6 +239,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info),
         get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
         get_feder8_studio_image_name_tag(therapeutic_area_info),
+        get_radiant_installer_image_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
         get_vocabulary_update_image_name_tag(therapeutic_area_info),
         get_local_backup_image_name_tag(therapeutic_area_info),
@@ -286,6 +289,10 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.9')
+
+
+def get_radiant_installer_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'install-radiant', '2.0.0')
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
@@ -1554,6 +1561,60 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
+@click.option('-fsd', '--feder8-studio-directory')
+def radiant(therapeutic_area, email, cli_key, feder8_studio_directory):
+    if therapeutic_area is None:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                              choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+    registry = therapeutic_area_info.registry
+    radiant_installer_image_name_tag = get_radiant_installer_image_name_tag(therapeutic_area_info)
+
+    docker_client = get_docker_client()
+    connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+    configuration: ConfigurationController = get_configuration(therapeutic_area)
+
+    if email is None:
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+    if cli_key is None:
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    if feder8_studio_directory is None:
+        feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+    if feder8_studio_directory is None:
+        logging.warning("Feder8 Studio installation folder not found! Unable to install radiant.")
+        return
+
+    pull_image(docker_client, registry, radiant_installer_image_name_tag, email, cli_key)
+
+    environment_variables = {
+        'THERAPEUTIC_AREA': therapeutic_area_info.name
+    }
+
+    volumes = {
+        feder8_studio_directory: {
+            'bind': '/opt/data',
+            'mode': 'rw'
+        }
+    }
+
+    container = docker_client.containers.run(
+        image=radiant_installer_image_name_tag,
+        name="radiant-installer",
+        remove=True,
+        environment=environment_variables,
+        volumes=volumes,
+        detach=True
+    )
+
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
 @click.option('-h', '--host')
 @click.option('-es', '--enable-ssl')
 @click.option('-cd', '--certificate-directory')
@@ -2373,6 +2434,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if install_feder8_studio:
             if feder8_studio_directory is None:
                 feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+            install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
 
         install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
 
@@ -2405,6 +2467,8 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
     if install_feder8_studio:
         ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    if install_radiant:
+        ctx.invoke(radiant, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, feder8_studio_directory=feder8_studio_directory)
     ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, feder8_studio_directory=feder8_studio_directory, security_method=security_method, admin_username=username, admin_password=password, rstudio_upload_dir=None, vscode_upload_dir=None)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
 

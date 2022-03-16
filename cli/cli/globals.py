@@ -16,7 +16,7 @@ class Globals:
     }
 
     def get_environment():
-        return "UAT"
+        return "DEV"
 
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
