@@ -260,7 +260,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.8')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
@@ -581,7 +581,8 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 @click.option('-edr', '--enable-docker-runner')
-def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner):
+@click.option('-fsd', '--feder8-studio-directory')
+def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner, feder8_studio_directory):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
@@ -616,6 +617,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             enable_docker_runner_string = 'true'
         else:
             enable_docker_runner_string = 'false'
+        if feder8_studio_directory is None:
+            feder8_studio_directory = configuration.get_optional_configuration('feder8.local.host.feder8-studio-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -661,6 +664,13 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             }
         }
     volumes = add_docker_sock_volume_mapping(volumes)
+    feder8_studio_app_directory_internal = '/home/feder8/feder8-studio/apps'
+    if feder8_studio_directory:
+        feder8_studio_app_directory = feder8_studio_directory + '/sites/' + therapeutic_area_info.name + 'studio/_apps'
+        volumes[feder8_studio_app_directory] = {
+            'bind': feder8_studio_app_directory_internal,
+            'mode': 'ro'
+        }
 
     container = docker_client.containers.run(
         image=local_portal_image_name_tag,
@@ -680,6 +690,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             'FEDER8_LOCAL_ADMIN_PASSWORD': password,
             'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
             'FEDER8_CENTRAL_SERVICE_ENVIRONMENT': get_default_feder8_central_environment(),
+            'FEDER8_STUDIO_APP_DIRECTORY': feder8_studio_app_directory_internal,
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
             'SERVER_SERVLET_CONTEXT_PATH': '/portal',
             'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
@@ -2458,7 +2469,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         sys.exit(1)
 
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
+    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner, feder8_studio_directory=feder8_studio_directory)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
