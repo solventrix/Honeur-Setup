@@ -18,6 +18,12 @@ class ConfigurationController:
             response = self.question_environment.get_configuration(key)
         return response
 
+    def get_optional_configuration(self, key:str) -> str:
+        response = self.config_server_environment.get_configuration(key)
+        if response == '':
+            return None
+        return response
+
     def get_image_repo_credentials(self):
         email = self.get_configuration('feder8.central.service.image-repo-username')
         cli_key = self.get_configuration('feder8.central.service.image-repo-key')
