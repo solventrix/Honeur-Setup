@@ -24,9 +24,9 @@ then
 
     mkdir setup-conf
     echo Downloading docker-compose.yml file.
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/WebAPIDBQASourceCreation/docker-compose.yml --output docker-compose.yml
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/WebAPIDBQASourceCreation/docker-compose.yml --output docker-compose.yml
     echo Downloading setup.yml file inside setup-conf folder
-    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/develop/WebAPIDBQASourceCreation/setup-conf/setup.yml --output setup-conf/setup.yml
+    curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/WebAPIDBQASourceCreation/setup-conf/setup.yml --output setup-conf/setup.yml
 
     docker volume create --name pgdata-qa
     docker volume create --name shared-qa
