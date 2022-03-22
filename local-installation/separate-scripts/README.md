@@ -16,6 +16,7 @@ Table of Contents
   * [User Management installation instructions](#user-management-installation-instructions)
   * [Distributed Analytics installation instructions](#distributed-analytics-installation-instructions)
   * [Feder8 Studio installation instructions](#feder8-studio-installation-instructions)
+  * [Radiant installation instructions](#radiant-installation-instructions)
   * [Proxy server](#proxy-server)
   * [Post ETL installation steps](#post-etl-installation-steps)
     * [Add constraints and indexes](#add-constraints-and-indexes)
@@ -379,6 +380,33 @@ Windows
 Once done, the script will download the Feder8 Studio docker image and will create the docker container.
 
 :warning: Please run the installation script of the [Proxy server](#proxy-server) after installing or updating FEDER8 Studio. The proxy is necessary for accessing FEDER8 Studio through the browser.
+
+## Radiant installation instructions
+Radiant can be installed by downloading and running the installation script.
+
+1. Download the installation script (**_start-radiant.sh_** for Linux/MacOS or **_start-radiant.cmd_** for Windows) using the following command:
+
+Linux/MacOS
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/local-installation/separate-scripts/start-radiant.sh --output start-radiant.sh && chmod +x start-radiant.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/local-installation/separate-scripts/start-radiant.cmd --output start-radiant.cmd
+```
+
+2. Run the script using the following command:
+
+Linux/MacOS
+```
+./start-radiant.sh
+```
+
+Windows
+```
+.\start-radiant.cmd
+```
 
 ## Proxy server
 The proxy server can be installed by downloading and running the installation script.
