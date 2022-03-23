@@ -7,6 +7,14 @@ from typing import Dict
 
 
 class Globals:
+
+    FEDER8_NET = "feder8-net"
+    RADIANT = "radiant"
+    DISEASE_EXPLORER = "diseaseExplorer"
+
+    def get_environment():
+        return "DEV"
+
     therapeutic_areas:Dict[str, TherapeuticArea] = {
         "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-dev.honeur.org', 'catalogue-dev.honeur.org', 'distributed-analytics-dev.honeur.org', 'cas-dev.honeur.org', Registry('harbor-dev.honeur.org', 'honeur'), ['Security Scan', 'UHL', 'DOS', 'CLLEAR', 'RMG', 'iOMEDICO', 'OIS', 'EMMOS', 'Janssen', 'EY', 'ZOL', 'HOPE', 'TestOrg1', 'TestOrg2', 'TestOrg3', 'TestOrg4', 'TestOrg5', 'TestOrg6']),
         "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal-dev.phederation.org', 'catalogue-dev.phederation.org', 'distributed-analytics-dev.phederation.org', 'cas-dev.phederation.org', Registry('harbor-dev.phederation.org', 'phederation'), ['Security Scan', 'Janssen', 'Actelion', 'PHederationTestOrg1', 'PHederationTestOrg2', 'PHederationTestOrg3', 'PHederationTestOrg4', 'PHederationTestOrg5', 'PHederationTestOrg6']),
@@ -14,9 +22,6 @@ class Globals:
         "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal-dev.athenafederation.org', 'catalogue-dev.athenafederation.org', 'distributed-analytics-dev.athenafederation.org', 'cas-dev.athenafederation.org', Registry('harbor-dev.athenafederation.org', 'athena'), ['CHU Liege', 'Illumina', 'KU Leuven', 'UZ Leuven', 'AZ Groeninge', 'Imec', 'edenceHealth', 'Janssen', 'AthenaTestOrg1', 'AthenaTestOrg2', 'AthenaTestOrg3', 'AthenaTestOrg4', 'AthenaTestOrg5', 'AthenaTestOrg6']),
         "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal-dev.lupusnet.org', 'catalogue-dev.lupusnet.org', 'distributed-analytics-dev.lupusnet.org', 'cas-dev.lupusnet.org', Registry('harbor-dev.lupusnet.org', 'lupus'), ['Janssen', 'LupusTestOrg1', 'LupusTestOrg2', 'LupusTestOrg3', 'LupusTestOrg4', 'LupusTestOrg5', 'LupusTestOrg6'])
     }
-
-    def get_environment():
-        return "DEV"
 
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
