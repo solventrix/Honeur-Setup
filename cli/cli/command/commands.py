@@ -1580,8 +1580,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 @click.option('-k', '--cli-key')
 @click.option('-fsd', '--feder8-studio-directory')
 def radiant(therapeutic_area, email, cli_key, feder8_studio_directory):
+    install_radiant_dependencies(therapeutic_area, email, cli_key)
     install_feder8_studio_app(therapeutic_area, email, cli_key, feder8_studio_directory, Globals.RADIANT)
-
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -1640,6 +1640,62 @@ def install_feder8_studio_app(therapeutic_area, email, cli_key, feder8_studio_di
     for l in container.logs(stream=True):
         print(l.decode('UTF-8'), end='')
 
+def install_radiant_dependencies(therapeutic_area, email, cli_key):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        docker_client = get_docker_client()
+
+        validate_correct_docker_network(docker_client)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        registry = therapeutic_area_info.registry
+
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
+    volume_names = ['r_libraries']
+    container_names = ['radiant-dependencies-installer']
+
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
+
+    registry = therapeutic_area_info.registry
+    feder8_studio_image_name_tag = get_feder8_studio_image_name_tag(therapeutic_area_info)
+    pull_image(docker_client, registry, feder8_studio_image_name_tag, email, cli_key)
+
+    environment_variables = {}
+
+    volumes = {
+        volume_names[0]: {
+            'bind': '/r-libs',
+            'mode': 'rw'
+        }
+    }
+
+    container = docker_client.containers.run(image=feder8_studio_image_name_tag,
+                                                remove=False,
+                                                name='radiant-dependencies-installer',
+                                                network=feder8_network,
+                                                environment=environment_variables,
+                                                volumes=volumes,
+                                                entrypoint="/bin/bash",
+                                                command="-c \"set -e && echo 'Installing Radiant dependencies... This could take a while.' && install2.r --error --libloc /r-libs --skipinstalled --repos 'https://r-package-manager.honeur.org/prod/latest' 'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert' > /dev/null 2>&1 && install2.r --error --libloc /r-libs --repos 'https://r-package-manager.honeur.org/prod/latest' 'radiant.data' 'radiant.basics' 'radiant.model' 'radiant.design' 'radiant.multivariate' 'radiant' > /dev/null 2>&1 && chown -R 54321:54321 /r-libs/* > /dev/null 2>&1 && echo 'Done installing Radiant dependencies'\"",
+                                                detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
