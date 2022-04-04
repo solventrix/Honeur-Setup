@@ -1589,6 +1589,7 @@ def radiant(therapeutic_area, email, cli_key, feder8_studio_directory):
 @click.option('-k', '--cli-key')
 @click.option('-fsd', '--feder8-studio-directory')
 def disease_explorer(therapeutic_area, email, cli_key, feder8_studio_directory):
+    install_disease_explorer_dependencies(therapeutic_area, email, cli_key)
     install_feder8_studio_app(therapeutic_area, email, cli_key, feder8_studio_directory, Globals.DISEASE_EXPLORER)
 
 
@@ -1640,7 +1641,36 @@ def install_feder8_studio_app(therapeutic_area, email, cli_key, feder8_studio_di
     for l in container.logs(stream=True):
         print(l.decode('UTF-8'), end='')
 
+
 def install_radiant_dependencies(therapeutic_area, email, cli_key):
+    dependencies_1 = "'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="radiant",
+                               dependencies=dependencies_1,
+                               repo="https://r-package-manager.honeur.org/prod/latest",
+                               skip_installed=True)
+    dependencies_2 = "'radiant.data' 'radiant.basics' 'radiant.model' 'radiant.design' 'radiant.multivariate' 'radiant'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="radiant",
+                               dependencies=dependencies_2,
+                               repo="https://r-package-manager.honeur.org/prod-internal/latest",
+                               skip_installed=False)
+
+
+def install_disease_explorer_dependencies(therapeutic_area, email, cli_key):
+    dependencies = "'flextable' 'inTextSummaryTable'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="disease_explorer",
+                               dependencies=dependencies,
+                               repo="https://r-package-manager.honeur.org/prod/latest",
+                               skip_installed=True)
+
+
+def install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name,
+                               dependencies,
+                               repo="https://r-package-manager.honeur.org/prod/latest",
+                               skip_installed=True):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
@@ -1666,7 +1696,8 @@ def install_radiant_dependencies(therapeutic_area, email, cli_key):
     feder8_network = get_network_name()
     network_names = [feder8_network]
     volume_names = ['r_libraries']
-    container_names = ['radiant-dependencies-installer']
+    container_name = app_name + "-r-dependencies-installer"
+    container_names = [container_name]
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
@@ -1685,15 +1716,19 @@ def install_radiant_dependencies(therapeutic_area, email, cli_key):
         }
     }
 
+    skip_installed_option = "--skipinstalled"
+    if not skip_installed:
+        skip_installed_option = ""
+    command = f"-c \"set -e && echo 'Installing R packages. This could take a while...' && install2.r --error --libloc /r-libs {skip_installed_option} --repos '{repo}' {dependencies} > /dev/null 2>&1 && chown -R 54321:54321 /r-libs/* > /dev/null 2>&1 && echo 'Done installing R packages'\""
     container = docker_client.containers.run(image=feder8_studio_image_name_tag,
-                                                remove=False,
-                                                name='radiant-dependencies-installer',
-                                                network=feder8_network,
-                                                environment=environment_variables,
-                                                volumes=volumes,
-                                                entrypoint="/bin/bash",
-                                                command="-c \"set -e && echo 'Installing Radiant dependencies... This could take a while.' && install2.r --error --libloc /r-libs --skipinstalled --repos 'https://r-package-manager.honeur.org/prod/latest' 'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert' > /dev/null 2>&1 && install2.r --error --libloc /r-libs --repos 'https://r-package-manager.honeur.org/prod/latest' 'radiant.data' 'radiant.basics' 'radiant.model' 'radiant.design' 'radiant.multivariate' 'radiant' > /dev/null 2>&1 && chown -R 54321:54321 /r-libs/* > /dev/null 2>&1 && echo 'Done installing Radiant dependencies'\"",
-                                                detach=True)
+                                             remove=False,
+                                             name=container_name,
+                                             network=feder8_network,
+                                             environment=environment_variables,
+                                             volumes=volumes,
+                                             entrypoint="/bin/bash",
+                                             command=command,
+                                             detach=True)
     for l in container.logs(stream=True):
         print(l.decode('UTF-8'), end='')
 
@@ -2517,6 +2552,8 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
         install_feder8_studio = questionary.confirm("Do you want to install Feder8 Studio?").unsafe_ask()
 
+        install_radiant = False
+        install_disease_explorer = False
         if install_feder8_studio:
             if feder8_studio_directory is None:
                 feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
