@@ -7,6 +7,14 @@ from typing import Dict
 
 
 class Globals:
+
+    FEDER8_NET = "feder8-net"
+    RADIANT = "radiant"
+    DISEASE_EXPLORER = "diseaseExplorer"
+
+    def get_environment():
+        return "UAT"
+
     therapeutic_areas:Dict[str, TherapeuticArea] = {
         "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-uat.honeur.org', 'catalogue-uat.honeur.org', 'distributed-analytics-uat.honeur.org', 'cas-uat.honeur.org', Registry('harbor-uat.honeur.org', 'honeur'), ['Security Scan', 'UHL', 'DOS', 'CLLEAR', 'RMG', 'iOMEDICO', 'OIS', 'EMMOS', 'Janssen', 'EY', 'ZOL', 'HOPE', 'TestOrg1', 'TestOrg2', 'TestOrg3', 'TestOrg4', 'TestOrg5', 'TestOrg6']),
         "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal-uat.phederation.org', 'catalogue-uat.phederation.org', 'distributed-analytics-uat.phederation.org', 'cas-uat.phederation.org', Registry('harbor-uat.phederation.org', 'phederation'), ['Security Scan', 'Janssen', 'Actelion', 'PHederationTestOrg1', 'PHederationTestOrg2', 'PHederationTestOrg3', 'PHederationTestOrg4', 'PHederationTestOrg5', 'PHederationTestOrg6']),
@@ -14,9 +22,6 @@ class Globals:
         "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal-uat.athenafederation.org', 'catalogue-uat.athenafederation.org', 'distributed-analytics-uat.athenafederation.org', 'cas-uat.athenafederation.org', Registry('harbor-uat.athenafederation.org', 'athena'), ['CHU Liege', 'Illumina', 'KU Leuven', 'UZ Leuven', 'AZ Groeninge', 'Imec', 'imec-1', 'imec-2', 'imec-3', 'edenceHealth', 'Janssen', 'AthenaTestOrg1', 'AthenaTestOrg2', 'AthenaTestOrg3', 'AthenaTestOrg4', 'AthenaTestOrg5', 'AthenaTestOrg6']),
         "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal-uat.lupusnet.org', 'catalogue-uat.lupusnet.org', 'distributed-analytics-uat.lupusnet.org', 'cas-uat.lupusnet.org', Registry('harbor-uat.lupusnet.org', 'lupus'), ['Janssen', 'Registry 1', 'Registry 2', 'LupusnetTestOrg1', 'LupusnetTestOrg2', 'LupusnetTestOrg3', 'LupusnetTestOrg4', 'LupusnetTestOrg5', 'LupusnetTestOrg6'])
     }
-
-    def get_environment():
-        return "UAT"
 
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
