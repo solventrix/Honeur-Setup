@@ -2520,8 +2520,9 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if install_feder8_studio:
             if feder8_studio_directory is None:
                 feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
-            install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
-            install_disease_explorer = questionary.confirm("Do you want to install the Disease Explorer app in Feder8 Studio?").unsafe_ask()
+            if therapeutic_area == "HONEUR":
+                install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
+                install_disease_explorer = questionary.confirm("Do you want to install the Disease Explorer app in Feder8 Studio?").unsafe_ask()
 
         install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
 
