@@ -1643,16 +1643,16 @@ def install_feder8_studio_app(therapeutic_area, email, cli_key, feder8_studio_di
 
 
 def install_radiant_dependencies(therapeutic_area, email, cli_key):
-    dependencies_1 = "'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert'"
+    external_dependencies = "'DBI' 'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'lubridate' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert'"
     install_r_app_dependencies(therapeutic_area, email, cli_key,
                                app_name="radiant",
-                               dependencies=dependencies_1,
+                               dependencies=external_dependencies,
                                repo="https://r-package-manager.honeur.org/prod/latest",
-                               skip_installed=True)
-    dependencies_2 = "'radiant.data' 'radiant.basics' 'radiant.model' 'radiant.design' 'radiant.multivariate' 'radiant'"
+                               skip_installed=False)
+    internal_radiant_packages = "'radiant.data' 'radiant.basics' 'radiant.model' 'radiant.design' 'radiant.multivariate' 'radiant'"
     install_r_app_dependencies(therapeutic_area, email, cli_key,
                                app_name="radiant",
-                               dependencies=dependencies_2,
+                               dependencies=internal_radiant_packages,
                                repo="https://r-package-manager.honeur.org/prod-internal/latest",
                                skip_installed=False)
 
@@ -1663,7 +1663,7 @@ def install_disease_explorer_dependencies(therapeutic_area, email, cli_key):
                                app_name="disease_explorer",
                                dependencies=dependencies,
                                repo="https://r-package-manager.honeur.org/prod/latest",
-                               skip_installed=True)
+                               skip_installed=False)
 
 
 def install_r_app_dependencies(therapeutic_area, email, cli_key,
