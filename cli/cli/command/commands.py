@@ -253,7 +253,7 @@ def get_postgres_image_name_tag(therapeutic_area_info):
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'config-server', '2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'config-server', '2.0.2')
 
 
 def get_update_configuration_image_name_tag(therapeutic_area_info):
