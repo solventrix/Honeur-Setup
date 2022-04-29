@@ -249,7 +249,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.8')
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
@@ -269,27 +269,27 @@ def get_user_mgmt_image_name_tag(therapeutic_area_info):
 
 
 def get_atlas_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'atlas', '2.9.0-2.0.0')
+    return get_image_name_tag(therapeutic_area_info, 'atlas', '2.9.0-2.0.1')
 
 
 def get_webapi_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.2')
 
 
 def get_zeppelin_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.5')
 
 
 def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'r-server-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'r-server-2.0.5')
 
 
 def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.5')
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.6')
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.9')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.10')
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
@@ -306,7 +306,7 @@ def get_task_manager_image_name_tag(therapeutic_area_info):
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.9')
+    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.10')
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
