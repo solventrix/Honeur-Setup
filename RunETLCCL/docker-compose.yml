@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  etl:
+    image: harbor.honeur.org/etl-ccl/etl:current
+    volumes:
+      - "./log:/log"
+    networks:
+      - honeur_honeur-net
+    environment:
+      VERBOSITY_LEVEL: verbosity_level
+      LOG_DIR: "../log"
+      BATCH_SIZE: "50000"
+      CLIENT_NAME: "CCL"
+      CHUNKSIZE: 1000000
+      SOURCE_SERVER: source_server
+      SOURCE_PORT: source_port
+      SOURCE_DATABASE: source_database
+      SOURCE_USERNAME: source_username
+      SOURCE_PASSWORD: source_password
+      TARGET_SERVER: target_server
+      TARGET_PORT: target_port
+      TARGET_DATABASE: target_database
+      TARGET_SCHEMA: target_schema
+      TARGET_USERNAME: target_username
+      TARGET_PASSWORD: target_password
+networks:
+  honeur_honeur-net:
+    external:
+      name: feder8-net
