@@ -12,6 +12,7 @@ class Globals:
     RADIANT = "radiant"
     DISEASE_EXPLORER = "diseaseExplorer"
 
+    @staticmethod
     def get_environment():
         return "UAT"
 
@@ -44,5 +45,6 @@ class Globals:
         'feder8.local.security.user-mgmt-password': SingleChoiceQuestion('Enter the administrator password?', 'admin'),
     }
 
+    @staticmethod
     def get_question(key):
         return Globals.all_questions.get(key)
