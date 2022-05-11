@@ -289,7 +289,7 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.10')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.9')
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
@@ -1203,6 +1203,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_TASK-MANAGER-CONTAINER-URL': 'http://task-manager:8080/task-manager',
+        'FEDER8_LOCAL_HOST_TASK-MANAGER-URL': '${feder8.local.host.portal-url}/task-manager'
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
