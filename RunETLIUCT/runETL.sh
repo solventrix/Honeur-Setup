@@ -10,7 +10,7 @@ read -p "DB schema [omopcdm]: " db_schema
 db_schema=${db_schema:-omopcdm}
 read -p "DB username [honeur_admin]: " db_username
 db_username=${db_username:-honeur_admin}
-read -p "DB password [honeur_admin]: " db_password
+read -p "DB password: " db_password
 read -p "Source file [EXTRACT_2022-04-25.xlsx]: " source_file
 source_file=${source_file:-EXTRACT_2022-04-25.xlsx}
 read -p "Output verbosity level [INFO]: " verbosity_level
