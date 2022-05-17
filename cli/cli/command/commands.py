@@ -29,7 +29,9 @@ PGDATA_VOLUME = "pgdata"
 SHARED_VOLUME = "shared"
 ZEPPELIN_NOTEBOOK_VOLUME = "zeppelin-notebooks"
 ZEPPELIN_LOGS_VOLUME = "zeppelin-logs"
-FEDER8_STUDIO_VOLUME = "feder8-studio"
+SHINY_APP_VOLUME = "shiny-apps"
+VS_CODE_CONFIG_VOLUME = "vs-code-config"
+FEDER8_SCRIPT_VOLUME = "feder8-scripts"
 FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
 PY_ENV_VOLUME  = "py_environment"
@@ -250,6 +252,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_feder8_studio_image_name_tag(therapeutic_area_info),
         get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.RADIANT),
         get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.DISEASE_EXPLORER),
+        get_vs_code_server_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
         get_vocabulary_update_image_name_tag(therapeutic_area_info),
         get_local_backup_image_name_tag(therapeutic_area_info),
@@ -298,7 +301,11 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.9')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.10')
+
+
+def get_vs_code_server_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'vs-code-server', '4.4.0')
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
@@ -612,7 +619,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = [SHARED_VOLUME, CONFIG_SERVER_VOLUME, FEDER8_STUDIO_VOLUME]
+    volume_names = [SHARED_VOLUME, CONFIG_SERVER_VOLUME, SHINY_APP_VOLUME]
     container_names = ['local-portal', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -642,8 +649,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
     print('Starting local-portal container...')
     socket_gid = os.stat("/var/run/docker.sock").st_gid
 
-    feder8_studio_directory = "/home/feder8/feder8-studio"
-    feder8_studio_app_directory = feder8_studio_directory + '/sites/' + therapeutic_area_info.name + 'studio/_apps'
+    feder8_studio_app_directory = "/home/feder8/studio/apps"
 
     volumes={
             SHARED_VOLUME: {
@@ -654,8 +660,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             },
-            FEDER8_STUDIO_VOLUME: {
-                'bind': feder8_studio_directory,
+            SHINY_APP_VOLUME: {
+                'bind': feder8_studio_app_directory,
                 'mode': 'ro'
             }
         }
@@ -1153,7 +1159,7 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = [CONFIG_SERVER_VOLUME, FEDER8_STUDIO_VOLUME]
+    volume_names = [CONFIG_SERVER_VOLUME, FEDER8_SCRIPT_VOLUME, VS_CODE_CONFIG_VOLUME]
     container_names = ['task-manager', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1187,10 +1193,10 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
 
     pull_image(docker_client, registry, task_manager_image_name_tag, email, cli_key)
 
-    feder8_studio_folder = "/home/feder8/studio"
-    feder8_studio_home_folder = feder8_studio_folder + '/sites/' + therapeutic_area_info.name + 'studio'
-    rstudio_upload_dir = 'r-scripts'
-    vscode_upload_dir = 'scripts'
+    feder8_home_folder = "/home/feder8"
+    rstudio_upload_folder = feder8_home_folder + "/r-scripts"
+    vscode_config_folder = feder8_home_folder + "/config"
+    vscode_upload_folder = vscode_config_folder + "/workspace"
 
     print('Starting Task Manager container...')
     environment_variables = {
@@ -1208,9 +1214,9 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_IS_CENTRAL': 'false',
         'SERVER_SERVLET_CONTEXT_PATH': '/task-manager',
-        'FEDER8_STUDIO_HOME_FOLDER': feder8_studio_home_folder,
-        'FEDER8_STUDIO_RSTUDIO_UPLOAD_DIR': rstudio_upload_dir,
-        'FEDER8_STUDIO_VSCODE_UPLOAD_DIR': vscode_upload_dir,
+        'FEDER8_STUDIO_HOME_FOLDER': feder8_home_folder,
+        'FEDER8_STUDIO_RSTUDIO_UPLOAD_DIR': rstudio_upload_folder,
+        'FEDER8_STUDIO_VSCODE_UPLOAD_DIR': vscode_upload_folder,
         'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
         'FEDER8_THERAPEUTIC_AREA_FAVICON_LOCATION': '/images/' + therapeutic_area_info.name + '-favicon.ico',
         'FEDER8_THERAPEUTIC_AREA_LOGO_LOCATION': '/images/' + therapeutic_area_info.name + '-logo.png',
@@ -1241,8 +1247,12 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
                 'bind': '/var/lib/shared',
                 'mode': 'ro'
             },
-            FEDER8_STUDIO_VOLUME: {
-                'bind': feder8_studio_folder,
+            FEDER8_SCRIPT_VOLUME: {
+                'bind': rstudio_upload_folder,
+                'mode': 'rw'
+            },
+            VS_CODE_CONFIG_VOLUME: {
+                'bind': vscode_config_folder,
                 'mode': 'rw'
             }
         },
@@ -1435,7 +1445,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = [FEDER8_STUDIO_VOLUME, FEDER8_DATA_VOLUME, SHARED_VOLUME, CONFIG_SERVER_VOLUME]
+    volume_names = [VS_CODE_CONFIG_VOLUME, FEDER8_DATA_VOLUME, SHARED_VOLUME, CONFIG_SERVER_VOLUME]
     container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1482,7 +1492,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
         'DOMAIN_NAME': host,
         'SESSION_TIMEOUT': 43200,
         'CONTAINER_WAIT_TIME': 720000,
-        'HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER': volume_names[0],
+        'HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER': FEDER8_DATA_VOLUME,
         'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'HONEUR_THERAPEUTIC_AREA_URL': therapeutic_area_info.registry.registry_url,
         'HONEUR_THERAPEUTIC_AREA_UPPERCASE': therapeutic_area_info.name.upper(),
@@ -1507,7 +1517,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
             'bind': '/var/lib/shared',
             'mode': 'ro'
         },
-        FEDER8_STUDIO_VOLUME: {
+        FEDER8_DATA_VOLUME: {
             'bind': '/opt/data',
             'mode': 'ro'
         }
@@ -1582,8 +1592,8 @@ def install_feder8_studio_app(therapeutic_area, email, cli_key, app_name):
     }
 
     volumes = {
-        FEDER8_STUDIO_VOLUME: {
-            'bind': '/opt/data',
+        SHINY_APP_VOLUME: {
+            'bind': '/opt/apps',
             'mode': 'rw'
         }
     }
