@@ -253,6 +253,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.RADIANT),
         get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.DISEASE_EXPLORER),
         get_vs_code_server_name_tag(therapeutic_area_info),
+        get_r_studio_server_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
         get_vocabulary_update_image_name_tag(therapeutic_area_info),
         get_local_backup_image_name_tag(therapeutic_area_info),
@@ -306,6 +307,10 @@ def get_feder8_studio_image_name_tag(therapeutic_area_info):
 
 def get_vs_code_server_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'vs-code-server', '4.4.0')
+
+
+def get_r_studio_server_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'r-studio-server', '4.2.0')
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
@@ -1480,6 +1485,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
     feder8_studio_image_name_tag = get_feder8_studio_image_name_tag(therapeutic_area_info)
 
     pull_image(docker_client, registry, feder8_studio_image_name_tag, email, cli_key)
+    pull_image(docker_client, registry, get_vs_code_server_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_r_studio_server_name_tag(therapeutic_area_info), email, cli_key)
 
     print('Starting Feder8 Studio container...')
 
