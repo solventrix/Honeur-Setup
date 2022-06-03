@@ -429,8 +429,8 @@ def config_server(therapeutic_area, email, cli_key):
         'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
         'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
-        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-URL': '${feder8.local.host.portal-url}/' + therapeutic_area_info.name + '-studio',
-        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-CONTAINER-URL': 'http://' + therapeutic_area_info.name + '-studio:8080/' + therapeutic_area_info.name + '-studio'
+        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-URL': '${feder8.local.host.portal-url}/feder8-studio',
+        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-CONTAINER-URL': 'http://feder8-studio:8080/feder8-studio'
     }
 
     update_config_on_config_server(docker_client=docker_client,
@@ -1451,7 +1451,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
     feder8_network = get_network_name()
     network_names = [feder8_network]
     volume_names = [VS_CODE_CONFIG_VOLUME, FEDER8_DATA_VOLUME, SHARED_VOLUME, CONFIG_SERVER_VOLUME]
-    container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
+    container_names = ['feder8-studio', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
