@@ -1686,8 +1686,8 @@ def install_r_app_dependencies(therapeutic_area, email, cli_key,
     check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     registry = therapeutic_area_info.registry
-    feder8_studio_image_name_tag = get_feder8_studio_image_name_tag(therapeutic_area_info)
-    pull_image(docker_client, registry, feder8_studio_image_name_tag, email, cli_key)
+    r_studio_image_name_tag = get_r_studio_server_name_tag(therapeutic_area_info)
+    pull_image(docker_client, registry, r_studio_image_name_tag, email, cli_key)
 
     environment_variables = {}
 
@@ -1702,7 +1702,7 @@ def install_r_app_dependencies(therapeutic_area, email, cli_key,
     if not skip_installed:
         skip_installed_option = ""
     command = f"-c \"set -e && echo 'Installing R packages. This could take a while...' && install2.r --error --libloc /r-libs {skip_installed_option} --repos '{repo}' {dependencies} > /dev/null 2>&1 && chown -R 54321:54321 /r-libs/* > /dev/null 2>&1 && echo 'Done installing R packages'\""
-    container = docker_client.containers.run(image=feder8_studio_image_name_tag,
+    container = docker_client.containers.run(image=r_studio_image_name_tag,
                                              remove=False,
                                              name=container_name,
                                              network=feder8_network,
