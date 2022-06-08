@@ -1646,6 +1646,12 @@ def install_disease_explorer_dependencies(therapeutic_area, email, cli_key):
                                dependencies=dependencies,
                                repo="https://r-package-manager.honeur.org/prod/latest",
                                skip_installed=False)
+    disease_explorer_package = "'diseaseExplorer'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="disease_explorer",
+                               dependencies=disease_explorer_package,
+                               repo="https://r-package-manager.honeur.org/prod-internal/latest",
+                               skip_installed=False)
 
 
 def install_r_app_dependencies(therapeutic_area, email, cli_key,
