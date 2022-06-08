@@ -1625,7 +1625,7 @@ def install_feder8_studio_app(therapeutic_area, email, cli_key, app_name):
 
 
 def install_radiant_dependencies(therapeutic_area, email, cli_key):
-    external_dependencies = "'DBI' 'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'lubridate' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert'"
+    external_dependencies = "'DBI' 'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'lubridate' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shiny' 'Cairo' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert' 'car' 'writexl'"
     install_r_app_dependencies(therapeutic_area, email, cli_key,
                                app_name="radiant",
                                dependencies=external_dependencies,
@@ -1640,7 +1640,7 @@ def install_radiant_dependencies(therapeutic_area, email, cli_key):
 
 
 def install_disease_explorer_dependencies(therapeutic_area, email, cli_key):
-    dependencies = "'flextable' 'inTextSummaryTable'"
+    dependencies = "'rjson' 'survminer' 'shiny' 'Cairo' 'flextable' 'inTextSummaryTable'"
     install_r_app_dependencies(therapeutic_area, email, cli_key,
                                app_name="disease_explorer",
                                dependencies=dependencies,
