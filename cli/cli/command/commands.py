@@ -2543,7 +2543,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         install_radiant = False
         install_disease_explorer = False
         if install_feder8_studio and therapeutic_area == "HONEUR":
-            install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
+            #install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
             install_disease_explorer = questionary.confirm("Do you want to install the Disease Explorer app in Feder8 Studio?").unsafe_ask()
 
         install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
