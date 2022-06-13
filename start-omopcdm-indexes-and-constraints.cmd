@@ -29,7 +29,7 @@ pause>NUL
 echo Creating folder setup-conf
 mkdir setup-conf
 echo Downloading docker-compose.yml file.
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/OMOPCDMDBIndexesAndContraints/docker-compose.yml --output docker-compose.yml
 
 docker-compose pull
 docker-compose up
