@@ -31,6 +31,7 @@ ZEPPELIN_NOTEBOOK_VOLUME = "zeppelin-notebooks"
 ZEPPELIN_LOGS_VOLUME = "zeppelin-logs"
 SHINY_APP_VOLUME = "shiny-apps"
 VS_CODE_CONFIG_VOLUME = "vs-code-config"
+DISEASE_EXPLORER_CONFIG_VOLUME = "disease-explorer-config"
 FEDER8_SCRIPT_VOLUME = "feder8-scripts"
 FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
@@ -251,10 +252,10 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
         get_feder8_studio_image_name_tag(therapeutic_area_info),
         get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.RADIANT),
-        get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.DISEASE_EXPLORER),
-        get_vs_code_server_name_tag(therapeutic_area_info),
-        get_r_studio_server_name_tag(therapeutic_area_info),
-        get_shiny_server_name_tag(therapeutic_area_info),
+        get_vs_code_server_image_name_tag(therapeutic_area_info),
+        get_r_studio_server_image_name_tag(therapeutic_area_info),
+        get_shiny_server_image_name_tag(therapeutic_area_info),
+        get_disease_explorer_image_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
         get_vocabulary_update_image_name_tag(therapeutic_area_info),
         get_local_backup_image_name_tag(therapeutic_area_info),
@@ -306,16 +307,20 @@ def get_feder8_studio_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.10')
 
 
-def get_vs_code_server_name_tag(therapeutic_area_info):
+def get_vs_code_server_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'vs-code-server', '4.4.0')
 
 
-def get_r_studio_server_name_tag(therapeutic_area_info):
+def get_r_studio_server_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'r-studio-server', '4.2.0')
 
 
-def get_shiny_server_name_tag(therapeutic_area_info):
+def get_shiny_server_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'shiny-server', '4.2.0')
+
+
+def get_disease_explorer_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.1.5')
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
@@ -1490,9 +1495,9 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
     feder8_studio_image_name_tag = get_feder8_studio_image_name_tag(therapeutic_area_info)
 
     pull_image(docker_client, registry, feder8_studio_image_name_tag, email, cli_key)
-    pull_image(docker_client, registry, get_vs_code_server_name_tag(therapeutic_area_info), email, cli_key)
-    pull_image(docker_client, registry, get_r_studio_server_name_tag(therapeutic_area_info), email, cli_key)
-    pull_image(docker_client, registry, get_shiny_server_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_vs_code_server_image_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_r_studio_server_image_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_shiny_server_image_name_tag(therapeutic_area_info), email, cli_key)
 
     print('Starting Feder8 Studio container...')
 
@@ -1576,8 +1581,18 @@ def radiant(therapeutic_area, email, cli_key):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def disease_explorer(therapeutic_area, email, cli_key):
-    install_disease_explorer_dependencies(therapeutic_area, email, cli_key)
-    install_feder8_studio_app(therapeutic_area, email, cli_key, Globals.DISEASE_EXPLORER)
+    docker_client = get_docker_client()
+    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+    registry = therapeutic_area_info.registry
+
+    configuration: ConfigurationController = get_configuration(therapeutic_area)
+    if email is None:
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+    if cli_key is None:
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+    pull_image(docker_client, registry, get_disease_explorer_image_name_tag(therapeutic_area_info), email, cli_key)
+    check_volumes_and_create_if_not_exists(docker_client, [DISEASE_EXPLORER_CONFIG_VOLUME])
 
 
 def install_feder8_studio_app(therapeutic_area, email, cli_key, app_name):
@@ -1692,7 +1707,7 @@ def install_r_app_dependencies(therapeutic_area, email, cli_key,
     check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
     registry = therapeutic_area_info.registry
-    r_studio_image_name_tag = get_r_studio_server_name_tag(therapeutic_area_info)
+    r_studio_image_name_tag = get_r_studio_server_image_name_tag(therapeutic_area_info)
     pull_image(docker_client, registry, r_studio_image_name_tag, email, cli_key)
 
     environment_variables = {}
