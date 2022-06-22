@@ -12,14 +12,62 @@ class CustomConceptsUpdatePipeline:
     def execute(self):
         logging.info("1. Pull all images of the pipeline")
         self._pull_images()
-        logging.info("2. Update custom concepts")
+        logging.info("2. delete base indexes")
+        self._delete_base_indexes()
+        is_constraints_set = self._constraints_set()
+        if is_constraints_set:
+            logging.info("3. delete constraints")
+            self._delete_constraints()
+        else:
+            logging.info("3. Constraints are not set: safe to continue")
+        logging.info("4. update custom concepts")
         self._update_custom_concepts()
-        logging.info("3. Rebuild concept hierarchy")
+        if is_constraints_set:
+            logging.info("5. add constraints again")
+            self._add_constraints()
+        else:
+            logging.info("5. no need to add constraints")
+        logging.info("6. add base indexes")
+        self._add_base_indexes()
+        logging.info("7. rebuild concept hierarchy")
         self._rebuild_concept_hierarchy()
 
+    def _constraints_set(self):
+        logging.info("Checking if constraints are set...")
+        with psycopg2.connect(host=self._db_connection_details.host,
+                              port=self._db_connection_details.port,
+                              dbname=self._db_connection_details.name,
+                              user=self._db_connection_details.username,
+                              password=self._db_connection_details.password,
+                              options="-c search_path=" + self._db_connection_details.schema) as connection:
+            connection.autocommit = True
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND rel.relname = 'concept' AND con.conname = 'fpk_concept_domain';")
+                return cursor.fetchone()[0] > 0
+
     def _pull_images(self):
+        self._docker_client.pull_image(self.get_delete_base_indexes_image_name_tag())
+        self._docker_client.pull_image(self.get_add_base_indexes_image_name_tag())
+        self._docker_client.pull_image(self.get_delete_constraints_image_name_tag())
+        self._docker_client.pull_image(self.get_add_constraints_image_name_tag())
         self._docker_client.pull_image(self.get_update_custom_concepts_image_name_tag())
         self._docker_client.pull_image(self.get_rebuild_concept_hierarchy_image_name_tag())
+
+    def _delete_base_indexes(self):
+        self._run_container(image=self.get_delete_base_indexes_image_name_tag(),
+                            name='omopcdm-delete-base-indexes')
+
+    def _delete_constraints(self):
+        self._run_container(image=self.get_delete_constraints_image_name_tag(),
+                            name='omopcdm-delete-constraints')
+
+    def _add_constraints(self):
+        self._run_container(image=self.get_add_constraints_image_name_tag(),
+                            name='omopcdm-add-constraints')
+
+    def _add_base_indexes(self):
+        self._run_container(image=self.get_add_base_indexes_image_name_tag(),
+                            name='omopcdm-add-base-indexes')
 
     def _update_custom_concepts(self):
         self._run_container(image=self.get_update_custom_concepts_image_name_tag(),
@@ -35,6 +83,18 @@ class CustomConceptsUpdatePipeline:
                                           network=self.get_network_name(),
                                           volumes={'shared': {'bind': '/var/lib/shared', 'mode': 'rw'}},
                                           detach=True, show_logs=True)
+
+    def get_delete_base_indexes_image_name_tag(self):
+        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-delete-base-indexes-2.0.0')
+
+    def get_add_base_indexes_image_name_tag(self):
+        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-add-base-indexes-2.0.0')
+
+    def get_delete_constraints_image_name_tag(self):
+        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-delete-constraints-2.0.0')
+
+    def get_add_constraints_image_name_tag(self):
+        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-add-constraints-2.0.0')
 
     def get_update_custom_concepts_image_name_tag(self):
         return self._docker_client.get_image_name_tag('postgres', 'omopcdm-update-custom-concepts-2.6')
