@@ -15,11 +15,9 @@ class CustomConceptsUpdatePipeline:
         logging.info("2. delete base indexes")
         self._delete_base_indexes()
         is_constraints_set = self._constraints_set()
-        if is_constraints_set:
-            logging.info("3. delete constraints")
-            self._delete_constraints()
-        else:
-            logging.info("3. Constraints are not set: safe to continue")
+        # it is safe to always drop the constraints because of the "if exists" in the SQL script
+        logging.info("3. delete constraints")
+        self._delete_constraints()
         logging.info("4. update custom concepts")
         self._update_custom_concepts()
         if is_constraints_set:
@@ -42,7 +40,7 @@ class CustomConceptsUpdatePipeline:
                               options="-c search_path=" + self._db_connection_details.schema) as connection:
             connection.autocommit = True
             with connection.cursor() as cursor:
-                cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND rel.relname = 'concept' AND con.conname = 'fpk_concept_domain';")
+                cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND con.conname = 'fpk_person_gender_concept';")
                 return cursor.fetchone()[0] > 0
 
     def _pull_images(self):
