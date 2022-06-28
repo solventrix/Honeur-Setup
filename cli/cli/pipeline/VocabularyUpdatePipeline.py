@@ -35,16 +35,24 @@ class VoacabularyUpdatePipeline:
 
     def _constraints_set(self):
         logging.info("Checking if constraints are set...")
-        with psycopg2.connect(host=self._db_connection_details.host,
-                              port=self._db_connection_details.port,
-                              dbname=self._db_connection_details.name,
-                              user=self._db_connection_details.username,
-                              password=self._db_connection_details.password,
-                              options="-c search_path=" + self._db_connection_details.schema) as connection:
-            connection.autocommit = True
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND rel.relname = 'concept' AND con.conname = 'fpk_concept_domain';")
-                return cursor.fetchone()[0] > 0
+        try:
+            if not self._db_connection_details.password or not self._db_connection_details.schema:
+                logging.warning("Missing configuration, unable to check the DB constraints")
+                return False
+
+            with psycopg2.connect(host=self._db_connection_details.host,
+                                  port=self._db_connection_details.port,
+                                  dbname=self._db_connection_details.name,
+                                  user=self._db_connection_details.username,
+                                  password=self._db_connection_details.password,
+                                  options="-c search_path=" + self._db_connection_details.schema) as connection:
+                connection.autocommit = True
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND rel.relname = 'concept' AND con.conname = 'fpk_concept_domain';")
+                    return cursor.fetchone()[0] > 0
+        except:
+            logging.warning("Failed to check database constraints")
+            return False
 
     def _pull_images(self):
         self._docker_client.pull_image(self.get_delete_base_indexes_image_name_tag())
