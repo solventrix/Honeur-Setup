@@ -15,11 +15,9 @@ class CustomConceptsUpdatePipeline:
         logging.info("2. delete base indexes")
         self._delete_base_indexes()
         is_constraints_set = self._constraints_set()
-        if is_constraints_set:
-            logging.info("3. delete constraints")
-            self._delete_constraints()
-        else:
-            logging.info("3. Constraints are not set: safe to continue")
+        # it is safe to always drop the constraints because of the "if exists" in the SQL script
+        logging.info("3. delete constraints")
+        self._delete_constraints()
         logging.info("4. update custom concepts")
         self._update_custom_concepts()
         if is_constraints_set:
@@ -34,16 +32,24 @@ class CustomConceptsUpdatePipeline:
 
     def _constraints_set(self):
         logging.info("Checking if constraints are set...")
-        with psycopg2.connect(host=self._db_connection_details.host,
-                              port=self._db_connection_details.port,
-                              dbname=self._db_connection_details.name,
-                              user=self._db_connection_details.username,
-                              password=self._db_connection_details.password,
-                              options="-c search_path=" + self._db_connection_details.schema) as connection:
-            connection.autocommit = True
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND rel.relname = 'concept' AND con.conname = 'fpk_concept_domain';")
-                return cursor.fetchone()[0] > 0
+        try:
+            if not self._db_connection_details.password or not self._db_connection_details.schema:
+                logging.warning("Missing configuration, unable to check the DB constraints")
+                return False
+
+            with psycopg2.connect(host=self._db_connection_details.host,
+                                  port=self._db_connection_details.port,
+                                  dbname=self._db_connection_details.name,
+                                  user=self._db_connection_details.username,
+                                  password=self._db_connection_details.password,
+                                  options="-c search_path=" + self._db_connection_details.schema) as connection:
+                connection.autocommit = True
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT count(*) FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname = 'omopcdm' AND con.conname = 'fpk_person_gender_concept';")
+                    return cursor.fetchone()[0] > 0
+        except:
+            logging.warning("Failed to check database constraints")
+            return False
 
     def _pull_images(self):
         self._docker_client.pull_image(self.get_delete_base_indexes_image_name_tag())
@@ -97,7 +103,7 @@ class CustomConceptsUpdatePipeline:
         return self._docker_client.get_image_name_tag('postgres', 'omopcdm-add-constraints-2.0.0')
 
     def get_update_custom_concepts_image_name_tag(self):
-        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-update-custom-concepts-2.6')
+        return self._docker_client.get_image_name_tag('postgres', 'omopcdm-update-custom-concepts-2.7')
 
     def get_rebuild_concept_hierarchy_image_name_tag(self):
         return self._docker_client.get_image_name_tag('postgres', 'results-rebuild-concept-hierarchy-2.0.1')
