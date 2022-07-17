@@ -16,7 +16,7 @@ services:
       DB_SCHEMA: db_schema
       DB_USER: db_username
       DB_PASSWORD: db_password
-      LAST_DATA_EXPORT: date_last_export
+      date_last_export: date_last_export
       VERBOSITY_LEVEL: verbosity_level
       SOURCE_FILE: source_file
 
