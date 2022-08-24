@@ -1203,6 +1203,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_TASK-MANAGER-CONTAINER-URL': 'http://task-manager:8080/task-manager',
+        'FEDER8_LOCAL_HOST_TASK-MANAGER-URL': '${feder8.local.host.portal-url}/task-manager'
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
