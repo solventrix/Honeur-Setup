@@ -18,11 +18,11 @@ if "%~1" NEQ "" (
     goto installation
 )
 
-SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
+SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena/lupus [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
 :while-therapeutic-area-not-correct
-if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "phederation" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "" (
-   echo Enter "honeur", "phederation", "esfurn" or empty for default "honeur" value
-   SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
+if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "phederation" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "athena" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "" (
+   echo Enter "honeur", "phederation", "esfurn", "athena" or empty for default "honeur" value
+   SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena/lupus [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
    goto :while-therapeutic-area-not-correct
 )
 
@@ -36,6 +36,14 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "phederation" (
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+)
+if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
+    SET FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+)
+if "%FEDER8_THERAPEUTIC_AREA%" == "lupus" (
+    SET FEDER8_THERAPEUTIC_AREA_DOMAIN=lupusnet.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
@@ -70,6 +78,14 @@ if "%FEDER8_THERAPEUTIC_AREA%" == "phederation" (
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+)
+if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
+    SET FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+)
+if "%FEDER8_THERAPEUTIC_AREA%" == "lupus" (
+    SET FEDER8_THERAPEUTIC_AREA_DOMAIN=lupusnet.org
     SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 

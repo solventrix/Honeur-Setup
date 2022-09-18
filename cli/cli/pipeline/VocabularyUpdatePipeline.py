@@ -3,7 +3,7 @@ import psycopg2
 from cli.configuration.DockerClientFacade import DockerClientFacade
 from cli.configuration.DatabaseConnectionDetails import DatabaseConnectionDetails
 
-class VoacabularyUpdatePipeline:
+class VocabularyUpdatePipeline:
 
     def __init__(self, docker_client: DockerClientFacade, db_connection_details: DatabaseConnectionDetails):
         self._docker_client = docker_client

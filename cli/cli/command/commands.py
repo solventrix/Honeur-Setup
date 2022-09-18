@@ -24,6 +24,19 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.WARNING)
 
+CONFIG_SERVER_VOLUME = "feder8-config-server"
+PGDATA_VOLUME = "pgdata"
+SHARED_VOLUME = "shared"
+ZEPPELIN_NOTEBOOK_VOLUME = "zeppelin-notebooks"
+ZEPPELIN_LOGS_VOLUME = "zeppelin-logs"
+SHINY_APP_VOLUME = "shiny-apps"
+VS_CODE_CONFIG_VOLUME = "vs-code-config"
+DISEASE_EXPLORER_CONFIG_VOLUME = "disease-explorer-config"
+FEDER8_SCRIPT_VOLUME = "feder8-scripts"
+FEDER8_DATA_VOLUME = "feder8-data"
+R_LIBRARIES_VOLUME = "r_libraries"
+PY_ENV_VOLUME  = "py_environment"
+
 
 def get_default_feder8_central_environment() -> str:
     return Globals.get_environment()
@@ -40,10 +53,12 @@ def get_docker_client() -> DockerClient:
 def get_docker_client_facade(therapeutic_area_info: TherapeuticArea, email, cli_key) -> DockerClientFacade:
     return DockerClientFacade(therapeutic_area_info, email, cli_key)
 
-def get_network_name():
-    return "feder8-net"
 
-def run_container(docker_client:DockerClient, image:str, remove:bool, name:str, environment, volumes, detach:bool, show_logs:bool):
+def get_network_name():
+    return Globals.FEDER8_NET
+
+
+def run_container(docker_client: DockerClient, image: str, remove: bool, name: str, environment, volumes, detach: bool, show_logs: bool):
     network_name = get_network_name()
     container = docker_client.containers.run(
         image, remove=remove, name=name, environment=environment, network=network_name, volumes=volumes, detach=detach)
@@ -58,10 +73,10 @@ def check_networks_and_create_if_not_exists(docker_client:DockerClient, network_
     for network_name in network_names:
         existing_network = docker_client.networks.list(filters={"name":network_name})
         if len(existing_network) == 0:
-            print(' '.join([network_name,'docker network does not exists.']))
-            print(' '.join(['Creating',network_name,'docker network...']))
+            print(' '.join([network_name, 'docker network does not exists.']))
+            print(' '.join(['Creating', network_name, 'docker network...']))
             networks.append(docker_client.networks.create(network_name, driver="bridge"))
-            print(' '.join(['Done creating',network_name,'docker network']))
+            print(' '.join(['Done creating', network_name, 'docker network']))
         else:
             networks.append(existing_network[0])
     return networks
@@ -116,7 +131,7 @@ def validate_correct_docker_network(docker_client: DockerClient):
         sys.exit(1)
 
 
-def pull_image(docker_client:DockerClient, registry:Registry, image:str, email:str, cli_key:str):
+def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
     print(f'Pulling image {image} ...')
     try:
         docker_client.login(username=email, password=cli_key, registry=registry.registry_url, reauth=True)
@@ -187,7 +202,6 @@ def update_config_on_config_server(docker_client:DockerClient, email, cli_key, t
     check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, [container_name])
     # run config update container
     print('Updating configuration on config-server...')
-    volume_name = 'feder8-config-server'
     run_container(
         docker_client=docker_client,
         image=update_configuration_image_name_tag,
@@ -195,7 +209,7 @@ def update_config_on_config_server(docker_client:DockerClient, email, cli_key, t
         name=container_name,
         environment=config_update,
         volumes={
-            volume_name: {
+            CONFIG_SERVER_VOLUME: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -237,6 +251,11 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
         get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info),
         get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
         get_feder8_studio_image_name_tag(therapeutic_area_info),
+        get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.RADIANT),
+        get_vs_code_server_image_name_tag(therapeutic_area_info),
+        get_r_studio_server_image_name_tag(therapeutic_area_info),
+        get_shiny_server_image_name_tag(therapeutic_area_info),
+        get_disease_explorer_image_name_tag(therapeutic_area_info),
         get_nginx_image_name_tag(therapeutic_area_info),
         get_vocabulary_update_image_name_tag(therapeutic_area_info),
         get_local_backup_image_name_tag(therapeutic_area_info),
@@ -245,11 +264,11 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.8')
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'config-server', '2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'config-server', '2.0.2')
 
 
 def get_update_configuration_image_name_tag(therapeutic_area_info):
@@ -257,43 +276,68 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.7')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.9')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'user-mgmt', '2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'user-mgmt', '2.0.5')
 
 
 def get_atlas_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'atlas', '2.9.0-2.0.0')
+    return get_image_name_tag(therapeutic_area_info, 'atlas', '2.9.0-2.0.1')
 
 
 def get_webapi_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.2')
 
 
 def get_zeppelin_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.5')
 
 
 def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'r-server-2.0.4')
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'r-server-2.0.5')
 
 
 def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.5')
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.6')
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.9')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.11')
+
+
+def get_vs_code_server_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'vs-code-server', '4.4.0')
+
+
+def get_r_studio_server_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'r-studio-server', '4.2.0')
+
+
+def get_shiny_server_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'shiny-server', '4.2.0')
+
+
+def get_disease_explorer_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.1.6')
+
+
+def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
+    if app_name == Globals.RADIANT:
+        return get_image_name_tag(therapeutic_area_info, 'install-radiant', '2.0.0')
+    if app_name == Globals.DISEASE_EXPLORER:
+        return get_image_name_tag(therapeutic_area_info, 'install-disease-explorer', '2.0.0')
+    else:
+        logging.warning(f"Unsupported application {app_name}")
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.1')
+    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.2')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.9')
+    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.10')
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
@@ -340,35 +384,11 @@ def get_image_repo_credentials(therapeutic_area, email=None, cli_key=None, confi
     return configuration.get_image_repo_credentials()
 
 
-def get_database_connection_details(therapeutic_area, configuration: ConfigurationController=None):
+def get_database_connection_details(therapeutic_area, configuration: ConfigurationController = None):
     if not configuration:
         configuration = get_configuration(therapeutic_area)
     return configuration.get_database_connection_details()
 
-def create_or_update_host_folder_with_correct_ownership(directory: str, owner: int, group: int):
-    docker_client = get_docker_client()
-
-    alpine_image_tag = get_alpine_image_name_tag()
-
-    print('Create or update folder permissions for ' + directory + ' on host machine ...')
-
-    container = docker_client.containers.run(image=alpine_image_tag,
-                                            remove=False,
-                                            name='create-update-folder-permissions',
-                                            volumes={
-                                                directory: {
-                                                    'bind': '/opt/folder',
-                                                    'mode': 'rw'
-                                                }
-                                            },
-                                            command='ash -c "chown -R ' + str(owner) + ':' + str(group) + ' /opt/folder"',
-                                            detach=True)
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
-    container.stop()
-    container.remove(v=True)
-
-    print('Done creating or updating folder permissions for ' + directory + ' on host machine ...')
 
 @click.group()
 def init():
@@ -401,7 +421,7 @@ def config_server(therapeutic_area, email, cli_key):
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['feder8-config-server']
+    volume_names = [CONFIG_SERVER_VOLUME]
     container_names = ['config-server', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -419,8 +439,8 @@ def config_server(therapeutic_area, email, cli_key):
         'FEDER8_CENTRAL_SERVICE_OAUTH-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_CATALOGUE-BASE-URI': 'https://' + therapeutic_area_info.catalogue_url,
         'FEDER8_CENTRAL_SERVICE_DISTRIBUTED-ANALYTICS-BASE-URI': 'https://' + therapeutic_area_info.distributed_analytics_url,
-        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-URL': '${feder8.local.host.portal-url}/' + therapeutic_area_info.name + '-studio',
-        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-CONTAINER-URL': 'http://' + therapeutic_area_info.name + '-studio:8080/' + therapeutic_area_info.name + '-studio'
+        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-URL': '${feder8.local.host.portal-url}/feder8-studio',
+        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-CONTAINER-URL': 'http://feder8-studio:8080/feder8-studio'
     }
 
     update_config_on_config_server(docker_client=docker_client,
@@ -430,7 +450,7 @@ def config_server(therapeutic_area, email, cli_key):
 
     config_server_image_tag = get_config_server_image_name_tag(therapeutic_area_info)
 
-    pull_image(docker_client,registry, config_server_image_tag, email, cli_key)
+    pull_image(docker_client, registry, config_server_image_tag, email, cli_key)
 
     print('Starting config-server container...')
     container = docker_client.containers.run(
@@ -446,7 +466,7 @@ def config_server(therapeutic_area, email, cli_key):
         },
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            CONFIG_SERVER_VOLUME: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
             }
@@ -499,7 +519,7 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['pgdata', 'shared', 'feder8-config-server']
+    volume_names = [PGDATA_VOLUME, SHARED_VOLUME, CONFIG_SERVER_VOLUME]
     container_names = ['postgres', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -545,11 +565,11 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
         environment={},
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            PGDATA_VOLUME: {
                 'bind': '/var/lib/postgresql/data',
                 'mode': 'rw'
             },
-            volume_names[1]: {
+            SHARED_VOLUME: {
                 'bind': '/var/lib/postgresql/envfileshared',
                 'mode': 'rw'
             }
@@ -614,7 +634,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['shared', 'feder8-config-server']
+    volume_names = [SHARED_VOLUME, CONFIG_SERVER_VOLUME, SHINY_APP_VOLUME]
     container_names = ['local-portal', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -643,14 +663,21 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
 
     print('Starting local-portal container...')
     socket_gid = os.stat("/var/run/docker.sock").st_gid
+
+    feder8_studio_app_directory = "/home/feder8/studio/apps"
+
     volumes={
-            volume_names[0]: {
+            SHARED_VOLUME: {
                 'bind': '/var/lib/shared',
                 'mode': 'ro'
             },
-            volume_names[1]: {
+            CONFIG_SERVER_VOLUME: {
                 'bind': '/home/feder8/config-repo',
                 'mode': 'rw'
+            },
+            SHINY_APP_VOLUME: {
+                'bind': feder8_studio_app_directory,
+                'mode': 'ro'
             }
         }
     volumes = add_docker_sock_volume_mapping(volumes)
@@ -673,6 +700,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             'FEDER8_LOCAL_ADMIN_PASSWORD': password,
             'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
             'FEDER8_CENTRAL_SERVICE_ENVIRONMENT': get_default_feder8_central_environment(),
+            'FEDER8_STUDIO_APP_DIRECTORY': feder8_studio_app_directory,
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
             'SERVER_SERVLET_CONTEXT_PATH': '/portal',
             'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
@@ -749,7 +777,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['shared', 'feder8-config-server']
+    volume_names = [SHARED_VOLUME, CONFIG_SERVER_VOLUME]
     container_names = ['webapi', 'atlas', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -817,7 +845,7 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            SHARED_VOLUME: {
                 'bind': '/var/lib/shared',
                 'mode': 'ro'
             }
@@ -869,15 +897,13 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-lu', '--ldap-url')
 @click.option('-ldn', '--ldap-dn')
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+def zeppelin(therapeutic_area, email, cli_key, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
@@ -898,12 +924,6 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
-
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
-
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
 
@@ -923,7 +943,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['feder8-data', 'shared', 'feder8-config-server']
+    volume_names = [ZEPPELIN_NOTEBOOK_VOLUME, ZEPPELIN_LOGS_VOLUME, FEDER8_DATA_VOLUME, SHARED_VOLUME, CONFIG_SERVER_VOLUME]
     container_names = ['zeppelin', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -934,9 +954,7 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-        'FEDER8_LOCAL_HOST_ZEPPELIN-LOG-DIRECTORY': log_directory,
-        'FEDER8_LOCAL_HOST_ZEPPELIN-NOTEBOOK-DIRECTORY': notebook_directory
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
@@ -987,19 +1005,19 @@ def zeppelin(therapeutic_area, email, cli_key, log_directory, notebook_directory
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[1]: {
+            SHARED_VOLUME: {
                 'bind': '/var/lib/shared',
                 'mode': 'ro'
             },
-            log_directory: {
+            ZEPPELIN_LOGS_VOLUME: {
                 'bind': '/logs',
                 'mode': 'rw'
             },
-            notebook_directory: {
+            ZEPPELIN_NOTEBOOK_VOLUME: {
                 'bind': '/notebook',
                 'mode': 'rw'
             },
-            volume_names[0]: {
+            FEDER8_DATA_VOLUME: {
                 'bind': '/usr/local/src/datafiles',
                 'mode': 'rw'
             }
@@ -1055,7 +1073,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['shared', 'feder8-config-server']
+    volume_names = [SHARED_VOLUME, CONFIG_SERVER_VOLUME]
     container_names = ['user-mgmt', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1103,7 +1121,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            SHARED_VOLUME: {
                 'bind': '/var/lib/shared',
                 'mode': 'ro'
             }
@@ -1122,10 +1140,7 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-au', '--admin-username')
 @click.option('-ap', '--admin-password')
-@click.option('-fsd', '--feder8-studio-directory')
-@click.option('-rud', '--rstudio-upload-dir')
-@click.option('-vud', '--vscode-upload-dir')
-def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, security_method, admin_username, admin_password, rstudio_upload_dir, vscode_upload_dir):
+def task_manager(therapeutic_area, email, cli_key, security_method, admin_username, admin_password):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
@@ -1146,14 +1161,6 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         if cli_key is None:
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-        if feder8_studio_directory is None:
-            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
-
-        if rstudio_upload_dir is None:
-            rstudio_upload_dir = 'r-scripts'
-        if vscode_upload_dir is None:
-            vscode_upload_dir = 'scripts'
-
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
 
@@ -1167,7 +1174,7 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['feder8-config-server']
+    volume_names = [CONFIG_SERVER_VOLUME, FEDER8_SCRIPT_VOLUME, VS_CODE_CONFIG_VOLUME]
     container_names = ['task-manager', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1179,6 +1186,8 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
+        'FEDER8_LOCAL_HOST_TASK-MANAGER-CONTAINER-URL': 'http://task-manager:8080/task-manager',
+        'FEDER8_LOCAL_HOST_TASK-MANAGER-URL': '${feder8.local.host.portal-url}/task-manager'
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
@@ -1199,6 +1208,11 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
 
     pull_image(docker_client, registry, task_manager_image_name_tag, email, cli_key)
 
+    feder8_home_folder = "/home/feder8"
+    rstudio_upload_folder = feder8_home_folder + "/r-scripts"
+    vscode_config_folder = feder8_home_folder + "/config"
+    vscode_upload_folder = vscode_config_folder + "/workspace"
+
     print('Starting Task Manager container...')
     environment_variables = {
         'SPRING_PROFILES_ACTIVE': 'local',
@@ -1215,6 +1229,9 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         'DOCKER_RUNNER_CLIENT_CONTEXT_PATH': 'portal',
         'FEDER8_IS_CENTRAL': 'false',
         'SERVER_SERVLET_CONTEXT_PATH': '/task-manager',
+        'FEDER8_STUDIO_HOME_FOLDER': feder8_home_folder,
+        'FEDER8_STUDIO_RSTUDIO_UPLOAD_DIR': rstudio_upload_folder,
+        'FEDER8_STUDIO_VSCODE_UPLOAD_DIR': vscode_upload_folder,
         'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
         'FEDER8_THERAPEUTIC_AREA_FAVICON_LOCATION': '/images/' + therapeutic_area_info.name + '-favicon.ico',
         'FEDER8_THERAPEUTIC_AREA_LOGO_LOCATION': '/images/' + therapeutic_area_info.name + '-logo.png',
@@ -1232,9 +1249,6 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
     else:
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'false'
 
-    studio_directory = feder8_studio_directory + '/sites/' + therapeutic_area_info.name + 'studio'
-    create_or_update_host_folder_with_correct_ownership(studio_directory, 54321, 54321)
-
     container = docker_client.containers.run(
         image=task_manager_image_name_tag,
         name=container_names[0],
@@ -1244,8 +1258,16 @@ def task_manager(therapeutic_area, email, cli_key, feder8_studio_directory, secu
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            studio_directory: {
-                'bind': '/home/feder8/studio',
+            SHARED_VOLUME: {
+                'bind': '/var/lib/shared',
+                'mode': 'ro'
+            },
+            FEDER8_SCRIPT_VOLUME: {
+                'bind': rstudio_upload_folder,
+                'mode': 'rw'
+            },
+            VS_CODE_CONFIG_VOLUME: {
+                'bind': vscode_config_folder,
                 'mode': 'rw'
             }
         },
@@ -1292,7 +1314,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['feder8-data', 'feder8-config-server']
+    volume_names = [FEDER8_DATA_VOLUME, CONFIG_SERVER_VOLUME]
     container_names = ['distributed-analytics-r-server', 'distributed-analytics-remote', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1327,7 +1349,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            FEDER8_DATA_VOLUME: {
                 'bind': '/home/feder8/data',
                 'mode': 'rw'
             }
@@ -1366,7 +1388,7 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
         environment=environment_variables,
         network=network_names[0],
         volumes={
-            volume_names[0]: {
+            FEDER8_DATA_VOLUME: {
                 'bind': data_directory,
                 'mode': 'rw'
             }
@@ -1384,14 +1406,13 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
-@click.option('-fsd', '--feder8-studio-directory')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-lu', '--ldap-url')
 @click.option('-ldn', '--ldap-dn')
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_directory, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
     try:
         docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
 
@@ -1417,9 +1438,6 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
 
-        if feder8_studio_directory is None:
-            feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
-
         if security_method is None:
             security_method = configuration.get_configuration('feder8.local.security.security-method')
 
@@ -1442,8 +1460,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['feder8-data', 'shared', 'feder8-config-server']
-    container_names = [therapeutic_area.lower() + '-studio', 'config-server-update-configuration']
+    volume_names = [VS_CODE_CONFIG_VOLUME, FEDER8_DATA_VOLUME, SHARED_VOLUME, CONFIG_SERVER_VOLUME]
+    container_names = ['feder8-studio', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
     check_volumes_and_create_if_not_exists(docker_client, volume_names)
@@ -1454,8 +1472,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'FEDER8_LOCAL_HOST_NAME': host,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-USERNAME': email,
-        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key,
-        'FEDER8_LOCAL_HOST_FEDER8-STUDIO-DIRECTORY': feder8_studio_directory
+        'FEDER8_CENTRAL_SERVICE_IMAGE-REPO-KEY': cli_key
     }
     if security_method == 'None':
         config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
@@ -1478,6 +1495,9 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
     feder8_studio_image_name_tag = get_feder8_studio_image_name_tag(therapeutic_area_info)
 
     pull_image(docker_client, registry, feder8_studio_image_name_tag, email, cli_key)
+    pull_image(docker_client, registry, get_vs_code_server_image_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_r_studio_server_image_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_shiny_server_image_name_tag(therapeutic_area_info), email, cli_key)
 
     print('Starting Feder8 Studio container...')
 
@@ -1485,12 +1505,12 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         'TAG': feder8_studio_image_name_tag,
         'APPLICATION_LOGS_TO_STDOUT': 'false',
         'SITE_NAME': therapeutic_area_info.name + 'studio',
-        'CONTENT_PATH': feder8_studio_directory,
+        'CONTENT_PATH': '/opt/data',
         'USERID': '54321',
         'DOMAIN_NAME': host,
         'SESSION_TIMEOUT': 43200,
         'CONTAINER_WAIT_TIME': 720000,
-        'HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER': volume_names[0],
+        'HONEUR_DISTRIBUTED_ANALYTICS_DATA_FOLDER': FEDER8_DATA_VOLUME,
         'HONEUR_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'HONEUR_THERAPEUTIC_AREA_URL': therapeutic_area_info.registry.registry_url,
         'HONEUR_THERAPEUTIC_AREA_UPPERCASE': therapeutic_area_info.name.upper(),
@@ -1511,11 +1531,11 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
         environment_variables['PROXY_DOCKER_CERT_PATH'] = '/home/certs'
 
     feder8_studio_volumes = {
-        volume_names[1]: {
+        SHARED_VOLUME: {
             'bind': '/var/lib/shared',
             'mode': 'ro'
         },
-        feder8_studio_directory: {
+        FEDER8_DATA_VOLUME: {
             'bind': '/opt/data',
             'mode': 'ro'
         }
@@ -1530,8 +1550,6 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
             'bind': '/var/run/docker.sock',
             'mode': 'rw'
         }
-
-    create_or_update_host_folder_with_correct_ownership(feder8_studio_directory, 54321, 54321)
 
     container = docker_client.containers.run(
         image=feder8_studio_image_name_tag,
@@ -1549,6 +1567,173 @@ def feder8_studio(therapeutic_area, email, cli_key, host, feder8_studio_director
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def radiant(therapeutic_area, email, cli_key):
+    install_radiant_dependencies(therapeutic_area, email, cli_key)
+    install_feder8_studio_app(therapeutic_area, email, cli_key, Globals.RADIANT)
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def disease_explorer(therapeutic_area, email, cli_key):
+    docker_client = get_docker_client()
+    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+    registry = therapeutic_area_info.registry
+
+    configuration: ConfigurationController = get_configuration(therapeutic_area)
+    if email is None:
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+    if cli_key is None:
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+    pull_image(docker_client, registry, get_disease_explorer_image_name_tag(therapeutic_area_info), email, cli_key)
+    check_volumes_and_create_if_not_exists(docker_client, [DISEASE_EXPLORER_CONFIG_VOLUME])
+
+
+def install_feder8_studio_app(therapeutic_area, email, cli_key, app_name):
+    if therapeutic_area is None:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                              choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+    therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+    registry = therapeutic_area_info.registry
+    app_installer_image_name_tag = get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name)
+
+    docker_client = get_docker_client()
+    connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+    configuration: ConfigurationController = get_configuration(therapeutic_area)
+
+    if email is None:
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+    if cli_key is None:
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+    pull_image(docker_client, registry, app_installer_image_name_tag, email, cli_key)
+
+    environment_variables = {
+        'THERAPEUTIC_AREA': therapeutic_area_info.name
+    }
+
+    volumes = {
+        SHINY_APP_VOLUME: {
+            'bind': '/opt/apps',
+            'mode': 'rw'
+        }
+    }
+
+    container = docker_client.containers.run(
+        image=app_installer_image_name_tag,
+        name=app_name + "-installer",
+        remove=True,
+        environment=environment_variables,
+        volumes=volumes,
+        detach=True
+    )
+
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
+
+
+def install_radiant_dependencies(therapeutic_area, email, cli_key):
+    external_dependencies = "'DBI' 'RPostgreSQL' 'DatabaseConnector' 'SqlRender' 'sqldf' 'dplyr' 'stringr' 'DT' 'xlsx' 'survminer' 'survival' 'jsonlite' 'readr' 'tidyr' 'tidyverse' 'lubridate' 'spsComps' 'import' 'psych' 'writexl' 'plotly' 'polycor' 'randomizr' 'patchwork' 'NeuralNetTools' 'sandwich' 'data.tree' 'e1071' 'ranger' 'xgboost' 'pdp' 'gower' 'clustMixType' 'GPArotation' 'shiny' 'Cairo' 'shinyjs' 'shinyAce' 'shinydashboard' 'shinydashboardPlus' 'shinyBS' 'shinyalert' 'shinyWidgets' 'shinycssloaders' 'shinycustomloader' 'rclipboard' 'kableExtra' 'shinyjqui' 'shinybusy' 'AlgDesign' 'pwr' 'shinyFiles' 'shinyalert' 'car' 'writexl'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="radiant",
+                               dependencies=external_dependencies,
+                               repo="https://r-package-manager.honeur.org/prod/latest",
+                               skip_installed=False)
+    internal_radiant_packages = "'radiant.data' 'radiant.basics' 'radiant.model' 'radiant.design' 'radiant.multivariate' 'radiant'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="radiant",
+                               dependencies=internal_radiant_packages,
+                               repo="https://r-package-manager.honeur.org/prod-internal/latest",
+                               skip_installed=False)
+
+
+def install_disease_explorer_dependencies(therapeutic_area, email, cli_key):
+    dependencies = "'rjson' 'survminer' 'shiny' 'Cairo' 'flextable' 'inTextSummaryTable'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="disease_explorer",
+                               dependencies=dependencies,
+                               repo="https://r-package-manager.honeur.org/prod/latest",
+                               skip_installed=False)
+    disease_explorer_package = "'diseaseExplorer'"
+    install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name="disease_explorer",
+                               dependencies=disease_explorer_package,
+                               repo="https://r-package-manager.honeur.org/prod-internal/latest",
+                               skip_installed=False)
+
+
+def install_r_app_dependencies(therapeutic_area, email, cli_key,
+                               app_name,
+                               dependencies,
+                               repo="https://r-package-manager.honeur.org/prod/latest",
+                               skip_installed=True):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        docker_client = get_docker_client()
+
+        validate_correct_docker_network(docker_client)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        registry = therapeutic_area_info.registry
+
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
+    volume_names = [R_LIBRARIES_VOLUME]
+    container_name = app_name + "-r-dependencies-installer"
+    container_names = [container_name]
+
+    check_networks_and_create_if_not_exists(docker_client, network_names)
+    check_volumes_and_create_if_not_exists(docker_client, volume_names)
+    check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
+
+    registry = therapeutic_area_info.registry
+    r_studio_image_name_tag = get_r_studio_server_image_name_tag(therapeutic_area_info)
+    pull_image(docker_client, registry, r_studio_image_name_tag, email, cli_key)
+
+    environment_variables = {}
+
+    volumes = {
+        R_LIBRARIES_VOLUME: {
+            'bind': '/r-libs',
+            'mode': 'rw'
+        }
+    }
+
+    skip_installed_option = "--skipinstalled"
+    if not skip_installed:
+        skip_installed_option = ""
+    command = f"-c \"set -e && echo 'Installing R packages. This could take a while...' && install2.r --error --libloc /r-libs {skip_installed_option} --repos '{repo}' {dependencies} > /dev/null 2>&1 && chown -R 54321:54321 /r-libs/* > /dev/null 2>&1 && echo 'Done installing R packages'\""
+    container = docker_client.containers.run(image=r_studio_image_name_tag,
+                                             remove=False,
+                                             name=container_name,
+                                             network=feder8_network,
+                                             environment=environment_variables,
+                                             volumes=volumes,
+                                             entrypoint="/bin/bash",
+                                             command=command,
+                                             detach=True)
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -1589,7 +1774,7 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = ['feder8-config-server']
+    volume_names = [CONFIG_SERVER_VOLUME]
     container_names = ['nginx', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1719,7 +1904,7 @@ def clean(therapeutic_area):
                     container.remove(v=True)
                 except docker.errors.NotFound:
                     pass
-                docker_client.volumes.get("feder8-config-server").remove()
+                docker_client.volumes.get(CONFIG_SERVER_VOLUME).remove()
             else:
                 print('disconnecting config-server from ' + ta_network_name)
                 ta_network.disconnect(container)
@@ -1730,11 +1915,11 @@ def clean(therapeutic_area):
 
 def cleanup_volumes(docker_client:DockerClient, therapeutic_area_name):
     try:
-        docker_client.volumes.get("shared").remove()
+        docker_client.volumes.get(SHARED_VOLUME).remove()
     except docker.errors.NotFound:
         pass
     try:
-        docker_client.volumes.get("pgdata").remove()
+        docker_client.volumes.get(PGDATA_VOLUME).remove()
     except docker.errors.NotFound:
         pass
     try:
@@ -1751,6 +1936,14 @@ def cleanup_volumes(docker_client:DockerClient, therapeutic_area_name):
         pass
     try:
         docker_client.volumes.get(therapeutic_area_name + "studio_r_libraries").remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(R_LIBRARIES_VOLUME).remove()
+    except docker.errors.NotFound:
+        pass
+    try:
+        docker_client.volumes.get(PY_ENV_VOLUME).remove()
     except docker.errors.NotFound:
         pass
     try:
@@ -2244,7 +2437,7 @@ def update_feder8_network():
     network_name = get_network_name()
 
     feder8_network = check_networks_and_create_if_not_exists(docker_client, [network_name])[0]
-    
+
     for therapeutic_area_key in Globals.therapeutic_areas.keys():
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area_key]
         if therapeutic_area_info.name != 'feder8':
@@ -2278,9 +2471,6 @@ def update_feder8_network():
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
-@click.option('-ld', '--log-directory')
-@click.option('-nd', '--notebook-directory')
-@click.option('-fsd', '--feder8-studio-directory')
 @click.option('-u', '--username')
 @click.option('-p', '--password')
 @click.option('-o', '--organization')
@@ -2289,7 +2479,7 @@ def update_feder8_network():
 @click.option('-es', '--enable-ssl')
 @click.option('-cd', '--certificate-directory')
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, log_directory, notebook_directory, feder8_studio_directory, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
@@ -2302,7 +2492,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
-        configuration:ConfigurationController = get_configuration(therapeutic_area)
+        configuration: ConfigurationController = get_configuration(therapeutic_area)
         if email is None:
             email = configuration.get_configuration('feder8.central.service.image-repo-username')
         if cli_key is None:
@@ -2362,17 +2552,14 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
                 ldap_system_username = configuration.get_configuration('feder8.local.security.ldap-system-username')
             if ldap_system_password is None:
                 ldap_system_password = configuration.get_configuration('feder8.local.security.ldap-system-password')
-        if log_directory is None:
-            log_directory = configuration.get_configuration('feder8.local.host.zeppelin-log-directory')
-
-        if notebook_directory is None:
-            notebook_directory = configuration.get_configuration('feder8.local.host.zeppelin-notebook-directory')
 
         install_feder8_studio = questionary.confirm("Do you want to install Feder8 Studio?").unsafe_ask()
 
-        if install_feder8_studio:
-            if feder8_studio_directory is None:
-                feder8_studio_directory = configuration.get_configuration('feder8.local.host.feder8-studio-directory')
+        install_radiant = False
+        install_disease_explorer = False
+        if install_feder8_studio and therapeutic_area == "HONEUR":
+            #install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
+            install_disease_explorer = questionary.confirm("Do you want to install the Disease Explorer app in Feder8 Studio?").unsafe_ask()
 
         install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
 
@@ -2398,13 +2585,16 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
     ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, log_directory=log_directory, notebook_directory=notebook_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
         ctx.invoke(user_management, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, username=username, password=password)
     if install_distributed_analytics:
         ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
     if install_feder8_studio:
-        ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, feder8_studio_directory=feder8_studio_directory, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, feder8_studio_directory=feder8_studio_directory, security_method=security_method, admin_username=username, admin_password=password, rstudio_upload_dir=None, vscode_upload_dir=None)
+        ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
+    if install_radiant:
+        ctx.invoke(radiant, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    if install_disease_explorer:
+        ctx.invoke(disease_explorer, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
+    ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, admin_username=username, admin_password=password)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
-

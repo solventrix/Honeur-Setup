@@ -36,6 +36,9 @@ The docker images required to run the full setup are located on a central reposi
   * For HONEUR: https://portal.honeur.org
   * For PHederation: https://portal.phederation.org
   * For ESFURN: https://portal.esfurn.org
+  * For ATHENA: https://portal.athenafederation.org
+  * For LupusNet: https://portal.lupusnet.org
+
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -58,7 +61,18 @@ Only the Feder8 central services should be accessible from within the local inst
   * https://harbor.esfurn.org
   * https://catalogue.esfurn.org
   * https://distributed-analytics.esfurn.org
+* For ATHENA:
+    * https://cas.athenafederation.org
+    * https://harbor.athenafederation.org
+    * https://catalogue.athenafederation.org
+    * https://distributed-analytics.athenafederation.org
+* For LupusNet:
+    * https://cas.lupusnet.org
+    * https://harbor.lupusnet.org
+    * https://catalogue.lupusnet.org
+    * https://distributed-analytics.lupusnet.org
 
+    
 ### Prerequisite for installations on Linux
 On Linux, please download and run the following 2 scripts before running the installation script:
 
@@ -128,6 +142,8 @@ Windows
     1. HONEUR for https://portal.honeur.org
     2. PHederation for https://portal.phederation.org
     3. ESFURN for https://portal.esfurn.org
+    4. ATHENA for https://portal.athenafederation.org
+    5. LupusNet for https://portal.lupusnet.org
 4. If a previous installation is present, the script will ask to remove the previous installation.  Choose Yes if the ETL will be re-executed after the re-installation.
 5. If a previous installation is present, the script will ask to create a backup of the Postgres database.  Choose Yes if there is no recent backup of the database.
 6. The script will prompt to enter the email address of the account you use to login on the central platform.

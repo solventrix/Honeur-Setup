@@ -7,14 +7,22 @@ from typing import Dict
 
 
 class Globals:
+
+    FEDER8_NET = "feder8-net"
+    RADIANT = "radiant"
+    DISEASE_EXPLORER = "diseaseExplorer"
+
+    @staticmethod
+    def get_environment():
+        return "PRD"
+
     therapeutic_areas:Dict[str, TherapeuticArea] = {
         "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['CCL','CHU Dijon','CHU Lille','CHU Montpellier','CHU Toulouse HAL','CLLEAR','DOS','EMMOS','GMV','iOMEDICO','IUCT','Janssen','OIS','Oncotyrol','RMG','UHL']),
         "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Actelion','Janssen']),
         "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Janssen'])
+        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'distributed-analytics.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['AZ Groeninge', 'CHU Liege', 'Illumina', 'KU Leuven', 'UZ Leuven', 'UZ Leuven UC', 'edenceHealth', 'Imec', 'Janssen']),
+        "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal.lupusnet.org', 'catalogue.lupusnet.org', 'distributed-analytics.lupusnet.org', 'cas.lupusnet.org', Registry('harbor.lupusnet.org', 'lupus'), ['Gladel', 'Janssen'])
     }
-
-    def get_environment():
-        return "PRD"
 
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
@@ -37,5 +45,6 @@ class Globals:
         'feder8.local.security.user-mgmt-password': SingleChoiceQuestion('Enter the administrator password?', 'admin'),
     }
 
+    @staticmethod
     def get_question(key):
         return Globals.all_questions.get(key)
