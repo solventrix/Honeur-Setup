@@ -320,7 +320,7 @@ def get_shiny_server_image_name_tag(therapeutic_area_info):
 
 
 def get_disease_explorer_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.1.6')
+    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.2.3')
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
