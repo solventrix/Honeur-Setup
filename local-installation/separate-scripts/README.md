@@ -26,6 +26,7 @@ Table of Contents
     * [Removal](#qa-database-removal)
   * [Backup and restore of the database](#backup-and-restore-of-the-database)
   * [Vocabulary update](#vocabulary-update)
+  * [Custom concepts update](#custom-concepts-update)
 
 ## Requirements
 
@@ -637,4 +638,29 @@ Linux/MacOS
 Windows
 ```
 .\start-vocabulary-update.cmd
+```
+
+## Custom concepts update
+When new custom concepts become available, they can be loaded in the OMOP CDM database.
+Installation steps:
+1.	Open a terminal window (Command Prompt on Windows)
+2.	Download the installation script
+
+Linux/MacOS
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+```
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+```
+3.	Run the script
+
+Linux/MacOS
+```
+./start-custom-concepts-update.sh
+```
+Windows
+```
+.\start-custom-concepts-update.cmd
 ```
