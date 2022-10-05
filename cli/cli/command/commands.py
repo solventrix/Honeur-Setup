@@ -344,6 +344,16 @@ def config_server(therapeutic_area, email, cli_key):
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+@init.command()
+@click.option('-o', '--output-dir')
+def export_all_image_name_tags(output_dir):
+    for therapeutic_area_info in Globals.therapeutic_areas.values():
+        images = get_all_feder8_local_image_name_tags(therapeutic_area_info)
+        images.append(get_alpine_image_name_tag())
+        images.append(get_postgres_13_image_name_tag())
+        with open(os.path.join(output_dir, therapeutic_area_info.name), 'w') as f:
+            f.write('\n'.join(images))
+
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
