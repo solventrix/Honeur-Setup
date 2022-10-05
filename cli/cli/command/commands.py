@@ -263,6 +263,15 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
     ]
 
 
+def pull_all_images(docker_client: DockerClient, email, cli_key, therapeutic_area_info):
+    registry = therapeutic_area_info.registry
+    images = get_all_feder8_local_image_name_tags(therapeutic_area_info)
+    images.append(get_alpine_image_name_tag())
+    images.append(get_postgres_13_image_name_tag())
+    for image in images:
+        pull_image(docker_client=docker_client, registry=registry, image=image, email=email, cli_key=cli_key)
+
+
 def get_postgres_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.8')
 
@@ -333,7 +342,7 @@ def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_na
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.2')
+    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.3')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
