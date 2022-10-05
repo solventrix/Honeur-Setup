@@ -11,6 +11,7 @@ Table of Contents
   * [Postgres installation instructions](#postgres-installation-instructions)
   * [Configuration server](#configuration-server)
   * [Local Portal](#local-portal)
+  * [Task Manager](#task-manager)
   * [Atlas/WebAPI installation instructions](#atlas-webapi-separate)
   * [Zeppelin installation instructions](#zeppelin-installation-instructions)
   * [User Management installation instructions](#user-management-installation-instructions)
@@ -170,6 +171,35 @@ Windows
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the local portal docker image and will create the docker container.
+
+
+## Task Manager
+The Task Manager can be installed by downloading and running the installation script.
+
+1. Download the installation script (**_start-task-manager.sh_** for Linux/MacOS or **_start-task-manager.cmd_** for Windows) using the following command:
+
+Linux/MacOS
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-task-manager.sh --output start-task-manager.sh && chmod +x start-task-manager.sh
+```
+
+Windows
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-task-manager.cmd --output start-task-manager.cmd
+```
+
+2. Run the script using the following command:
+
+Linux/MacOS
+```
+./start-task-manager.sh
+```
+
+Windows
+```
+.\start-task-manager.cmd
+```
+
 
 ## <a id="atlas-webapi-separate"></a>Atlas/WebAPI installation instructions
 The Postgres database installed in the previous step is required for Atlas/WebAPI to function.
