@@ -44,7 +44,7 @@ pipeline {
                             tagCommands = []
                             tags.each() { tag ->
                                 nonUatTag = tag.replace('-uat', '')
-                                tagCommands.append("docker pull --quiet ${nonUatTag}")
+                                tagCommands.add("docker pull --quiet ${nonUatTag}")
                             }
                             sh " & ".join(tagCommands)
                         }
