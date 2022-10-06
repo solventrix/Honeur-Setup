@@ -333,7 +333,7 @@ def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_na
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.2')
+    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.3')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
