@@ -34,8 +34,9 @@ pipeline {
             steps {
                 script {
                     sh 'docker run --rm --name feder8-installer -e CURRENT_DIRECTORY=$(pwd) -e IS_WINDOWS=false -e IS_MAC=false -e DOCKER_CERT_SUPPORT=false -v /output:/output -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:2.0.18 feder8 init export-all-image-name-tags -o /output'
-                    files = sh(script: 'ls -1 /output', returnStdout: true).split()
-                    files.each() { file ->
+//                     files = sh(script: 'ls -1 /output', returnStdout: true).split()
+//                     files.each() { file ->
+                        file = 'honeur'
                         echo "attempting login for ${file}"
                         domain = getTADomain(file)
                         withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
@@ -54,12 +55,13 @@ pipeline {
                             }
                             successFullyPulledTags.remove('alpine:3.15.0')
                             successFullyPulledTags.remove('postgres:13')
+                            successFullyPulledTags.add('https://harbor-uat.${domain}/library/install-script')
 
                             tagsForSaving = successFullyPulledTags.join(" ")
                             sh "docker save ${tagsForSaving} | gzip > ./${file}.tar.gz"
-                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install.tar.gz"
+                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.TAG}.tar.gz"
                         }
-                    }
+//                     }
                 }
             }
         }
