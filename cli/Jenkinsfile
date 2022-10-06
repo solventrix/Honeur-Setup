@@ -46,7 +46,7 @@ pipeline {
                                 nonUatTag = tag.replace('-uat', '')
                                 tagCommands.add("docker pull --quiet ${nonUatTag}")
                             }
-                            sh " & ".join(tagCommands)
+                            sh tagCommands.join(" & ")
                         }
                     }
                 }
