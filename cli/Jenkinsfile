@@ -36,17 +36,17 @@ pipeline {
                     sh 'docker run --rm --name feder8-installer -e CURRENT_DIRECTORY=$(pwd) -e IS_WINDOWS=false -e IS_MAC=false -e DOCKER_CERT_SUPPORT=false -v /output:/output -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:2.0.18 feder8 init export-all-image-name-tags -o /output'
                     files = sh(script: 'ls -1 /output', returnStdout: true).split()
                     files.each() { file ->
-                        fileString = readFile encoding: 'UTF-8', file: '/output/' + file
-                        tags = fileString.split()
-                        tags.each() { tag ->
-                            echo "attempting login for ${file}"
-                            domain = getTADomain(file)
-                            echo "https://harbor.${domain}"
-                            echo "harbor-${file}-robot"
-                            nonUatTag = tag.replace('-uat', '')
-                            withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
-                                sh "docker pull ${nonUatTag}"
+                        echo "attempting login for ${file}"
+                        domain = getTADomain(file)
+                        withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
+                            fileString = readFile encoding: 'UTF-8', file: '/output/' + file
+                            tags = fileString.split()
+                            tagCommands = []
+                            tags.each() { tag ->
+                                nonUatTag = tag.replace('-uat', '')
+                                tagCommands.append("docker pull --quiet ${nonUatTag}")
                             }
+                            sh " & ".join(tagCommands)
                         }
                     }
                 }
