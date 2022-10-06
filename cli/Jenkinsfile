@@ -53,7 +53,7 @@ pipeline {
 
                             }
                             tagsForSaving = successFullyPulledTags.join(" ")
-                            sh "docker save -o ${file}.tar ${tagsForSaving} | gzip > ${file}.tar.gz"
+                            sh "docker save -o ${file}.tar ${tagsForSaving}"
                         }
                     }
                 }
