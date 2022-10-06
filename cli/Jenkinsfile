@@ -56,7 +56,7 @@ pipeline {
                             successFullyPulledTags.remove('postgres:13')
 
                             tagsForSaving = successFullyPulledTags.join(" ")
-                            sh "docker save ${tagsForSaving} -o ./${file}.tar | gzip ./${file}.tar.gz"
+                            sh "docker save ${tagsForSaving} | gzip ./${file}.tar.gz"
                             sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/${file}.tar.gz"
                         }
                     }
