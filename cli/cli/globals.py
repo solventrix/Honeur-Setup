@@ -9,7 +9,6 @@ from typing import Dict
 class Globals:
 
     FEDER8_NET = "feder8-net"
-    RADIANT = "radiant"
     DISEASE_EXPLORER = "diseaseExplorer"
 
     @staticmethod

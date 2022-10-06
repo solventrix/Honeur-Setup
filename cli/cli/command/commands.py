@@ -12,6 +12,8 @@ from docker.client import DockerClient
 from docker.models.containers import Container
 from docker.models.networks import Network
 
+from cli.configuration import ImageManager
+from cli.configuration.ImageLookup import *
 from cli.configuration.ConfigurationController import ConfigurationController
 from cli.globals import Globals
 from cli.registry.registry import Registry
@@ -116,6 +118,7 @@ def check_containers_and_remove_if_not_exists(docker_client: DockerClient,
         except:
             logging.debug("check_containers_and_remove_if_not_exists failed")
 
+
 def ta_specific_docker_network_exists(docker_client: DockerClient):
     for therapeutic_area_key in Globals.therapeutic_areas.keys():
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area_key]
@@ -127,6 +130,7 @@ def ta_specific_docker_network_exists(docker_client: DockerClient):
                 pass
     return False
 
+
 def validate_correct_docker_network(docker_client: DockerClient):
     if ta_specific_docker_network_exists(docker_client):
         print("We notice that you have an outdated setup installed. This seperate script is not compatible with this older version of your setup. Please run the full installer to update all components. You can follow the installation instruction at https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/local-installation/helper-scripts#installation-instruction")
@@ -137,15 +141,7 @@ def pull_image(docker_client: DockerClient, registry: Registry, image: str, emai
     if not central_connection_ok:
         logging.info(f"Running in offline modus.  Image '{image}' expected to be present on the host machine")
         return
-
-    print(f'Pulling image {image} ...')
-    try:
-        docker_client.login(username=email, password=cli_key, registry=registry.registry_url, reauth=True)
-    except docker.errors.APIError:
-        print('Failed to pull image. Are the correct email and CLI Key provided?')
-        sys.exit(1)
-    docker_client.images.pull(image)
-    print(f'Done pulling image {image}')
+    ImageManager.pull_image(docker_client, registry, image, email, cli_key)
 
 
 def wait_for_healthy_container(docker_client:DockerClient, container:Container, interval:int, timeout:int):
@@ -236,162 +232,6 @@ def refresh_config_on_server(docker_client:DockerClient):
         log.debug("Local portal container not found")
     except Exception:
         log.debug("Config could not be refreshed on server")
-
-
-def get_image_name_tag(therapeutic_area_info, name, tag):
-    registry = therapeutic_area_info.registry
-    image_name = '/'.join([registry.registry_url, registry.project, name])
-    return ':'.join([image_name, tag])
-
-
-def get_all_feder8_local_image_name_tags(therapeutic_area_info):
-    return [
-        get_postgres_image_name_tag(therapeutic_area_info),
-        get_config_server_image_name_tag(therapeutic_area_info),
-        get_update_configuration_image_name_tag(therapeutic_area_info),
-        get_local_portal_image_name_tag(therapeutic_area_info),
-        get_user_mgmt_image_name_tag(therapeutic_area_info),
-        get_atlas_image_name_tag(therapeutic_area_info),
-        get_webapi_image_name_tag(therapeutic_area_info),
-        get_zeppelin_image_name_tag(therapeutic_area_info),
-        get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info),
-        get_distributed_analytics_remote_image_name_tag(therapeutic_area_info),
-        get_feder8_studio_image_name_tag(therapeutic_area_info),
-        get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, Globals.RADIANT),
-        get_vs_code_server_image_name_tag(therapeutic_area_info),
-        get_r_studio_server_image_name_tag(therapeutic_area_info),
-        get_shiny_server_image_name_tag(therapeutic_area_info),
-        get_disease_explorer_image_name_tag(therapeutic_area_info),
-        get_nginx_image_name_tag(therapeutic_area_info),
-        get_vocabulary_update_image_name_tag(therapeutic_area_info),
-        get_local_backup_image_name_tag(therapeutic_area_info),
-        get_fix_default_privileges_image_name_tag(therapeutic_area_info)
-    ]
-
-
-def pull_all_images(docker_client: DockerClient, email, cli_key, therapeutic_area_info):
-    registry = therapeutic_area_info.registry
-    images = get_all_feder8_local_image_name_tags(therapeutic_area_info)
-    images.append(get_postgres_13_image_name_tag())
-    for image in images:
-        pull_image(docker_client=docker_client, registry=registry, image=image, email=email, cli_key=cli_key)
-
-
-def load_all_images(docker_client: DockerClient, image_filename):
-    try:
-        with open(image_filename, mode='rb') as image_file:
-            images = docker_client.images.load(image_file)
-        logging.info("The following images are successfully loaded:")
-        for image in images:
-            logging.info(image.tags)
-    except Exception as e:
-        logging.error("Failed to load the Docker images:")
-        logging.error(e)
-
-
-def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.8')
-
-
-def get_config_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'config-server', '2.0.2')
-
-
-def get_update_configuration_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'config-server', 'update-configuration-2.0.1')
-
-
-def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.9')
-
-
-def get_user_mgmt_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'user-mgmt', '2.0.5')
-
-
-def get_atlas_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'atlas', '2.9.0-2.0.1')
-
-
-def get_webapi_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.2')
-
-
-def get_zeppelin_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.5')
-
-
-def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'r-server-2.0.5')
-
-
-def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.6')
-
-
-def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.11')
-
-
-def get_vs_code_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'vs-code-server', '4.4.0')
-
-
-def get_r_studio_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'r-studio-server', '4.2.0')
-
-
-def get_shiny_server_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'shiny-server', '4.2.0')
-
-
-def get_disease_explorer_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.1.6')
-
-
-def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
-    if app_name == Globals.RADIANT:
-        return get_image_name_tag(therapeutic_area_info, 'install-radiant', '2.0.0')
-    if app_name == Globals.DISEASE_EXPLORER:
-        return get_image_name_tag(therapeutic_area_info, 'install-disease-explorer', '2.0.0')
-    else:
-        logging.warning(f"Unsupported application {app_name}")
-
-
-def get_task_manager_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.3')
-
-
-def get_nginx_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.10')
-
-
-def get_vocabulary_update_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', 'pipeline-vocabulary-update-2.0.2')
-
-
-def get_local_backup_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'backup', '2.0.0')
-
-
-def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.1')
-
-
-def get_alpine_image_name_tag():
-    return 'alpine:3.15.0'
-
-
-def get_postgres_9_6_image_name_tag():
-    return 'postgres:9.6'
-
-
-def get_postgres_13_image_name_tag():
-    return 'postgres:13'
-
-
-def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
-    return 'tianon/postgres-upgrade:9.6-to-13'
 
 
 def get_configuration(therapeutic_area) -> ConfigurationController:
@@ -1598,14 +1438,6 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
-def radiant(therapeutic_area, email, cli_key):
-    install_radiant_dependencies(therapeutic_area, email, cli_key)
-    install_feder8_studio_app(therapeutic_area, email, cli_key, Globals.RADIANT)
-
-@init.command()
-@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
-@click.option('-e', '--email')
-@click.option('-k', '--cli-key')
 def disease_explorer(therapeutic_area, email, cli_key):
     docker_client = get_docker_client()
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
@@ -2415,9 +2247,6 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        global central_connection_ok
-        central_connection_ok = check_central_platform_connection(therapeutic_area_info)
-
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
@@ -2513,11 +2342,17 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        global central_connection_ok
+        central_connection_ok = check_central_platform_connection(therapeutic_area_info)
+
+        if not central_connection_ok:
+            logging.info("Running installation script in offline modus")
+
         docker_client = get_docker_client()
 
         ctx.invoke(update_feder8_network)
-
-        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
@@ -2584,10 +2419,8 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
         install_feder8_studio = questionary.confirm("Do you want to install Feder8 Studio?").unsafe_ask()
 
-        install_radiant = False
         install_disease_explorer = False
         if install_feder8_studio and therapeutic_area == "HONEUR":
-            #install_radiant = questionary.confirm("Do you want to install the Radiant app in Feder8 Studio?").unsafe_ask()
             install_disease_explorer = questionary.confirm("Do you want to install the Disease Explorer app in Feder8 Studio?").unsafe_ask()
 
         install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
@@ -2621,8 +2454,6 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(distributed_analytics, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, organization=organization)
     if install_feder8_studio:
         ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
-    if install_radiant:
-        ctx.invoke(radiant, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     if install_disease_explorer:
         ctx.invoke(disease_explorer, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, admin_username=username, admin_password=password)
@@ -2630,7 +2461,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
 
 
 def check_central_platform_connection(therapeutic_area_info: TherapeuticArea):
-    url = f"{therapeutic_area_info.catalogue_url}/actuator/health"
+    url = f"https://{therapeutic_area_info.catalogue_url}/actuator/health"
     timeout = 5
     try:
         request = requests.get(url, timeout=timeout)

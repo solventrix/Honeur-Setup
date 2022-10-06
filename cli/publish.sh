@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eux
 
-VERSION=2.0.18
+VERSION=2.0.19
 TAG=$VERSION
 
 docker tag feder8/install-script:$TAG $THERAPEUTIC_AREA_URL/library/install-script:$TAG
