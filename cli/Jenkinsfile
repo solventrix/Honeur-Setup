@@ -39,7 +39,7 @@ pipeline {
                         fileString = readFile encoding: 'UTF-8', file: '/output/' + file
                         tags = fileString.split()
                         tags.each() { tag ->
-                            withDockerRegistry(credentialsId: "harbor-${file}-library-robot-uat", url: "https://harbor-uat.${file}.org") {
+                            withDockerRegistry(credentialsId: "harbor-${file}-robot-uat", url: "https://harbor-uat.${file}.org") {
                                 sh "docker pull ${tag}"
                             }
                         }
