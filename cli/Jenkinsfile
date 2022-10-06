@@ -58,6 +58,7 @@ pipeline {
                             successFullyPulledTags.add('harbor-uat.${domain}/library/install-script')
 
                             tagsForSaving = successFullyPulledTags.join(" ")
+                            sh 'mkdir /output-zip'
                             sh "docker save ${tagsForSaving} -o /output-zip/images.tar"
                             sh "cp -R Honeur-Setup/local-installation/helper-scripts /output-zip/helper-scripts"
                             sh "tar -zcvf ./${file}.tar.gz /output-zip"
