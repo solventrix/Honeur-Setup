@@ -43,8 +43,9 @@ pipeline {
                             domain = getTADomain(file)
                             echo "https://harbor.${domain}"
                             echo "harbor-${file}-robot"
+                            nonUatTag = tag.replace('-uat', '')
                             withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
-                                sh "docker pull ${tag}"
+                                sh "docker pull ${nonUatTag}"
                             }
                         }
                     }
