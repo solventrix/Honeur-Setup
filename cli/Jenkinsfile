@@ -35,8 +35,14 @@ pipeline {
                 script {
                     sh 'docker run --rm --name feder8-installer -e CURRENT_DIRECTORY=$(pwd) -e IS_WINDOWS=false -e IS_MAC=false -e DOCKER_CERT_SUPPORT=false -v /output:/output -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:2.0.18 feder8 init export-all-image-name-tags -o /output'
                     files = sh(script: 'ls -1 /output', returnStdout: true).split()
-                    files.each() {
-                        echo it
+                    files.each() { file ->
+                        fileString = readFile encoding: 'UTF-8', file: '/output/${file}'
+                        tags = fileString.split()
+                        tags.each() { tag ->
+                            withDockerRegistry(credentialsId: "harbor-${file}-library-robot-uat", url: "https://harbor-uat.${file}.org") {
+                                sh 'docker pull ${tag}'
+                            }
+                        }
                     }
                 }
             }
