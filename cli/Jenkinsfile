@@ -52,6 +52,9 @@ pipeline {
                                 }
 
                             }
+                            successFullyPulledTags.remove('alpine:3.15.0')
+                            successFullyPulledTags.remove('postgres:13')
+
                             tagsForSaving = successFullyPulledTags.join(" ")
                             sh "docker save ${tagsForSaving} -o ./${file}.tar"
                         }
