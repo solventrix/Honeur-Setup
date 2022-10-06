@@ -56,7 +56,7 @@ pipeline {
                             successFullyPulledTags.remove('postgres:13')
 
                             tagsForSaving = successFullyPulledTags.join(" ")
-                            sh "docker save ${tagsForSaving[0]} -o ./${file}.tar"
+                            sh "docker save ${successFullyPulledTags[0]} -o ./${file}.tar"
                         }
                     }
                 }
