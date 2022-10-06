@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'amzl-honeur'
+        label 'amzl-honeur-upgrade'
     }
 
     stages {
