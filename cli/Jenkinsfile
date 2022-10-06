@@ -46,7 +46,7 @@ pipeline {
                                 nonUatTag = tag.replace('-uat', '')
                                 try {
                                     sh "docker pull --quiet ${nonUatTag}"
-                                    successFullyPulledTags.add(tag)
+                                    successFullyPulledTags.add(nonUatTag)
                                 } catch (e) {
                                     echo "Could not pull tag ${nonUatTag}"
                                 }
@@ -56,7 +56,7 @@ pipeline {
                             successFullyPulledTags.remove('postgres:13')
 
                             tagsForSaving = successFullyPulledTags.join(" ")
-                            sh "docker save ${successFullyPulledTags[0]} -o ./${file}.tar"
+                            sh "docker save ${tagsForSaving} -o ./${file}.tar"
                         }
                     }
                 }
