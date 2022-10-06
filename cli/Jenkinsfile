@@ -41,13 +41,14 @@ pipeline {
                         withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
                             fileString = readFile encoding: 'UTF-8', file: '/output/' + file
                             tags = fileString.split()
-                            tagCommands = []
                             tags.each() { tag ->
                                 nonUatTag = tag.replace('-uat', '')
 //                                 tagCommands.add("docker pull --quiet ${nonUatTag}")
                                 sh "docker pull --quiet ${nonUatTag}"
                             }
 //                             sh tagCommands.join(" & ")
+                            tagsForSaving = tags.join(" ")
+                            sh "docker save -o ${file}.tar ${tagsForSaving} | gzip > ${file}.tar.gz"
                         }
                     }
                 }
