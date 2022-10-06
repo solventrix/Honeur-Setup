@@ -40,7 +40,8 @@ pipeline {
                         tags = fileString.split()
                         tags.each() { tag ->
                             echo "attempting login for ${file}"
-                            withDockerRegistry(credentialsId: "harbor-${file}-robot-uat", url: "https://harbor-uat.${file}.org") {
+                            domain = getTADomain(file)
+                            withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
                                 sh "docker pull ${tag}"
                             }
                         }
@@ -58,4 +59,23 @@ def notifyPushFailed(url) {
         <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
       to: "sverwim1@its.jnj.com,pmoorth1@its.jnj.com"
     )
+}
+
+def getTADomain(area) {
+  switch(area) {
+    case "honeur":
+        return "honeur.org"
+    case "phederation":
+        return "phederation.org"
+    case "esfurn":
+        return "esfurn.org"
+    case "athena":
+        return "athenafederation.org"
+    case "lupus":
+        return "lupusnet.org"
+    case "athena":
+        return "athenafederation.org"
+    default:
+        return "honeur.org"
+  }
 }
