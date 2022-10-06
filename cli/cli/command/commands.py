@@ -37,6 +37,8 @@ FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
 PY_ENV_VOLUME  = "py_environment"
 
+central_connection_ok = True
+
 
 def get_default_feder8_central_environment() -> str:
     return Globals.get_environment()
@@ -132,6 +134,10 @@ def validate_correct_docker_network(docker_client: DockerClient):
 
 
 def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
+    if not central_connection_ok:
+        logging.info(f"Running in offline modus.  Image '{image}' expected to be present on the host machine")
+        return
+
     print(f'Pulling image {image} ...')
     try:
         docker_client.login(username=email, password=cli_key, registry=registry.registry_url, reauth=True)
@@ -266,10 +272,21 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
 def pull_all_images(docker_client: DockerClient, email, cli_key, therapeutic_area_info):
     registry = therapeutic_area_info.registry
     images = get_all_feder8_local_image_name_tags(therapeutic_area_info)
-    images.append(get_alpine_image_name_tag())
     images.append(get_postgres_13_image_name_tag())
     for image in images:
         pull_image(docker_client=docker_client, registry=registry, image=image, email=email, cli_key=cli_key)
+
+
+def load_all_images(docker_client: DockerClient, image_filename):
+    try:
+        with open(image_filename, mode='rb') as image_file:
+            images = docker_client.images.load(image_file)
+        logging.info("The following images are successfully loaded:")
+        for image in images:
+            logging.info(image.tags)
+    except Exception as e:
+        logging.error("Failed to load the Docker images:")
+        logging.error(e)
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
@@ -2398,6 +2415,9 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
+        global central_connection_ok
+        central_connection_ok = check_central_platform_connection(therapeutic_area_info)
+
         connect_install_container_to_network(docker_client, therapeutic_area_info)
 
         registry = therapeutic_area_info.registry
@@ -2607,3 +2627,16 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(disease_explorer, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, admin_username=username, admin_password=password)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
+
+
+def check_central_platform_connection(therapeutic_area_info: TherapeuticArea):
+    url = f"{therapeutic_area_info.catalogue_url}/actuator/health"
+    timeout = 5
+    try:
+        request = requests.get(url, timeout=timeout)
+        if request.status_code == 200:
+            logging.info("Connection to the central platform ok")
+            return True
+    except (requests.ConnectionError, requests.Timeout) as exception:
+        logging.warning("No connection to the central platform")
+    return False
