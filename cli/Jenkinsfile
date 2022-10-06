@@ -41,6 +41,8 @@ pipeline {
                         tags.each() { tag ->
                             echo "attempting login for ${file}"
                             domain = getTADomain(file)
+                            echo "https://harbor.${domain}"
+                            echo "harbor-${file}-robot"
                             withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
                                 sh "docker pull ${tag}"
                             }
