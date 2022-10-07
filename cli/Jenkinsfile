@@ -8,7 +8,7 @@ pipeline {
                 script: 'cat Honeur-Setup/cli/VERSION',
                 returnStdout: true
             ).trim()
-        ENV = getEnv()
+        ENV = getEnvironment()
     }
 
     stages {
@@ -112,7 +112,7 @@ def getTADomain(area) {
   }
 }
 
-def getEnv() {
+def getEnvironment() {
    if (env.GIT_BRANCH.startsWith('origin/release/')) {
         return 'UAT'
    } else if (env.GIT_BRANCH.equals('origin/master')) {
