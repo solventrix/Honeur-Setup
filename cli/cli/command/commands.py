@@ -2326,6 +2326,12 @@ def update_feder8_network():
                 pass
 
 
+def load_local_images(docker_client):
+    with open('../images.tar', 'r') as f:
+        logging.info("Loading images. This could take a while.")
+        docker_client.images.load(f)
+
+
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
@@ -2357,10 +2363,11 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         global central_connection_ok
         central_connection_ok = check_central_platform_connection(therapeutic_area_info)
 
+        docker_client = get_docker_client()
+
         if not central_connection_ok:
             logging.info("Running installation script in offline modus")
-
-        docker_client = get_docker_client()
+            load_local_images(docker_client)
 
         ctx.invoke(update_feder8_network)
 
