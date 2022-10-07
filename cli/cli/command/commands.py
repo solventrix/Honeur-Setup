@@ -39,7 +39,7 @@ FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
 PY_ENV_VOLUME  = "py_environment"
 
-central_connection_ok = True
+offline_mode = True
 
 
 def get_default_feder8_central_environment() -> str:
@@ -138,7 +138,7 @@ def validate_correct_docker_network(docker_client: DockerClient):
 
 
 def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
-    if not central_connection_ok:
+    if not offline_mode:
         logging.info(f"Running in offline modus.  Image '{image}' expected to be present on the host machine")
         return
     ImageManager.pull_image(docker_client, registry, image, email, cli_key)
@@ -2327,7 +2327,7 @@ def update_feder8_network():
 
 
 def load_local_images(docker_client):
-    with open('../images.tar', 'r') as f:
+    with open('/images.tar', 'r') as f:
         logging.info("Loading images. This could take a while.")
         docker_client.images.load(f)
 
@@ -2352,20 +2352,21 @@ def load_local_images(docker_client):
 @click.option('-edoh', '--expose-database-on-host')
 @click.option('-es', '--enable-ssl')
 @click.option('-cd', '--certificate-directory')
+@click.option('--offline', is_flag=True, default=False)
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory, offline):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        global central_connection_ok
-        central_connection_ok = check_central_platform_connection(therapeutic_area_info)
+        global offline_mode
+        offline_mode = offline
 
         docker_client = get_docker_client()
 
-        if not central_connection_ok:
+        if not offline_mode:
             logging.info("Running installation script in offline modus")
             load_local_images(docker_client)
 
@@ -2477,14 +2478,3 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
 
 
-def check_central_platform_connection(therapeutic_area_info: TherapeuticArea):
-    url = f"https://{therapeutic_area_info.catalogue_url}/actuator/health"
-    timeout = 5
-    try:
-        request = requests.get(url, timeout=timeout)
-        if request.status_code == 200:
-            logging.info("Connection to the central platform ok")
-            return True
-    except (requests.ConnectionError, requests.Timeout) as exception:
-        logging.warning("No connection to the central platform")
-    return False
