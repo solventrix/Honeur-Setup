@@ -9,27 +9,27 @@ pipeline {
                 script {
                     dir('Honeur-Setup/cli') {
                         withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                            sh './build.sh'
+                            sh 'VERSION=shawn-test ./build.sh'
                         }
                     }
                 }
             }
         }
-//         stage('upload image') {
-//             steps {
-//                 script {
-//                     dir('Honeur-Setup/cli') {
-//                         try {
-//                             withDockerRegistry(credentialsId: "harbor-honeur-library-robot-uat", url: "https://harbor-uat.honeur.org") {
-//                                 sh "THERAPEUTIC_AREA_URL=harbor-uat.honeur.org ./publish.sh"
-//                             }
-//                         } catch (e) {
-//                             notifyPushFailed("https://harbor-uat.honeur.org")
-//                         }
-//                     }
-//                 }
-//             }
-//         }
+        stage('upload image') {
+            steps {
+                script {
+                    dir('Honeur-Setup/cli') {
+                        try {
+                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot-uat", url: "https://harbor-uat.honeur.org") {
+                                sh "THERAPEUTIC_AREA_URL=harbor-uat.honeur.org ./publish.sh"
+                            }
+                        } catch (e) {
+                            notifyPushFailed("https://harbor-uat.honeur.org")
+                        }
+                    }
+                }
+            }
+        }
         stage('Save dependencies') {
             steps {
                 script {
