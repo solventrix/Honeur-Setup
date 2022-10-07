@@ -59,8 +59,7 @@ pipeline {
                                     echo "Could not pull tag ${nonUatTag}"
                                 }
                             }
-                            successFullyPulledTags.remove('alpine:3.15.0')
-                            successFullyPulledTags.remove('postgres:13')
+
                             successFullyPulledTags.add("harbor-uat.${domain}/library/install-script")
 
                             tagsForSaving = successFullyPulledTags.join(" ")
