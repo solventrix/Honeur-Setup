@@ -118,6 +118,6 @@ def getEnv() {
    } else if (env.GIT_BRANCH.equals('origin/master')) {
         return 'PRD'
    } else {
-        return 'DEV'
+        return 'UAT'
    }
 }
