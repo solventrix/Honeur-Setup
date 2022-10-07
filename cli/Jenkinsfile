@@ -8,6 +8,7 @@ pipeline {
                 script: 'cat Honeur-Setup/cli/VERSION',
                 returnStdout: true
             ).trim()
+        ENV = getEnv()
     }
 
     stages {
@@ -26,12 +27,14 @@ pipeline {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
+                        credentialsId = env.ENV.equals('UAT') ? "harbor-honeur-library-robot-uat" : "harbor-honeur-library-robot"
+                        hostname = env.ENV.equals('UAT') ? "harbor-uat.${domain}" : "harbor.${domain}"
                         try {
-                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot-uat", url: "https://harbor-uat.honeur.org") {
-                                sh "THERAPEUTIC_AREA_URL=harbor-uat.honeur.org ./publish.sh"
+                            withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
+                                sh "THERAPEUTIC_AREA_URL=${hostname} ./publish.sh"
                             }
                         } catch (e) {
-                            notifyPushFailed("https://harbor-uat.honeur.org")
+                            notifyPushFailed("https://${hostname}")
                         }
                     }
                 }
@@ -46,21 +49,24 @@ pipeline {
                         file = 'honeur'
                         echo "attempting login for ${file}"
                         domain = getTADomain(file)
-                        withDockerRegistry(credentialsId: "harbor-${file}-robot", url: "https://harbor.${domain}") {
+
+                        credentialsId = env.ENV.equals('UAT') ? "harbor-${file}-robot-uat" : "harbor-${file}-robot"
+                        hostname = env.ENV.equals('UAT') ? "harbor-uat.${domain}" : "harbor.${domain}"
+
+                        withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
                             fileString = readFile encoding: 'UTF-8', file: '/output/' + file
                             tags = fileString.split()
                             successFullyPulledTags = []
                             tags.each() { tag ->
-                                nonUatTag = tag.replace('-uat', '')
                                 try {
-                                    sh "docker pull --quiet ${nonUatTag}"
-                                    successFullyPulledTags.add(nonUatTag)
+                                    sh "docker pull --quiet ${tag}"
+                                    successFullyPulledTags.add(tag)
                                 } catch (e) {
-                                    echo "Could not pull tag ${nonUatTag}"
+                                    echo "Could not pull tag ${tag}"
                                 }
                             }
 
-                            successFullyPulledTags.add("harbor-uat.${domain}/library/install-script")
+                            successFullyPulledTags.add("${hostname}/library/install-script")
 
                             tagsForSaving = successFullyPulledTags.join(" ")
                             outputFile = "./feder8-local-install-${env.VERSION}"
@@ -103,4 +109,14 @@ def getTADomain(area) {
     default:
         return "honeur.org"
   }
+}
+
+def getEnv() {
+   if (env.GIT_BRANCH.startsWith('origin/release/') {
+        return 'UAT'
+   } else if (env.GIT_BRANCH.equals('origin/master') {
+        return 'PRD'
+   } else {
+        return 'DEV'
+   }
 }
