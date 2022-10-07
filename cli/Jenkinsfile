@@ -73,7 +73,7 @@ pipeline {
                             outputFile = "./feder8-local-install-${env.VERSION}"
                             sh "mkdir ${outputFile}"
                             sh "docker save ${tagsForSaving} -o ${outputFile}/images.tar"
-                            sh "cp -R Honeur-Setup/local-installation/offline-helper-scripts ${outputFile}/"
+                            sh "cp -RT Honeur-Setup/local-installation/offline-helper-scripts ${outputFile}/"
                             sh "tar -zcvf ./${file}.tar.gz ${outputFile}"
                             sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.VERSION}.tar.gz"
                         }
