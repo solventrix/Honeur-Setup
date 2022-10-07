@@ -4,7 +4,7 @@ pipeline {
     }
 
     environment {
-        VERSION = shawn-test
+        VERSION = 'shawn-test'
     }
 
     stages {
