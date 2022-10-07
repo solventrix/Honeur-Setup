@@ -3,13 +3,17 @@ pipeline {
         label 'amzl-honeur-upgrade'
     }
 
+    environment {
+        VERSION = shawn-test
+    }
+
     stages {
         stage('build image') {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
                         withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                            sh 'VERSION=shawn-test ./build.sh'
+                            sh './build.sh'
                         }
                     }
                 }
@@ -62,7 +66,7 @@ pipeline {
                             sh "docker save ${tagsForSaving} -o output-zip/images.tar"
                             sh "cp -R Honeur-Setup/local-installation/helper-scripts output-zip/helper-scripts"
                             sh "tar -zcvf ./${file}.tar.gz output-zip"
-                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.TAG}.tar.gz"
+                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.VERSION}.tar.gz"
                         }
 //                     }
                 }
