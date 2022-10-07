@@ -39,7 +39,7 @@ FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
 PY_ENV_VOLUME  = "py_environment"
 
-offline_mode = True
+offline_mode = False
 
 
 def get_default_feder8_central_environment() -> str:
@@ -138,7 +138,7 @@ def validate_correct_docker_network(docker_client: DockerClient):
 
 
 def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
-    if not offline_mode:
+    if offline_mode:
         logging.info(f"Running in offline modus.  Image '{image}' expected to be present on the host machine")
         return
     ImageManager.pull_image(docker_client, registry, image, email, cli_key)
@@ -239,7 +239,7 @@ def get_configuration(therapeutic_area) -> ConfigurationController:
     is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if not therapeutic_area:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
-    return ConfigurationController(therapeutic_area, current_environment, is_windows)
+    return ConfigurationController(therapeutic_area, current_environment, is_windows, offline_mode)
 
 
 def get_image_repo_credentials(therapeutic_area, email=None, cli_key=None, configuration: ConfigurationController=None):
@@ -2326,12 +2326,6 @@ def update_feder8_network():
                 pass
 
 
-def load_local_images(docker_client):
-    with open('/images.tar', 'r') as f:
-        logging.info("Loading images. This could take a while.")
-        docker_client.images.load(f)
-
-
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
 @click.option('-e', '--email')
@@ -2364,11 +2358,10 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         global offline_mode
         offline_mode = offline
 
-        docker_client = get_docker_client()
-
-        if not offline_mode:
+        if offline_mode:
             logging.info("Running installation script in offline modus")
-            load_local_images(docker_client)
+
+        docker_client = get_docker_client()
 
         ctx.invoke(update_feder8_network)
 
