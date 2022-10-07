@@ -14,6 +14,7 @@ pipeline {
     stages {
         stage('build image') {
             steps {
+                echo "Currently running pipeline for ${ENV} environment"
                 script {
                     dir('Honeur-Setup/cli') {
                         withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
@@ -112,9 +113,9 @@ def getTADomain(area) {
 }
 
 def getEnv() {
-   if (env.GIT_BRANCH.startsWith('origin/release/') {
+   if (env.GIT_BRANCH.startsWith('origin/release/')) {
         return 'UAT'
-   } else if (env.GIT_BRANCH.equals('origin/master') {
+   } else if (env.GIT_BRANCH.equals('origin/master')) {
         return 'PRD'
    } else {
         return 'DEV'
