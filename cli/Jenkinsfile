@@ -29,7 +29,7 @@ pipeline {
                 script {
                     dir('Honeur-Setup/cli') {
                         credentialsId = env.ENV.equals('UAT') ? "harbor-honeur-library-robot-uat" : "harbor-honeur-library-robot"
-                        hostname = env.ENV.equals('UAT') ? "harbor-uat.${domain}" : "harbor.${domain}"
+                        hostname = env.ENV.equals('UAT') ? "harbor-uat.honeur.org" : "harbor.honeur.org"
                         try {
                             withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
                                 sh "THERAPEUTIC_AREA_URL=${hostname} ./publish.sh"
