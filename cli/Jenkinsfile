@@ -62,10 +62,10 @@ pipeline {
                             successFullyPulledTags.add("harbor-uat.${domain}/library/install-script")
 
                             tagsForSaving = successFullyPulledTags.join(" ")
-                            dir('output-zip') {}
-                            sh "docker save ${tagsForSaving} -o output-zip/images.tar"
+                            sh 'mkdir ./output-zip'
+                            sh "docker save ${tagsForSaving} -o ./output-zip/images.tar"
                             sh "cp -R Honeur-Setup/local-installation/helper-scripts output-zip/helper-scripts"
-                            sh "tar -zcvf ./${file}.tar.gz output-zip"
+                            sh "tar -zcvf ./${file}.tar.gz ./output-zip"
                             sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.VERSION}.tar.gz"
                         }
 //                     }
