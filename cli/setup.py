@@ -23,7 +23,7 @@ with open(version_path) as f:
 # setup the package
 setup(
     name='feder8',
-    version=version_ns['__version__'],
+    version='2.0.19',
     description='Feder8 command line interface',
     url='https://github.com/Solventrix/Honeur-Setup',
     packages=find_namespace_packages(),
