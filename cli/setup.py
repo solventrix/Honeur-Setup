@@ -10,20 +10,11 @@ here = path.abspath(path.dirname(__file__))
 # with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 #     long_description = f.read()
 
-# Read the API version from disk. This file should be located in the package
-# folder, since it's also used to set the pkg.__version__ variable.
-version_path = os.path.join(here, 'cli', '_version.py')
-version_ns = {
-    '__file__': version_path
-}
-with open(version_path) as f:
-    exec(f.read(), {}, version_ns)
-
 
 # setup the package
 setup(
     name='feder8',
-    version='2.0.19',
+    version='2.0.19', # set by bump2version
     description='Feder8 command line interface',
     url='https://github.com/Solventrix/Honeur-Setup',
     packages=find_namespace_packages(),
