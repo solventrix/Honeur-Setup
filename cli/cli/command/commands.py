@@ -2403,7 +2403,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
             host = configuration.get_configuration('feder8.local.host.name')
 
         if security_method is None:
-            security_method = configuration.get_configuration('feder8.local.security.security-method')
+            security_method = configuration.ask('feder8.local.security.security-method')
 
         if security_method == 'LDAP':
             if ldap_url is None:
