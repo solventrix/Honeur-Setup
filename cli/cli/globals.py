@@ -25,8 +25,8 @@ class Globals:
 
     all_questions:Dict[str,Question] = {
         'feder8.local.host.name': SingleChoiceQuestion('Enter the FQDN(Fully Qualified Domain Name eg. www.example.com) or public IP address(eg. 125.24.44.18) of the host machine. Use localhost only for testing?', ''),
-        'feder8.central.service.image-repo-username': SingleChoiceQuestion('Enter email address used to login to FEDER8_PORTAL_URL?', '', True),
-        'feder8.central.service.image-repo-key': SingleChoiceQuestion('Surf to FEDER8_REGISTRY_URL and login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field. Enter the CLI Secret?', '', True),
+        'feder8.central.service.image-repo-username': SingleChoiceQuestion('Enter email address used to login to FEDER8_PORTAL_URL?', '', skip_in_offline_mode=True),
+        'feder8.central.service.image-repo-key': SingleChoiceQuestion('Surf to FEDER8_REGISTRY_URL and login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field. Enter the CLI Secret?', '', skip_in_offline_mode=True),
         'feder8.local.datasource.password': SingleChoiceQuestion('Enter password for FEDER8_THERAPEUTIC_AREA database user?', 'FEDER8_RANDOM_PASSWORD'),
         'feder8.local.datasource.admin-password': SingleChoiceQuestion('Enter password for FEDER8_THERAPEUTIC_AREA_admin database user?', 'FEDER8_RANDOM_PASSWORD'),
         'feder8.local.security.security-method': MultipleChoiceQuestion('Enter the security method to use?', ['None', 'JDBC', 'LDAP']),
