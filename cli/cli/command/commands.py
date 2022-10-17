@@ -39,7 +39,7 @@ FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
 PY_ENV_VOLUME  = "py_environment"
 
-central_connection_ok = True
+offline_mode = False
 
 
 def get_default_feder8_central_environment() -> str:
@@ -138,7 +138,7 @@ def validate_correct_docker_network(docker_client: DockerClient):
 
 
 def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
-    if not central_connection_ok:
+    if offline_mode:
         logging.info(f"Running in offline modus.  Image '{image}' expected to be present on the host machine")
         return
     ImageManager.pull_image(docker_client, registry, image, email, cli_key)
@@ -239,7 +239,7 @@ def get_configuration(therapeutic_area) -> ConfigurationController:
     is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     if not therapeutic_area:
         therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
-    return ConfigurationController(therapeutic_area, current_environment, is_windows)
+    return ConfigurationController(therapeutic_area, current_environment, is_windows, offline_mode)
 
 
 def get_image_repo_credentials(therapeutic_area, email=None, cli_key=None, configuration: ConfigurationController=None):
@@ -343,6 +343,16 @@ def config_server(therapeutic_area, email, cli_key):
     print('Done starting config-server container')
 
     wait_for_healthy_container(docker_client, container, 5, 120)
+
+@init.command()
+@click.option('-o', '--output-dir')
+def export_all_image_name_tags(output_dir):
+    for therapeutic_area_info in Globals.therapeutic_areas.values():
+        images = get_all_feder8_local_image_name_tags(therapeutic_area_info)
+        images.append(get_alpine_image_name_tag())
+        images.append(get_postgres_13_image_name_tag())
+        with open(os.path.join(output_dir, therapeutic_area_info.name), 'w') as f:
+            f.write('\n'.join(images))
 
 
 @init.command()
@@ -2336,18 +2346,19 @@ def update_feder8_network():
 @click.option('-edoh', '--expose-database-on-host')
 @click.option('-es', '--enable-ssl')
 @click.option('-cd', '--certificate-directory')
+@click.option('--offline', is_flag=True, default=False)
 @click.pass_context
-def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory):
+def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password, username, password, organization, enable_docker_runner, expose_database_on_host, enable_ssl, certificate_directory, offline):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
         therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
 
-        global central_connection_ok
-        central_connection_ok = check_central_platform_connection(therapeutic_area_info)
+        global offline_mode
+        offline_mode = offline
 
-        if not central_connection_ok:
+        if offline_mode:
             logging.info("Running installation script in offline modus")
 
         docker_client = get_docker_client()
@@ -2460,14 +2471,3 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
 
 
-def check_central_platform_connection(therapeutic_area_info: TherapeuticArea):
-    url = f"https://{therapeutic_area_info.catalogue_url}/actuator/health"
-    timeout = 5
-    try:
-        request = requests.get(url, timeout=timeout)
-        if request.status_code == 200:
-            logging.info("Connection to the central platform ok")
-            return True
-    except (requests.ConnectionError, requests.Timeout) as exception:
-        logging.warning("No connection to the central platform")
-    return False
