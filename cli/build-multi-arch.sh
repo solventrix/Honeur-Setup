@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eux
 
-VERSION=2.0.18
+VERSION=2.0.19
 TAG=$VERSION
 
 REPOSITORY=library

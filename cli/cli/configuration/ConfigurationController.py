@@ -15,8 +15,11 @@ class ConfigurationController:
     def get_configuration(self, key:str) -> str:
         response = self.config_server_environment.get_configuration(key)
         if response == '':
-            response = self.question_environment.get_configuration(key)
+            response = self.ask(key)
         return response
+
+    def ask(self, key:str):
+        return self.question_environment.get_configuration(key)
 
     def get_optional_configuration(self, key:str) -> str:
         response = self.config_server_environment.get_configuration(key)
