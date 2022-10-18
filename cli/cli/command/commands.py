@@ -173,7 +173,7 @@ def add_docker_sock_volume_mapping(volumes: dict):
     is_mac = os.getenv('IS_MAC', 'false') == 'true'
 
     if is_mac or is_windows:
-        volumes['/var/run/docker.sock.raw'] = {
+        volumes['/var/run/docker.sock'] = {
             'bind': '/var/run/docker.sock',
             'mode': 'rw'
         }
@@ -1847,10 +1847,11 @@ def backup(therapeutic_area, email, cli_key):
     try:
         is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
         directory_separator = '/'
+        current_directory = os.getenv('CURRENT_DIRECTORY', '')
         if is_windows:
-            directory_separator = '\\'
+            current_directory = directory_separator + current_directory.replace('\\', directory_separator).replace(':', '')
 
-        backup_folder = os.getenv('CURRENT_DIRECTORY', '') + directory_separator + 'backup'
+        backup_folder = current_directory + directory_separator + 'backup'
 
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
