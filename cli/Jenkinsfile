@@ -1,11 +1,20 @@
 pipeline {
     agent {
-        label 'amzl-honeur'
+        label 'amzl-honeur-upgrade'
+    }
+
+    environment {
+        VERSION = sh(
+                script: 'cat Honeur-Setup/cli/VERSION',
+                returnStdout: true
+            ).trim()
+        ENV = getEnvironment()
     }
 
     stages {
         stage('build image') {
             steps {
+                echo "Currently running pipeline for ${ENV} environment"
                 script {
                     dir('Honeur-Setup/cli') {
                         withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
@@ -19,14 +28,56 @@ pipeline {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
+                        credentialsId = env.ENV.equals('UAT') ? "harbor-honeur-library-robot-uat" : "harbor-honeur-library-robot"
+                        hostname = env.ENV.equals('UAT') ? "harbor-uat.honeur.org" : "harbor.honeur.org"
                         try {
-                            withDockerRegistry(credentialsId: "harbor-honeur-library-robot", url: "https://harbor.honeur.org") {
-                                sh "THERAPEUTIC_AREA_URL=harbor.honeur.org ./publish.sh"
+                            withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
+                                sh "THERAPEUTIC_AREA_URL=${hostname} ./publish.sh"
                             }
                         } catch (e) {
-                            notifyPushFailed("https://harbor.honeur.org")
+                            notifyPushFailed("https://${hostname}")
                         }
                     }
+                }
+            }
+        }
+        stage('Save dependencies') {
+            steps {
+                script {
+                    sh "docker run --rm --name feder8-installer -e CURRENT_DIRECTORY=\$(pwd) -e IS_WINDOWS=false -e IS_MAC=false -e DOCKER_CERT_SUPPORT=false -v /output:/output -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:${env.VERSION} feder8 init export-all-image-name-tags -o /output"
+//                     files = sh(script: 'ls -1 /output', returnStdout: true).split()
+//                     files.each() { file ->
+                        file = 'honeur'
+                        echo "attempting login for ${file}"
+                        domain = getTADomain(file)
+
+                        credentialsId = env.ENV.equals('UAT') ? "harbor-${file}-robot-uat" : "harbor-${file}-robot"
+                        hostname = env.ENV.equals('UAT') ? "harbor-uat.${domain}" : "harbor.${domain}"
+
+                        withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
+                            fileString = readFile encoding: 'UTF-8', file: '/output/' + file
+                            tags = fileString.split()
+                            successFullyPulledTags = []
+                            tags.each() { tag ->
+                                try {
+                                    sh "docker pull --quiet ${tag}"
+                                    successFullyPulledTags.add(tag)
+                                } catch (e) {
+                                    echo "Could not pull tag ${tag}"
+                                }
+                            }
+
+                            successFullyPulledTags.add("${hostname}/library/install-script")
+
+                            tagsForSaving = successFullyPulledTags.join(" ")
+                            outputFile = "./feder8-local-install-${env.VERSION}"
+                            sh "mkdir ${outputFile}"
+                            sh "docker save ${tagsForSaving} -o ${outputFile}/images.tar"
+                            sh "cp -RT Honeur-Setup/local-installation/offline-helper-scripts ${outputFile}/"
+                            sh "tar -zcvf ./${file}.tar.gz ${outputFile}"
+                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.VERSION}.tar.gz"
+                        }
+//                     }
                 }
             }
         }
@@ -40,4 +91,33 @@ def notifyPushFailed(url) {
         <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
       to: "sverwim1@its.jnj.com,pmoorth1@its.jnj.com"
     )
+}
+
+def getTADomain(area) {
+  switch(area) {
+    case "honeur":
+        return "honeur.org"
+    case "phederation":
+        return "phederation.org"
+    case "esfurn":
+        return "esfurn.org"
+    case "athena":
+        return "athenafederation.org"
+    case "lupus":
+        return "lupusnet.org"
+    case "athena":
+        return "athenafederation.org"
+    default:
+        return "honeur.org"
+  }
+}
+
+def getEnvironment() {
+   if (env.GIT_BRANCH.startsWith('origin/release/')) {
+        return 'UAT'
+   } else if (env.GIT_BRANCH.equals('origin/master')) {
+        return 'PRD'
+   } else {
+        return 'UAT'
+   }
 }

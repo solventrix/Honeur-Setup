@@ -7,9 +7,9 @@ from cli.configuration.DatabaseConnectionDetails import DatabaseConnectionDetail
 
 class ConfigurationController:
 
-    def __init__(self, therapeutic_area:str, current_directory:str, is_windows:bool) -> None:
+    def __init__(self, therapeutic_area:str, current_directory:str, is_windows:bool, offline_mode:bool) -> None:
         self.therapeutic_area:TherapeuticArea = Globals.therapeutic_areas[therapeutic_area]
-        self.question_environment = QuestionaryEnvironment(self.therapeutic_area, current_directory, is_windows)
+        self.question_environment = QuestionaryEnvironment(self.therapeutic_area, current_directory, is_windows, offline_mode)
         self.config_server_environment = ConfigurationServerEnvironment(self.therapeutic_area)
 
     def get_configuration(self, key:str) -> str:

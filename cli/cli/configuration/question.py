@@ -3,11 +3,15 @@ import strgen
 
 class Question:
 
-    def __init__(self, text:str, default:str) -> None:
+    def __init__(self, text:str, default:str, skip_in_offline_mode=False) -> None:
         self.text = text
         self.default = default
+        self.skip_in_offline_mode = skip_in_offline_mode
 
-    def ask(self, therapeutic_area:TherapeuticArea, current_directory:str, is_windows:bool) -> str:
+    def ask(self, therapeutic_area:TherapeuticArea, current_directory:str, is_windows:bool, offline_mode:bool) -> str:
+        if offline_mode and self.skip_in_offline_mode:
+            return None
+
         question:str = self.text
         question = question.replace('FEDER8_PORTAL_URL', therapeutic_area.portal_url)
         question = question.replace('FEDER8_REGISTRY_URL', therapeutic_area.registry.registry_url)
