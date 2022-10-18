@@ -1385,7 +1385,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
     }
     if security_method == 'LDAP':
         environment_variables['HONEUR_STUDIO_LDAP_URL'] = '/'.join([ldap_url,ldap_base_dn])
-        environment_variables['HONEUR_STUDIO_LDAP_DN'] = 'uid=\{0\}'
+        environment_variables['HONEUR_STUDIO_LDAP_DN'] = ldap_dn # 'uid=\{0\}'
         environment_variables['HONEUR_STUDIO_LDAP_MANAGER_DN'] = ldap_system_username
         environment_variables['HONEUR_STUDIO_LDAP_MANAGER_PASSWORD'] = ldap_system_password
     elif security_method == 'JDBC':
