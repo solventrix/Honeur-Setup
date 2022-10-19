@@ -168,12 +168,12 @@ def get_or_create_network(docker_client:DockerClient, therapeutic_area_info):
     return network
 
 
-def add_docker_sock_volume_mapping(volumes: dict):
+def add_docker_sock_volume_mapping(volumes: dict, raw=False):
     is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     is_mac = os.getenv('IS_MAC', 'false') == 'true'
 
-    if is_mac or is_windows:
-        volumes['/var/run/docker.sock'] = {
+    if raw and (is_mac or is_windows):
+        volumes['/var/run/docker.sock.raw'] = {
             'bind': '/var/run/docker.sock',
             'mode': 'rw'
         }
@@ -556,7 +556,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
                 'mode': 'ro'
             }
         }
-    volumes = add_docker_sock_volume_mapping(volumes)
+    volumes = add_docker_sock_volume_mapping(volumes, raw=True)
 
     container = docker_client.containers.run(
         image=local_portal_image_name_tag,
@@ -703,10 +703,17 @@ def atlas_webapi(therapeutic_area, email, cli_key, host, enable_ssl, certificate
     else:
         environment_variables['FEDER8_WEBAPI_SECURE'] = 'true'
         if security_method == 'LDAP':
+            ldap_username_attribute = ldap_dn.split('=')[0]
+            ldap_search_string = ldap_dn.split(',')[0]
+            ldap_search_string = f'(&(objectClass=person)({ldap_search_string}))'
+            if ldap_base_dn not in ldap_dn:
+                ldap_dn = f'{ldap_dn},{ldap_base_dn}'
             environment_variables['FEDER8_WEBAPI_AUTH_METHOD'] = 'ldap'
             environment_variables['FEDER8_WEBAPI_LDAP_URL'] = ldap_url
-            environment_variables['FEDER8_WEBAPI_LDAP_DN'] = ldap_dn
             environment_variables['FEDER8_WEBAPI_LDAP_BASEDN'] = ldap_base_dn
+            environment_variables['FEDER8_WEBAPI_LDAP_DN'] = ldap_dn
+            environment_variables['FEDER8_WEBAPI_LDAP_SEARCH_STRING'] = ldap_search_string
+            environment_variables['FEDER8_WEBAPI_LDAP_USERNAME_ATTRIBUTE'] = ldap_username_attribute
             environment_variables['FEDER8_WEBAPI_LDAP_SYSTEM_USERNAME'] = ldap_system_username
             environment_variables['FEDER8_WEBAPI_LDAP_SYSTEM_PASSWORD'] = ldap_system_password
         else:
@@ -861,6 +868,8 @@ def zeppelin(therapeutic_area, email, cli_key, security_method, ldap_url, ldap_d
         'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
         'JAVA_OPTS': "-Dlog4j2.formatMsgNoLookups=true"
     }
+    if ldap_base_dn not in ldap_dn:
+        ldap_dn = f'{ldap_dn},{ldap_base_dn}'
     if security_method == 'LDAP':
         environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
         environment_variables['LDAP_URL'] = ldap_url
@@ -1014,9 +1023,10 @@ def user_management(therapeutic_area, email, cli_key, username, password):
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
-@click.option('-au', '--admin-username')
-@click.option('-ap', '--admin-password')
-def task_manager(therapeutic_area, email, cli_key, security_method, admin_username, admin_password):
+@click.option('-lu', '--ldap-url')
+@click.option('-ldn', '--ldap-dn')
+@click.option('-lbdn', '--ldap-base-dn')
+def task_manager(therapeutic_area, email, cli_key, security_method, ldap_url, ldap_dn, ldap_base_dn):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
@@ -1041,10 +1051,13 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
             security_method = configuration.get_configuration('feder8.local.security.security-method')
 
         if security_method == 'LDAP':
-            if admin_username is None:
-                admin_username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
-            if admin_password is None:
-                admin_password = configuration.get_configuration('feder8.local.security.user-mgmt-password')
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -1070,8 +1083,9 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
     else:
         if security_method == 'LDAP':
             config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
-            config_update['FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME'] = admin_username,
-            config_update['FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD'] = admin_password
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
         else:
             config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
 
@@ -1116,9 +1130,11 @@ def task_manager(therapeutic_area, email, cli_key, security_method, admin_userna
     }
     if security_method == 'LDAP':
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
-        environment_variables['FEDER8_IN_MEMORY_AUTH_ENABLED'] = 'true'
-        environment_variables['FEDER8_IN_MEMORY_AUTH_USERNAME'] = admin_username
-        environment_variables['FEDER8_IN_MEMORY_AUTH_PASSWORD'] = admin_password
+        environment_variables['FEDER8_IN_MEMORY_AUTH_ENABLED'] = 'false'
+        environment_variables['FEDER8_LDAP_AUTH_ENABLED'] = 'true'
+        environment_variables['FEDER8_LDAP_URL'] = f'{ldap_url}/{ldap_base_dn}'
+        environment_variables['FEDER8_LDAP_BASE_DN'] = ldap_base_dn
+        environment_variables['FEDER8_LDAP_DN'] = ldap_dn
     elif security_method == 'JDBC':
         environment_variables['FEDER8_SECURITY_ENABLED'] = 'true'
         environment_variables['FEDER8_IN_MEMORY_AUTH_ENABLED'] = 'false'
@@ -1394,8 +1410,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
         'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
     }
     if security_method == 'LDAP':
-        environment_variables['HONEUR_STUDIO_LDAP_URL'] = '/'.join([ldap_url,ldap_base_dn])
-        environment_variables['HONEUR_STUDIO_LDAP_DN'] = ldap_dn # 'uid=\{0\}'
+        environment_variables['HONEUR_STUDIO_LDAP_URL'] = f'{ldap_url}/{ldap_base_dn}'
+        environment_variables['HONEUR_STUDIO_LDAP_DN'] = ldap_dn # 'uid={0}'
         environment_variables['HONEUR_STUDIO_LDAP_MANAGER_DN'] = ldap_system_username
         environment_variables['HONEUR_STUDIO_LDAP_MANAGER_PASSWORD'] = ldap_system_password
     elif security_method == 'JDBC':
@@ -2468,7 +2484,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         ctx.invoke(feder8_studio, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if install_disease_explorer:
         ctx.invoke(disease_explorer, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
-    ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, admin_username=username, admin_password=password)
+    ctx.invoke(task_manager, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn)
     ctx.invoke(nginx, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory)
 
 
