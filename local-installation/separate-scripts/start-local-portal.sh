@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TAG=2.0.18
-REGISTRY=harbor-uat.honeur.org
+REGISTRY=harbor.honeur.org
 
 if [[ $OSTYPE == 'darwin'* ]]; then
   IS_MAC=true

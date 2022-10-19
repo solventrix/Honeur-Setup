@@ -51,11 +51,11 @@ def get_atlas_image_name_tag(therapeutic_area_info):
 
 
 def get_webapi_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.2')
+    return get_image_name_tag(therapeutic_area_info, 'webapi', '2.9.0-2.0.3')
 
 
 def get_zeppelin_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.5')
+    return get_image_name_tag(therapeutic_area_info, 'zeppelin', '0.8.2-2.0.6')
 
 
 def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
@@ -96,7 +96,7 @@ def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_na
 
 
 def get_task_manager_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.3')
+    return get_image_name_tag(therapeutic_area_info, 'task-manager', '2.0.4')
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):

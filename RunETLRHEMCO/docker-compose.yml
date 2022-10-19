@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+  etl:
+    image: harbor.honeur.org/etl-rhemco/etl:image_tag
+    volumes:
+      - "./log:/log"
+      - "data_folder:/data"
+    networks:
+      - honeur_honeur-net
+    environment:
+      DB_DBMS: "postgresql"
+      DB_SERVER : "postgres"
+      DB_PORT: "5432"
+      DB_DBNAME: "OHDSI"
+      DB_SCHEMA: "omopcdm"
+      DB_USER: db_username
+      DB_PASSWORD: db_password
+      FILENAME: "1_rhemco_21_tt_molecule_1980_2018.txt:rhemco_21_hemo_1980_2018.txt:rhemco_21_indiv_1980_2018.txt"
+      LAST_DATA_EXPORT: date_last_export
+      VERBOSITY_LEVEL: verbosity_level
+
+networks:
+  honeur_honeur-net:
+    external:
+      name: feder8-net

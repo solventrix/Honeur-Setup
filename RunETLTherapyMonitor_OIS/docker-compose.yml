@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   etl:
-    image: edence/ois:image_tag
+    image: harbor.honeur.org/etl-ois/etl:image_tag
     volumes:
       - "./log:/log"
       - "data_folder:/data"
@@ -23,4 +23,4 @@ services:
 networks:
   honeur_honeur-net:
     external:
-      name: honeur-net
+      name: feder8-net

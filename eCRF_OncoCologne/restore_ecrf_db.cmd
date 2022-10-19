@@ -1,6 +1,6 @@
 @echo off
 
-DATABASE_NAME=postgres
+SET DATABASE_NAME=opal
 
 SET /p DATABASE_BACKUP_FILE="Please enter the full path of the backup file: "
 :while-backup-file-not-correct
@@ -8,6 +8,13 @@ if "%DATABASE_BACKUP_FILE%" == "" (
    echo The backup file cannot be empty
    SET /p DATABASE_BACKUP_FILE="Please enter the full path of the backup file: "
    goto :while-backup-file-not-correct
+)
+
+if exist %DATABASE_BACKUP_FILE% (
+    rem file exists
+) else (
+    echo %DATABASE_BACKUP_FILE% not found!
+    exit 1
 )
 
 SET /p POSTGRES_PASSWORD="Please enter the password for Postgres: "
@@ -18,21 +25,5 @@ if "%POSTGRES_PASSWORD%" == "" (
    goto :while-postgres-password-not-correct
 )
 
-CURRENT_TIME=%time%
-RESTORE_FOLDER=%cd%\restore\%TIME%
-
-mkdir %RESTORE_FOLDER%
-
-echo "remove old database container"
-docker stop honeur_ecrf_postgres
-docker rm honeur_ecrf_postgres
-docker volume rm postgres_data
-docker volume create postgres_data
-echo "re-create database container"
-docker run -d --name honeur_ecrf_postgres --network feder8-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=%POSTGRES_PASSWORD% --restart=always -p 5432:5432 harbor-uat.honeur.org/ecrf/oncocologne/postgres:0.2
-TIMEOUT 5
-
-echo "Restore database $DB_NAME"
-type %DATABASE_BACKUP_FILE% | docker exec -i honeur_ecrf_postgres bash -c "PGPASSWORD=%POSTGRES_PASSWORD% psql -U postgres -d %DATABASE_NAME%"
-
-rmdir /s  ${RESTORE_FOLDER}
+echo Restore database %DATABASE_NAME%
+docker run --network="honeur-net" --rm -e DB_NAME=%DATABASE_NAME% -e PGPASSWORD=%POSTGRES_PASSWORD% -v %DATABASE_BACKUP_FILE%:/opt/database/backup.dump postgres:13.0-alpine sh -c "set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_restore --clean -h honeur_ecrf_postgres -U postgres -d ${DB_NAME} /opt/database/backup.dump"

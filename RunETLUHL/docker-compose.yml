@@ -15,14 +15,7 @@ services:
       - /bin/bash
       - -c
       - |
-          pip3 install sqlalchemy
-          pip3 install psycopg2-binary
-          pip3 install pyyaml
-          pip3 install numpy
-          pip3 install pandas
-          pip3 install xlrd
-          pip3 install click
-          pip3 install coloredlogs
+          pip3 install -r /UHL-ETL/requirements.txt
           cd /UHL-ETL
           python main.py --db_host <db_host> --db_port <db_port> --db_name <db_name> --db_username <db_username> --db_password <db_password> --source_excel "/data/<data_file>" --source_sheet <data_sheet>
 networks:

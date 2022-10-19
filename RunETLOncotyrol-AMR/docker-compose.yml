@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   etl:
-    image: harbor-uat.honeur.org/etl-oncotyrol/etl:current
+    image: harbor.honeur.org/etl-oncotyrol/etl:current
     volumes:
       - "./log:/log"
       - "data_folder:/data"
@@ -18,8 +18,9 @@ services:
       DB_USER: db_username
       DB_PASSWORD: db_password
       VERBOSITY_LEVEL: verbosity_level
+      LAST_DATA_EXPORT: date_last_export
 
 networks:
   honeur_honeur-net:
     external:
-      name: honeur-net
+      name: feder8-net

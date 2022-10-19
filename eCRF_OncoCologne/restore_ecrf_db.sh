@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -z "$1" ]
-  then
-    echo "Please specify the file to restore"
+DATABASE_NAME=opal
+
+DATABASE_BACKUP_FILE=
+read -p "Please enter the absolute path of the backup file to restore: " DATABASE_BACKUP_FILE
+while [[ "$DATABASE_BACKUP_FILE" == "" ]]; do
+    echo "The backup file path cannot be empty"
+    read -p "Please enter the absolute path of the backup file to restore: " DATABASE_BACKUP_FILE
+done
+
+if [ -f "$DATABASE_BACKUP_FILE" ]; then
+    echo "$DATABASE_BACKUP_FILE found."
+else
+    echo "$DATABASE_BACKUP_FILE not found!"
     exit 1
 fi
-
-DATABASE_BACKUP_FILE=$1
-CURRENT_TIME=$(date "+%Y_%m_%d_%H_%M_%S")
-RESTORE_FOLDER=${PWD}/restore/${CURRENT_TIME}
 
 POSTGRES_PASSWORD=
 read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
@@ -18,26 +24,11 @@ while [[ "$POSTGRES_PASSWORD" == "" ]]; do
     read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
 done
 
-mkdir -p ${RESTORE_FOLDER}
-
-export LANG=en_US.UTF-8
-export LC_ALL=$LANG
-tar -C ${RESTORE_FOLDER} -zxvf ${DATABASE_BACKUP_FILE}
-
-echo "remove old database container"
-docker stop honeur_ecrf_postgres
-docker rm honeur_ecrf_postgres
-docker volume rm postgres_data
-docker volume create postgres_data
-echo "re-create database container"
-docker run -d --name honeur_ecrf_postgres --network feder8-net --volume postgres_data:/var/lib/postgresql/data --env POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart=always -p 5432:5432 harbor-uat.honeur.org/ecrf/oncocologne/postgres:0.2
-sleep 5s
-
-for sql_script in ${RESTORE_FOLDER}/*.sql; do
-    sql_script_name=$(basename -- "$sql_script")
-    DB_NAME="${sql_script_name%%.*}"
-    echo "Restore database $DB_NAME"
-    cat $sql_script | docker exec -i honeur_ecrf_postgres bash -c "PGPASSWORD=${POSTGRES_PASSWORD} psql -U postgres -d $DB_NAME"
-done
-
-rm -rf ${RESTORE_FOLDER}
+echo "Restore database $DATABASE_NAME"
+docker run \
+--network="honeur-net" \
+--rm \
+-e DB_NAME=$DATABASE_NAME \
+-e PGPASSWORD=$POSTGRES_PASSWORD \
+-v ${DATABASE_BACKUP_FILE}:/opt/database/backup.dump \
+postgres:13.0-alpine sh -c 'set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_restore --clean -h honeur_ecrf_postgres -U postgres -d ${DB_NAME} /opt/database/backup.dump'

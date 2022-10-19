@@ -2,7 +2,7 @@ if [ $(docker ps --filter "name=etl" | grep -w 'etl' | wc -l) = 1 ]; then
   docker stop -t 1 etl && docker rm etl;
 fi
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/RunETLTherapyMonitor_OIS/docker-compose.yml --output docker-compose.yml
+curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLTherapyMonitor_OIS/docker-compose.yml --output docker-compose.yml
 
 read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}
@@ -24,6 +24,6 @@ sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
 sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 sed -i -e "s/filename/$filename/g" docker-compose.yml
 
-docker login
+docker login harbor.honeur.org
 docker-compose pull
 docker-compose run --rm --name etl etl
