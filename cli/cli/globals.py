@@ -13,14 +13,14 @@ class Globals:
 
     @staticmethod
     def get_environment():
-        return "PRD"
+        return "UAT"
 
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['CCL','CHU Dijon','CHU Lille','CHU Montpellier','CHU Toulouse HAL','CLLEAR','DOS','EMMOS','GMV','iOMEDICO','IUCT','Janssen','OIS','Oncotyrol','RMG','UHL']),
-        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Actelion','Janssen']),
-        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Janssen']),
-        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'distributed-analytics.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['AZ Groeninge', 'CHU Liege', 'edenceHealth', 'Illumina', 'Imec', 'Janssen', 'KU Leuven', 'OLVZ Aalst', 'UGent', 'UZ Leuven MM', 'UZ Leuven UC', 'ZOL']),
-        "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal.lupusnet.org', 'catalogue.lupusnet.org', 'distributed-analytics.lupusnet.org', 'cas.lupusnet.org', Registry('harbor.lupusnet.org', 'lupus'), ['Gladel', 'Janssen'])
+        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal-uat.honeur.org', 'catalogue-uat.honeur.org', 'distributed-analytics-uat.honeur.org', 'cas-uat.honeur.org', Registry('harbor-uat.honeur.org', 'honeur'), ['CCL','CHU Dijon','CHU Lille','CHU Montpellier','CLLEAR','DOS','EMMOS','IUCT','iOMEDICO','Janssen','OIS','Oncotyrol','RMG', 'UHL','EY', 'ZOL', 'HOPE','Security Scan', 'TestOrg1', 'TestOrg2', 'TestOrg3', 'TestOrg4', 'TestOrg5', 'TestOrg6']),
+        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal-uat.phederation.org', 'catalogue-uat.phederation.org', 'distributed-analytics-uat.phederation.org', 'cas-uat.phederation.org', Registry('harbor-uat.phederation.org', 'phederation'), ['Security Scan', 'Janssen', 'Actelion', 'PHederationTestOrg1', 'PHederationTestOrg2', 'PHederationTestOrg3', 'PHederationTestOrg4', 'PHederationTestOrg5', 'PHederationTestOrg6']),
+        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal-uat.esfurn.org', 'catalogue-uat.esfurn.org', 'distributed-analytics-uat.esfurn.org', 'cas-uat.esfurn.org', Registry('harbor-uat.esfurn.org', 'esfurn'), ['DARM', 'Janssen', 'EsfurnTestOrg1', 'EsfurnTestOrg2', 'EsfurnTestOrg3', 'EsfurnTestOrg4', 'EsfurnTestOrg5', 'EsfurnTestOrg6']),
+        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal-uat.athenafederation.org', 'catalogue-uat.athenafederation.org', 'distributed-analytics-uat.athenafederation.org', 'cas-uat.athenafederation.org', Registry('harbor-uat.athenafederation.org', 'athena'), ['CHU Liege', 'Illumina', 'KU Leuven', 'UZ Leuven', 'AZ Groeninge', 'Imec', 'imec-1', 'imec-2', 'imec-3', 'edenceHealth', 'Janssen', 'AthenaTestOrg1', 'AthenaTestOrg2', 'AthenaTestOrg3', 'AthenaTestOrg4', 'AthenaTestOrg5', 'AthenaTestOrg6']),
+        "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal-uat.lupusnet.org', 'catalogue-uat.lupusnet.org', 'distributed-analytics-uat.lupusnet.org', 'cas-uat.lupusnet.org', Registry('harbor-uat.lupusnet.org', 'lupus'), ['Gladel', 'Janssen', 'Registry 1', 'Registry 2', 'LupusnetTestOrg1', 'LupusnetTestOrg2', 'LupusnetTestOrg3', 'LupusnetTestOrg4', 'LupusnetTestOrg5', 'LupusnetTestOrg6'])
     }
 
     all_questions:Dict[str,Question] = {
