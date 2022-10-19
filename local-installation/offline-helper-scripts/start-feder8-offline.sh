@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TAG=2.0.19
-REGISTRY=harbor-uat.honeur.org
+REGISTRY=harbor.honeur.org
 
 if systemctl show --property ActiveState docker &> /dev/null; then
     DOCKER_CERT_SUPPORT=true
