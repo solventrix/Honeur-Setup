@@ -27,7 +27,8 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
 
 
 def get_postgres_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'postgres', '13-omopcdm-5.3.1-webapi-2.9.0-2.0.8')
+    cdm_version = therapeutic_area_info.cdm_version
+    return get_image_name_tag(therapeutic_area_info, 'postgres', f'13-omopcdm-{cdm_version}-webapi-2.9.0-2.0.7')
 
 
 def get_config_server_image_name_tag(therapeutic_area_info):
