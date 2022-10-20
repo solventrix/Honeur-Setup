@@ -467,10 +467,14 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 @click.option('-h', '--host')
+@click.option('-s', '--security-method', type=click.Choice(['None', 'JDBC', 'LDAP']))
 @click.option('-u', '--username')
 @click.option('-p', '--password')
+@click.option('-lu', '--ldap-url')
+@click.option('-ldn', '--ldap-dn')
+@click.option('-lbdn', '--ldap-base-dn')
 @click.option('-edr', '--enable-docker-runner')
-def local_portal(therapeutic_area, email, cli_key, host, username, password, enable_docker_runner):
+def local_portal(therapeutic_area, email, cli_key, host, security_method, username, password, ldap_url, ldap_dn, ldap_base_dn, enable_docker_runner):
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
@@ -495,6 +499,8 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
         if host is None:
             host = configuration.get_configuration('feder8.local.host.name')
+        if security_method is None:
+            security_method = configuration.get_configuration('feder8.local.security.security-method')
         if username is None:
             username = configuration.get_configuration('feder8.local.security.user-mgmt-username')
         if password is None:
@@ -505,6 +511,13 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             enable_docker_runner_string = 'true'
         else:
             enable_docker_runner_string = 'false'
+        if security_method == 'LDAP':
+            if ldap_url is None:
+                ldap_url = configuration.get_configuration('feder8.local.security.ldap-url')
+            if ldap_dn is None:
+                ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
+            if ldap_base_dn is None:
+                ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -527,6 +540,17 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
         'FEDER8_LOCAL_SECURITY_USER-MGMT-USERNAME': username,
         'FEDER8_LOCAL_SECURITY_USER-MGMT-PASSWORD': password
     }
+
+    if security_method == 'None':
+        config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'None'
+    else:
+        if security_method == 'LDAP':
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'LDAP'
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-URL'] = ldap_url
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-DN'] = ldap_dn
+            config_update['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
+        else:
+            config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
 
     update_config_on_config_server(docker_client=docker_client,
                                    email=email, cli_key=cli_key,
@@ -558,13 +582,7 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
         }
     volumes = add_docker_sock_volume_mapping(volumes, raw=True)
 
-    container = docker_client.containers.run(
-        image=local_portal_image_name_tag,
-        name=container_names[0],
-        restart_policy={"Name": "always"},
-        security_opt=['no-new-privileges'],
-        remove=False,
-        environment={
+    environment_variables = {
             'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
             'FEDER8_THERAPEUTIC_AREA_LIGHT_THEME_COLOR': therapeutic_area_info.light_theme,
             'FEDER8_THERAPEUTIC_AREA_DARK_THEME_COLOR': therapeutic_area_info.dark_theme,
@@ -572,15 +590,32 @@ def local_portal(therapeutic_area, email, cli_key, host, username, password, ena
             'FEDER8_CONFIG_SERVER_HOST': 'config-server',
             'FEDER8_CONFIG_SERVER_PORT': '8080',
             'FEDER8_CONFIG_SERVER_CONTEXT_PATH': '/config-server',
-            'FEDER8_LOCAL_ADMIN_USERNAME': username,
-            'FEDER8_LOCAL_ADMIN_PASSWORD': password,
+            'FEDER8_SECURITY_ENABLED': 'true',
+            'FEDER8_IN_MEMORY_AUTH_USERNAME': username,
+            'FEDER8_IN_MEMORY_AUTH_PASSWORD': password,
             'FEDER8_ENABLE_DOCKER_RUNNER': enable_docker_runner_string,
             'FEDER8_CENTRAL_SERVICE_ENVIRONMENT': get_default_feder8_central_environment(),
             'FEDER8_STUDIO_APP_DIRECTORY': feder8_studio_app_directory,
             'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
             'SERVER_SERVLET_CONTEXT_PATH': '/portal',
             'JDK_JAVA_OPTIONS': "-Dlog4j2.formatMsgNoLookups=true"
-        },
+        }
+
+    if security_method == 'LDAP':
+        environment_variables['FEDER8_LDAP_AUTH_ENABLED'] = 'true'
+        environment_variables['FEDER8_LDAP_URL'] = f'{ldap_url}/{ldap_base_dn}'
+        environment_variables['FEDER8_LDAP_BASE_DN'] = ldap_base_dn
+        environment_variables['FEDER8_LDAP_DN'] = ldap_dn
+    elif security_method == 'JDBC':
+        environment_variables['FEDER8_JDBC_AUTH_ENABLED'] = 'true'
+
+    container = docker_client.containers.run(
+        image=local_portal_image_name_tag,
+        name=container_names[0],
+        restart_policy={"Name": "always"},
+        security_opt=['no-new-privileges'],
+        remove=False,
+        environment=environment_variables,
         network=network_names[0],
         volumes=volumes,
         group_add=[socket_gid, 0],
@@ -2473,7 +2508,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         sys.exit(1)
 
     ctx.invoke(postgres, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, user_password=user_password, admin_password=admin_password, expose_database_on_host=expose_database_on_host)
-    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, username=username, password=password, enable_docker_runner=enable_docker_runner)
+    ctx.invoke(local_portal, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, host=host, security_method=security_method, username=username, password=password, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, enable_docker_runner=enable_docker_runner)
     ctx.invoke(atlas_webapi, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, enable_ssl=enable_ssl, certificate_directory=certificate_directory, host=host, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     ctx.invoke(zeppelin, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key, security_method=security_method, ldap_url=ldap_url, ldap_dn=ldap_dn, ldap_base_dn=ldap_base_dn, ldap_system_username=ldap_system_username, ldap_system_password=ldap_system_password)
     if security_method != 'None':
