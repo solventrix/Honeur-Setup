@@ -90,7 +90,9 @@ Windows
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a new password for standard database user.
 8. The script will prompt to enter a new password for admin database user.
@@ -129,7 +131,9 @@ Windows
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the configuration server docker image and will create the docker container.
@@ -166,7 +170,9 @@ Windows
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the local portal docker image and will create the docker container.
@@ -234,7 +240,9 @@ Windows
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt to enable authentication.  Choose "None" if authentication is not required. The same authentication mechanism should be selected for all local components.
@@ -276,7 +284,9 @@ Windows
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a directory on the host machine to save the zeppelin logs and notebooks. Please provide an absolute path.
 8. The script will prompt you to enter the security options for Zeppelin. If you have existing HONEUR Components like Postgres/Atlas/WebAPI or Feder8 Studio. Please use the same security settings as with these previous installation.
@@ -320,7 +330,9 @@ Windows
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter credentials for the administrator user that can manage users and roles.
 
@@ -362,7 +374,9 @@ Windows
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to select the name of your organization.
 
@@ -400,7 +414,9 @@ Windows
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Feder8 Studio will only be accessible on the host machine (via localhost) if you enter ‘localhost’ as host name.
 8. The script will prompt to enter the directory of where the Feder8 Studio will store its working directory files.
@@ -448,7 +464,9 @@ Windows
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
     * https://harbor.honeur.org for HONEUR
     * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for Esfurn
+    * https://harbor.esfurn.org for ESFURN
+    * https://harbor.athenafederation.org for ATHENA
+    * https://harbor.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to ask wheter you want to enable HTTPS support. :warning: Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".
 8. The script will prompt to enter a directory on the host machine where the public key certificate file named "feder8.crt" and a private key file named "feder8.key" are located.
