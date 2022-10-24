@@ -903,9 +903,10 @@ def zeppelin(therapeutic_area, email, cli_key, security_method, ldap_url, ldap_d
         'ZEPPELIN_SERVER_CONTEXT_PATH': '/zeppelin',
         'JAVA_OPTS': "-Dlog4j2.formatMsgNoLookups=true"
     }
-    if ldap_base_dn not in ldap_dn:
-        ldap_dn = f'{ldap_dn},{ldap_base_dn}'
+
     if security_method == 'LDAP':
+        if ldap_base_dn not in ldap_dn:
+            ldap_dn = f'{ldap_dn},{ldap_base_dn}'
         environment_variables['ZEPPELIN_SECURITY'] = 'ldap'
         environment_variables['LDAP_URL'] = ldap_url
         environment_variables['LDAP_DN'] = ldap_dn
