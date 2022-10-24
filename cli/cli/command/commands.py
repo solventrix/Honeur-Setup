@@ -20,6 +20,7 @@ from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
 from cli.configuration.DockerClientFacade import DockerClientFacade
 from cli.pipeline.CustomConceptsUpdatePipeline import CustomConceptsUpdatePipeline
+from cli.configuration.cdm_version import CdmVersion
 
 # Init logger
 log = logging.getLogger(__name__)
@@ -2325,6 +2326,236 @@ def update_feder8_network():
                 therapeutic_area_network.remove()
             except docker.errors.NotFound:
                 pass
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-cs', '--cdm-schema')
+@click.option('-cs', '--results-schema')
+def add_cdm_schema_54(therapeutic_area, cdm_schema, results_schema):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        docker_client = get_docker_client()
+
+        validate_correct_docker_network(docker_client)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        registry = therapeutic_area_info.registry
+
+        configuration: ConfigurationController = get_configuration(therapeutic_area)
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+        if cdm_schema is None:
+            cdm_schema = questionary.text("Name of OMOP CDM v5.4 schema", default='omopcdm_5_4').ask()
+        if results_schema is None:
+            results_schema = questionary.text("Name of new result schema", default='results_5_4').ask()
+
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    feder8_network = get_network_name()
+    network_names = [feder8_network]
+
+    # TODO check if postgres container is healthy
+
+    source_name = therapeutic_area_info.name.upper() + " OMOP CDM v5.4"
+    environment_variables = {
+        'CDMOMOP_CDM_VERSION': '5.4',
+        'DB_HOST': 'postgres',
+        'THERAPEUTIC_AREA_URL': therapeutic_area_info.registry.registry_url,
+        'THERAPEUTIC_AREA': therapeutic_area,
+        'DB_OMOPCDM_SCHEMA': cdm_schema,
+        'DB_RESULTS_SCHEMA': results_schema,
+        'FEDER8_ADMIN_USERNAME': therapeutic_area_info.name + '_admin',
+        'CDM_SCHENA': cdm_schema,
+        'VOCABULARY_SCHEMA': cdm_schema,
+        'RESULTS_SCHEMA': results_schema,
+        'FEDER8_SOURCE_NAME': source_name,
+        'FEDER8_DATABASE_HOST': 'postgres',
+    }
+
+    init_schema_image_name_tag = get_postgres_omopcdm_initialize_schema_image_name_tag(therapeutic_area_info,
+                                                                                       CdmVersion.v5_4)
+
+    pull_image(docker_client, registry, init_schema_image_name_tag, email, cli_key)
+
+    print('Initializing OMOP CDM v5.4 schema...')
+    try:
+        docker_client.containers.run(
+            image=init_schema_image_name_tag,
+            name='postgres_initialize_omopcdm_schema',
+            security_opt=['no-new-privileges'],
+            remove=True,
+            environment=environment_variables,
+            network=network_names[0],
+            volumes={
+                SHARED_VOLUME: {
+                    'bind': '/var/lib/shared'
+                }
+            },
+            detach=False
+        )
+    except docker.errors.ContainerError:
+        print(f'Error while creating schema {cdm_schema}. Schema might already exist. Exiting.')
+        sys.exit(1)
+
+    print('Finished initializing schema')
+
+    # update_vocabulary_image_name_tag = get_postgres_omopcdm_update_vocabulary_image_name_tag(therapeutic_area_info)
+    #
+    # pull_image(docker_client, registry, update_vocabulary_image_name_tag, email, cli_key)
+    #
+    # print('Updating vocabulary...')
+    #
+    # docker_client.containers.run(
+    #     image=update_vocabulary_image_name_tag,
+    #     name='postgres_omopcdm_update_vocabulary',
+    #     security_opt=['no-new-privileges'],
+    #     remove=True,
+    #     environment=environment_variables,
+    #     network=network_names[0],
+    #     volumes={
+    #         SHARED_VOLUME: {
+    #             'bind': '/var/lib/shared'
+    #         }
+    #     },
+    #     detach=False
+    # )
+    #
+    # print('Finished updating vocabulary')
+    #
+    # update_custom_concepts_image_name_tag = get_postgres_omopcdm_update_custom_concepts_image_name_tag(therapeutic_area_info)
+    #
+    # pull_image(docker_client, registry, update_custom_concepts_image_name_tag, email, cli_key)
+    #
+    # print('Updating custom concepts...')
+    #
+    # docker_client.containers.run(
+    #     image=update_custom_concepts_image_name_tag,
+    #     name='postgres_omopcdm_update_custom_concepts',
+    #     security_opt=['no-new-privileges'],
+    #     remove=True,
+    #     environment=environment_variables,
+    #     network=network_names[0],
+    #     volumes={
+    #         SHARED_VOLUME: {
+    #             'bind': '/var/lib/shared'
+    #         }
+    #     },
+    #     detach=False
+    # )
+    #
+    #
+    # print('Finished updating custom concepts')
+
+    add_base_primary_keys_image_name_tag = get_postgres_omopcdm_add_base_primary_keys_image_name_tag(therapeutic_area_info, CdmVersion.v5_4)
+
+    pull_image(docker_client, registry, add_base_primary_keys_image_name_tag, email, cli_key)
+
+    print('Adding base primary keys...')
+
+    docker_client.containers.run(
+        image=add_base_primary_keys_image_name_tag,
+        name='postgres_add_base_primary_keys',
+        security_opt=['no-new-privileges'],
+        remove=True,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={
+            SHARED_VOLUME: {
+                'bind': '/var/lib/shared'
+            }
+        },
+        detach=False
+    )
+
+    print('Finished adding base primary keys')
+
+    add_base_indexes_image_name_tag = get_postgres_omopcdm_add_base_indexes_image_name_tag(
+        therapeutic_area_info, CdmVersion.v5_4)
+
+    pull_image(docker_client, registry, add_base_indexes_image_name_tag, email, cli_key)
+
+    print('Adding base base indexes...')
+
+    docker_client.containers.run(
+        image=add_base_indexes_image_name_tag,
+        name='postgres_add_base_indexes',
+        security_opt=['no-new-privileges'],
+        remove=True,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={
+            SHARED_VOLUME: {
+                'bind': '/var/lib/shared'
+            }
+        },
+        detach=False
+    )
+
+    print('Finished adding base indexes')
+
+    results_initialize_schema_image_name_tag = get_postgres_results_initialize_schema_image_name_tag(
+        therapeutic_area_info)
+
+    pull_image(docker_client, registry, results_initialize_schema_image_name_tag, email, cli_key)
+
+    print('Initializing results schema...')
+
+    docker_client.containers.run(
+        image=results_initialize_schema_image_name_tag,
+        name='postgres_results_initialize_schema',
+        security_opt=['no-new-privileges'],
+        remove=True,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={
+            SHARED_VOLUME: {
+                'bind': '/var/lib/shared'
+            }
+        },
+        detach=False
+    )
+
+    print('Finished initializing results schema')
+
+    webapi_add_source_image_name_tag = get_postgres_webapi_add_source_image_name_tag(
+        therapeutic_area_info)
+
+    pull_image(docker_client, registry, webapi_add_source_image_name_tag, email, cli_key)
+
+    print('Adding WebAPI source...')
+
+    docker_client.containers.run(
+        image=webapi_add_source_image_name_tag,
+        name='postgres_webapi_add_source',
+        security_opt=['no-new-privileges'],
+        remove=True,
+        environment=environment_variables,
+        network=network_names[0],
+        volumes={
+            SHARED_VOLUME: {
+                'bind': '/var/lib/shared'
+            }
+        },
+        detach=False
+    )
+
+    print('Finished adding WebAPI source')
+
+    print('Restarting WebAPI...')
+    docker_client.containers.get('webapi').restart()
+    print('Restart done')
+
+    print(f'Please grant role [{source_name}] to all applicable users in user management.')
+
+
 
 
 @init.command()

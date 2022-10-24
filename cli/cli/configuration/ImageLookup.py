@@ -116,6 +116,26 @@ def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.1')
 
 
+def get_postgres_omopcdm_initialize_schema_image_name_tag(therapeutic_area_info, cdm_version):
+    return get_image_name_tag(therapeutic_area_info, 'postgres-omopcdm-initialize-schema', str(cdm_version) + '-2.0.2')
+
+
+def get_postgres_omopcdm_add_base_primary_keys_image_name_tag(therapeutic_area_info, cdm_version):
+    return get_image_name_tag(therapeutic_area_info, 'postgres-omopcdm-add-base-primary-keys', str(cdm_version) + '-2.0.1')
+
+
+def get_postgres_omopcdm_add_base_indexes_image_name_tag(therapeutic_area_info, cdm_version):
+    return get_image_name_tag(therapeutic_area_info, 'postgres-omopcdm-add-base-indexes', str(cdm_version) + '-2.0.1')
+
+
+def get_postgres_results_initialize_schema_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres-results-initialize-schema', '2.0.3')
+
+
+def get_postgres_webapi_add_source_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres-webapi-add-source', '2.0.1')
+
+
 def get_alpine_image_name_tag():
     return 'alpine:3.15.0'
 
