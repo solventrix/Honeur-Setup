@@ -2363,6 +2363,15 @@ def add_cdm_schema_54(therapeutic_area, cdm_schema, results_schema):
     network_names = [feder8_network]
 
     # TODO check if postgres container is healthy
+    print('Checking if existing database is reachable...')
+    try:
+        postgres_container = docker_client.containers.get("postgres")
+        if postgres_container.attrs['State']['Status'] != 'running':
+            print('Database not running...')
+            sys.exit(1)
+    except docker.errors.NotFound:
+        print('Could not find postgres container')
+        sys.exit(1)
 
     source_name = therapeutic_area_info.name.upper() + " OMOP CDM v5.4"
     environment_variables = {
