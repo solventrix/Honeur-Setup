@@ -2415,53 +2415,6 @@ def add_cdm_schema_54(therapeutic_area, cdm_schema, results_schema):
 
     print('Finished initializing schema')
 
-    # update_vocabulary_image_name_tag = get_postgres_omopcdm_update_vocabulary_image_name_tag(therapeutic_area_info)
-    #
-    # pull_image(docker_client, registry, update_vocabulary_image_name_tag, email, cli_key)
-    #
-    # print('Updating vocabulary...')
-    #
-    # docker_client.containers.run(
-    #     image=update_vocabulary_image_name_tag,
-    #     name='postgres_omopcdm_update_vocabulary',
-    #     security_opt=['no-new-privileges'],
-    #     remove=True,
-    #     environment=environment_variables,
-    #     network=network_names[0],
-    #     volumes={
-    #         SHARED_VOLUME: {
-    #             'bind': '/var/lib/shared'
-    #         }
-    #     },
-    #     detach=False
-    # )
-    #
-    # print('Finished updating vocabulary')
-    #
-    # update_custom_concepts_image_name_tag = get_postgres_omopcdm_update_custom_concepts_image_name_tag(therapeutic_area_info)
-    #
-    # pull_image(docker_client, registry, update_custom_concepts_image_name_tag, email, cli_key)
-    #
-    # print('Updating custom concepts...')
-    #
-    # docker_client.containers.run(
-    #     image=update_custom_concepts_image_name_tag,
-    #     name='postgres_omopcdm_update_custom_concepts',
-    #     security_opt=['no-new-privileges'],
-    #     remove=True,
-    #     environment=environment_variables,
-    #     network=network_names[0],
-    #     volumes={
-    #         SHARED_VOLUME: {
-    #             'bind': '/var/lib/shared'
-    #         }
-    #     },
-    #     detach=False
-    # )
-    #
-    #
-    # print('Finished updating custom concepts')
-
     add_base_primary_keys_image_name_tag = get_postgres_omopcdm_add_base_primary_keys_image_name_tag(therapeutic_area_info, CdmVersion.v5_4)
 
     pull_image(docker_client, registry, add_base_primary_keys_image_name_tag, email, cli_key)
