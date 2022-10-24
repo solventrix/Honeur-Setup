@@ -2362,7 +2362,6 @@ def add_cdm_schema_54(therapeutic_area, cdm_schema, results_schema):
     feder8_network = get_network_name()
     network_names = [feder8_network]
 
-    # TODO check if postgres container is healthy
     print('Checking if existing database is reachable...')
     try:
         postgres_container = docker_client.containers.get("postgres")
