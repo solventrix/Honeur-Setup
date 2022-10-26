@@ -54,3 +54,8 @@ class DockerClientFacade:
                 print(l.decode('UTF-8'), end='')
         return container
 
+    def restart_container(self, container_name: str):
+        self._docker_client.containers.get(container_name).restart()
+
+    def validate_running(self, container_name: str) -> bool:
+        return self._docker_client.containers.get(container_name).attrs['State']['Status'] == 'running'
