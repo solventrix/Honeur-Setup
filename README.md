@@ -7,12 +7,12 @@ HONEUR-Setup is a public repository. This repository is used for files that can 
 
 ## Remote Docker Installation
 
-Remote installation Instructions can be found at [local-installation](https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/local-installation)
+Remote installation Instructions can be found at [local-installation](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation)
 
 ## Run ETL
 
-- [12 d'octubre](https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/RunETL12doctubre)
-- [CLLEAR](https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/RunETLCLLEAR)
-- [CMG](https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/RunETLCMG)
-- [iOMEDICO - NHL](https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/RunETLiOMEDICO_NHL)
-- [UHL](https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/RunETLUHL)
+- [12 d'octubre](https://github.com/solventrix/Honeur-Setup/tree/master/RunETL12doctubre)
+- [CLLEAR](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCLLEAR)
+- [CMG](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCMG)
+- [iOMEDICO - NHL](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLiOMEDICO_NHL)
+- [UHL](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLUHL)

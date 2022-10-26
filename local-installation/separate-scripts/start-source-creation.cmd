@@ -24,11 +24,11 @@ if "%~1" NEQ "" (
     goto installation
 )
 
-SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
+SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
 :while-therapeutic-area-not-correct
-if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "phederation" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "athena" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "" (
-   echo Enter "honeur", "phederation", "esfurn", "athena" or empty for default "honeur" value
-   SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn/athena [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
+if NOT "%FEDER8_THERAPEUTIC_AREA%" == "honeur" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "phederation" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" if NOT "%FEDER8_THERAPEUTIC_AREA%" == "" (
+   echo Enter "honeur", "phederation", "esfurn" or empty for default "honeur" value
+   SET /p FEDER8_THERAPEUTIC_AREA="Enter the Therapeutic Area of choice. Enter honeur/phederation/esfurn [honeur]: " || SET FEDER8_THERAPEUTIC_AREA=honeur
    goto :while-therapeutic-area-not-correct
 )
 
@@ -36,26 +36,22 @@ for /f "usebackq delims=" %%I in (`powershell "\"%FEDER8_THERAPEUTIC_AREA%\".toU
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "phederation" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-)
-if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
-    SET FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
-SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
 :while-email-address-not-correct
 if "%FEDER8_EMAIL_ADDRESS%" == "" (
    echo Email address can not be empty
-   SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+   SET /p FEDER8_EMAIL_ADDRESS="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
    goto :while-email-address-not-correct
 )
 
@@ -64,7 +60,7 @@ SET /p FEDER8_CLI_SECRET="Enter the CLI Secret: "
 :while-cli-secret-not-correct
 if "%FEDER8_CLI_SECRET%" == "" (
    echo Email address can not be empty
-   SET /p FEDER8_CLI_SECRET="Enter email address used to login to https://portal-uat.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
+   SET /p FEDER8_CLI_SECRET="Enter email address used to login to https://portal.%FEDER8_THERAPEUTIC_AREA_DOMAIN%: "
    goto :while-cli-secret-not-correct
 )
 
@@ -78,19 +74,15 @@ SET /p FEDER8_DAIMONS_PRIORITY="Enter the priority for the new source [2]: " || 
 
 if "%FEDER8_THERAPEUTIC_AREA%" == "honeur" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=honeur.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "phederation" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=phederation.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 if "%FEDER8_THERAPEUTIC_AREA%" == "esfurn" (
     SET FEDER8_THERAPEUTIC_AREA_DOMAIN=esfurn.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
-)
-if "%FEDER8_THERAPEUTIC_AREA%" == "athena" (
-    SET FEDER8_THERAPEUTIC_AREA_DOMAIN=athenafederation.org
-    SET FEDER8_THERAPEUTIC_AREA_URL=harbor-uat.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
+    SET FEDER8_THERAPEUTIC_AREA_URL=harbor.!FEDER8_THERAPEUTIC_AREA_DOMAIN!
 )
 
 IF "%FEDER8_SHARED_SECRETS_VOLUME_NAME%"=="" (
