@@ -20,6 +20,7 @@ from cli.registry.registry import Registry
 from cli.therapeutic_area.therapeutic_area import TherapeuticArea
 from cli.configuration.DockerClientFacade import DockerClientFacade
 from cli.pipeline.CustomConceptsUpdatePipeline import CustomConceptsUpdatePipeline
+from cli.pipeline.AddCdmSchema54Pipeline import AddCdmSchema54Pipeline
 
 # Init logger
 log = logging.getLogger(__name__)
@@ -2376,6 +2377,47 @@ def update_feder8_network():
                 therapeutic_area_network.remove()
             except docker.errors.NotFound:
                 pass
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-cs', '--cdm-schema')
+@click.option('-vs', '--vocabulary-schema')
+@click.option('-rs', '--results-schema')
+def add_cdm_schema_54(therapeutic_area, cdm_schema, vocabulary_schema, results_schema):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        docker_client = get_docker_client()
+        validate_correct_docker_network(docker_client)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        configuration: ConfigurationController = get_configuration(therapeutic_area)
+        email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+
+        if cdm_schema is None:
+            cdm_schema = questionary.text("Name of cdm schema", default='omopcdm_5_4').ask()
+        if vocabulary_schema is None:
+            vocabulary_schema = questionary.text("Name of vocabulary schema", default='omopcdm').ask()
+        if results_schema is None:
+            results_schema = questionary.text("Name of result schema", default='results_5_4').ask()
+
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    AddCdmSchema54Pipeline(
+        docker_client=DockerClientFacade(therapeutic_area_info, email, cli_key, docker_client),
+        therapeutic_area_info=therapeutic_area_info,
+        cdm_schema=cdm_schema,
+        vocabulary_schema=vocabulary_schema,
+        results_schema=results_schema,
+    ).execute()
+
+
 
 
 @init.command()
