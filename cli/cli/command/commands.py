@@ -2351,7 +2351,7 @@ def add_cdm_schema_54(therapeutic_area, cdm_schema, vocabulary_schema, results_s
         if cdm_schema is None:
             cdm_schema = questionary.text("Name of cdm schema", default='omopcdm_5_4').ask()
         if vocabulary_schema is None:
-            vocabulary_schema = questionary.text("Name of vocabulary schema", default='omopcdm_5_4').ask()
+            vocabulary_schema = questionary.text("Name of vocabulary schema", default='omopcdm').ask()
         if results_schema is None:
             results_schema = questionary.text("Name of result schema", default='results_5_4').ask()
 
