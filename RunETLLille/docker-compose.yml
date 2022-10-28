@@ -1,0 +1,27 @@
+version: '3.5'
+
+services:
+  etl:
+    image: harbor.honeur.org/etl-lille/etl:image_tag
+    volumes:
+      - "./log:/log"
+      - "data_folder:/data"
+    networks:
+      - honeur-net
+    environment:
+      DB_DBMS: "postgresql"
+      DB_SERVER : "postgres"
+      DB_PORT: "5432"
+      DB_DBNAME: "OHDSI"
+      DB_SCHEMA: db_schema
+      DB_USER: db_username
+      DB_PASSWORD: db_password
+      RELEASE_DATE: date_last_export
+      VERBOSITY_LEVEL: verbosity_level
+      DELIMITER: source_delimiter
+      ENCODING: source_encoding
+
+networks:
+  honeur-net:
+    external:
+      name: feder8-net
