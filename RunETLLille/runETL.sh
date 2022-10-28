@@ -12,9 +12,9 @@ read -p "DB username [honeur_admin]: " db_username
 db_username=${db_username:-honeur_admin}
 read -p "DB password: " db_password
 read -p "Source data delimiter [","]: " source_delimiter
-source_delimiter=${source_delimiter:-,}
+source_delimiter=${source_delimiter:-\",\"}
 read -p "Source encoding ["utf-8"]: " source_encoding
-source_encoding=${source_encoding:-utf-8}
+source_encoding=${source_encoding:-\"utf-8\"}
 read -p "Output verbosity level [INFO]: " verbosity_level
 verbosity_level=${verbosity_level:-INFO}
 read -p "Docker Hub image tag [current]: " image_tag
