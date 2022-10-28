@@ -19,8 +19,9 @@
     * the path to the folder that contains the input data files
     * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
     * the tag name for the Docker Hub image
+    * the delimiter used in the source files (if different from default, make sure to quote the string as in ";")
+    * the encoding used for the source files
     * the verbosity level [DEBUG, INFO, WARNING, ERROR]
-    * the file name of the input data file
     * the date of last update of the data-export, double-quoted, example: "2022-10-30"
 5. The script will run the ETL code and show the output of the code
 7. The `etl_<datetime>.log` log file will be available in the `log` folder. 
