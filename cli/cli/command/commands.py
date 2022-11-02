@@ -1834,47 +1834,20 @@ def clean(therapeutic_area):
                 print('disconnecting config-server from ' + ta_network_name)
                 ta_network.disconnect(container)
 
-    cleanup_volumes(docker_client, therapeutic_area_info.name)
+    cleanup_volumes(docker_client)
     cleanup_images(docker_client, therapeutic_area_info)
 
 
-def cleanup_volumes(docker_client:DockerClient, therapeutic_area_name):
-    try:
-        docker_client.volumes.get(SHARED_VOLUME).remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get(PGDATA_VOLUME).remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get("cronicle_data").remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get(therapeutic_area_name + "studio_pwsh_modules").remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get(therapeutic_area_name + "studio_py_environment").remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get(therapeutic_area_name + "studio_r_libraries").remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get(R_LIBRARIES_VOLUME).remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get(PY_ENV_VOLUME).remove()
-    except docker.errors.NotFound:
-        pass
-    try:
-        docker_client.volumes.get("pwsh_modules").remove()
-    except docker.errors.NotFound:
-        pass
+def cleanup_volumes(docker_client:DockerClient):
+    volumes = [
+        SHARED_VOLUME, PGDATA_VOLUME, R_LIBRARIES_VOLUME, PY_ENV_VOLUME, SHINY_APP_VOLUME, ZEPPELIN_LOGS_VOLUME,
+        ZEPPELIN_NOTEBOOK_VOLUME, FEDER8_DATA_VOLUME, FEDER8_SCRIPT_VOLUME, VS_CODE_CONFIG_VOLUME
+    ]
+    for volume in volumes:
+        try:
+            docker_client.volumes.get(volume).remove()
+        except docker.errors.NotFound:
+            pass
 
 
 def cleanup_images(docker_client: DockerClient, therapeutic_area_info, constraint: str = None):
