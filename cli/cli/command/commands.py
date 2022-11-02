@@ -35,6 +35,8 @@ ZEPPELIN_LOGS_VOLUME = "zeppelin-logs"
 SHINY_APP_VOLUME = "shiny-apps"
 VS_CODE_CONFIG_VOLUME = "vs-code-config"
 DISEASE_EXPLORER_CONFIG_VOLUME = "disease-explorer-config"
+DISEASE_EXPLORER_COHORTS_VOLUME = "disease-explorer-cohorts"
+DISEASE_EXPLORER_TEMPLATES_VOLUME = "disease-explorer-templates"
 FEDER8_SCRIPT_VOLUME = "feder8-scripts"
 FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
@@ -1513,7 +1515,9 @@ def disease_explorer(therapeutic_area, email, cli_key):
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
     pull_image(docker_client, registry, get_disease_explorer_image_name_tag(therapeutic_area_info), email, cli_key)
-    check_volumes_and_create_if_not_exists(docker_client, [DISEASE_EXPLORER_CONFIG_VOLUME])
+    check_volumes_and_create_if_not_exists(docker_client, [DISEASE_EXPLORER_CONFIG_VOLUME,
+                                                           DISEASE_EXPLORER_COHORTS_VOLUME,
+                                                           DISEASE_EXPLORER_TEMPLATES_VOLUME])
 
 
 def install_feder8_studio_app(therapeutic_area, email, cli_key, app_name):
