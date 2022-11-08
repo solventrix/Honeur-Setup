@@ -75,7 +75,10 @@ pipeline {
                             sh "docker save ${tagsForSaving} -o ${outputFile}/images.tar"
                             sh "cp -RT Honeur-Setup/local-installation/offline-helper-scripts ${outputFile}/"
                             sh "tar -zcvf ./${file}.tar.gz ${outputFile}"
-                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.VERSION}.tar.gz"
+
+                            bucket = env.ENV.equals('UAT') ? "feder8-download-bucket-uat" : "feder8-download-bucket"
+
+                            sh "aws s3 cp ./${file}.tar.gz s3://${bucket}/${file}/feder8-local-install-${env.VERSION}.tar.gz"
                         }
 //                     }
                 }
