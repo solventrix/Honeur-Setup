@@ -46,17 +46,6 @@ MacOS: https://docs.docker.com/docker-for-mac/install/
 
 Assign 2 or more CPU’s, 8 GB of RAM and 100 GB of disk space to Docker in Docker Desktop.
 On Linux Docker compose (v1.24 or higher) should be installed separately.
-
-### Docker images
-The docker images required to run the full setup are located on a central repository. Make sure you have an account on our central platform before trying to run the local setup installation scripts:
-
-  * For HONEUR: https://portal-uat.honeur.org
-  * For PHederation: https://portal-uat.phederation.org
-  * For ESFURN: https://portal-uat.esfurn.org
-  * For ATHENA: https://portal-uat.athenafederation.org
-  * For LupusNet: https://portal-uat.lupusnet.org
-
-Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
     
 ### Prerequisite for installations on Linux
 On Linux, please download and run the following 2 scripts before running the installation script:
