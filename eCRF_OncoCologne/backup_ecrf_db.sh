@@ -3,13 +3,17 @@ set -e
 
 DATABASE_NAME=opal
 BACKUP_FOLDER=${PWD}/backup
+NETWORK=honeur-net
 
+if [[ "$POSTGRES_PASSWORD" == "" ]]
+then
 POSTGRES_PASSWORD=
 read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
 while [[ "$POSTGRES_PASSWORD" == "" ]]; do
     echo "The password cannot be empty"
     read -p "Please enter the password for Postgres: " POSTGRES_PASSWORD
 done
+fi
 
 create_db_dump () {
   mkdir -p ${BACKUP_FOLDER}
@@ -17,7 +21,7 @@ create_db_dump () {
   PGPASSWORD=$2
   echo "Create dump of database $DB_NAME from postgres"
   docker run \
-  --network="honeur-net" \
+  --network=$NETWORK \
   --rm \
   -e DB_NAME=$DB_NAME \
   -e PGPASSWORD=$PGPASSWORD \
