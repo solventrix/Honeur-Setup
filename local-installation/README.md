@@ -9,7 +9,7 @@ Table of Contents
 ## Installation Methods
 The Feder8 local installation can be installed as follows:
 1. [Helper scripts](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/helper-scripts) (recommended)
-2. [Helper scripts](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/offline-helper-scripts)
+2. [Offline helper scripts](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/offline-helper-scripts)
 3. [Installing each component separatly](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/separate-scripts).
 
 ## Helper scripts
