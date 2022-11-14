@@ -7,14 +7,15 @@ Table of Contents
     * [Hardware](#hardware)
     * [Operating system](#operating-system)
     * [Docker](#docker)
-    * [Docker images](#docker-images)
-    * [Installation instructions](#installation-instruction)
+    * [Prerequisite for installations on Linux](#prerequisite-linux)
+    * [Prerequisite for HTTPS support during installation](#prerequisite-https)
+  * [Installation instructions](#installation-instruction)
 
 Offline helper scripts combines the installation of Feder8 components and provides all the necessary components in a download package. You can choose to fully install all components or only install the essential components.
 
 ## Requirements
 
-### Offline install package
+### <a id="offline-install-package"></a> Offline install package
 1. Please download the offline install package from a machine with internet access:
    * https://download-uat.honeur.org/honeur/feder8-local-install-2.0.19.tar.gz
     > You will need to login with your central account credentials.
@@ -30,16 +31,16 @@ Offline helper scripts combines the installation of Feder8 components and provid
     * `start-feder8-offline.sh`
     * `images.tar`
 
-### Hardware
+### <a id="hardware"></a> Hardware
 Modern 64 bit (x86) dual core processor (or better)
 8 GB RAM, 16 GB RAM recommended
 100 GB free disk space (or more)
 
-### Operating system
+### <a id="operating-system"></a> Operating system
 Linux (Ubuntu, CentOS, Debian, …), Windows 10 or MacOS
 Linux is recommended
 
-### Docker
+### <a id="docker"></a> Docker
 Linux: https://docs.docker.com/install/linux/docker-ce/ubuntu/
 Windows: https://docs.docker.com/docker-for-windows/install/
 MacOS: https://docs.docker.com/docker-for-mac/install/
@@ -47,7 +48,7 @@ MacOS: https://docs.docker.com/docker-for-mac/install/
 Assign 2 or more CPU’s, 8 GB of RAM and 100 GB of disk space to Docker in Docker Desktop.
 On Linux Docker compose (v1.24 or higher) should be installed separately.
     
-### Prerequisite for installations on Linux
+### <a id="prerequisite-linux"></a> Prerequisite for installations on Linux
 On Linux, please download and run the following 2 scripts before running the installation script:
 
 Download the "Docker certificates generation script":
@@ -70,7 +71,7 @@ Run the "enable Docker TLS security script":
 ./enable-docker-tls-security.sh
 ```
 
-### Prerequisite for HTTPS support during installation
+### <a id="prerequisite-https"></a> Prerequisite for HTTPS support during installation
 During the installation, the script will ask you if you want to enable HTTPS support for the local toolbox. To enable HTTPS during the installation process, you should provide the certificate and private key beforehand. The files should be placed in a folder on the host machine where the installation will run and the files should be named the following:
 * Public certificate (file starting with -----BEGIN CERTIFICATE-----): feder8.crt
 * Private Key (file starting with -----BEGIN PRIVATE KEY-----): feder8.key
@@ -80,6 +81,7 @@ The following components will be installed:
 * Postgres v13 database with OMOP CDM pre-loaded (port 5444 can optionally be exposed on the host machine during the installation)
 * Configuration server
 * Local Portal
+* Task Manager
 * Atlas/WebAPI v2.9 running on Apache Tomcat 9.0.20
 * Zeppelin v0.8.2
 * FEDER8 Studio (including R Studio server, Shiny server and Visual Studio Code)(Only when confirmed for installation)
