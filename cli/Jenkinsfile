@@ -12,19 +12,7 @@ pipeline {
     }
 
     stages {
-        stage('build image') {
-            steps {
-                echo "Currently running pipeline for ${ENV} environment"
-                script {
-                    dir('Honeur-Setup/cli') {
-                        withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                            sh './build.sh'
-                        }
-                    }
-                }
-            }
-        }
-        stage('upload image') {
+        stage('build & upload image') {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
@@ -32,7 +20,7 @@ pipeline {
                         hostname = env.ENV.equals('UAT') ? "harbor-uat.honeur.org" : "harbor.honeur.org"
                         try {
                             withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
-                                sh "THERAPEUTIC_AREA_URL=${hostname} ./publish.sh"
+                                sh "THERAPEUTIC_AREA_URL=${hostname} ./build-multi-arch.sh"
                             }
                         } catch (e) {
                             notifyPushFailed("https://${hostname}")
