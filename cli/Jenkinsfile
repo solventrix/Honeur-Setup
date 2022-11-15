@@ -12,19 +12,7 @@ pipeline {
     }
 
     stages {
-        stage('build image') {
-            steps {
-                echo "Currently running pipeline for ${ENV} environment"
-                script {
-                    dir('Honeur-Setup/cli') {
-                        withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                            sh './build.sh'
-                        }
-                    }
-                }
-            }
-        }
-        stage('upload image') {
+        stage('build & upload image') {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
