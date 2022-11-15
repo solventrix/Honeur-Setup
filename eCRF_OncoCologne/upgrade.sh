@@ -25,6 +25,10 @@ while [[ "$OPAL_SUPER_USER_PASSWORD" == "" ]]; do
 done
 
 echo "Take database backup"
+if [[ ! -f ./backup_ecrf_db.sh ]]
+then
+    curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF_OncoCologne/backup_ecrf_db.sh --output backup_ecrf_db.sh && chmod +x backup_ecrf_db.sh
+fi
 POSTGRES_PASSWORD=$POSTGRES_PASSWORD ./backup_ecrf_db.sh
 
 echo "Stop running eCRF app"
