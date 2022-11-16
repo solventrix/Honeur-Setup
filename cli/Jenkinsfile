@@ -20,6 +20,7 @@ pipeline {
                         hostname = env.ENV.equals('UAT') ? "harbor-uat.honeur.org" : "harbor.honeur.org"
                         try {
                             withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
+                                sh "docker buildx use mybuild"
                                 sh "docker run --privileged --rm tonistiigi/binfmt --install all"
                                 sh "THERAPEUTIC_AREA_URL=${hostname} ./build-multi-arch.sh"
                             }
