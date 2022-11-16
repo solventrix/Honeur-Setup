@@ -21,6 +21,7 @@ pipeline {
                             withDockerRegistry(credentialsId: credentialsId, url: taInfo.getRegistry()) {
                                 sh 'docker buildx create --use'
                                 sh "THERAPEUTIC_AREA_URL=${taInfo.url} ./build-multi-arch.sh"
+                                sh "docker pull ${taInfo.url}/library/install-script:${env.VERSION}"
                                 sh "docker tag ${taInfo.url}/library/install-script:${env.VERSION} feder8/install-script:${env.VERSION}"
                             }
                         } catch (e) {
