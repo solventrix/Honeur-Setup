@@ -20,6 +20,7 @@ pipeline {
                         hostname = env.ENV.equals('UAT') ? "harbor-uat.honeur.org" : "harbor.honeur.org"
                         try {
                             withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
+                                sh 'docker context ls'
                                 sh "THERAPEUTIC_AREA_URL=${hostname} ./build-multi-arch.sh"
                             }
                         } catch (e) {
