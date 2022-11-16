@@ -19,13 +19,14 @@ pipeline {
                         taInfo = feder8.getInfoForTA('honeur')
                         try {
                             withDockerRegistry(credentialsId: credentialsId, url: taInfo.getRegistry()) {
-                                sh 'docker buildx create --use'
-                                sh "THERAPEUTIC_AREA_URL=${taInfo.url} ./build-multi-arch.sh"
-                                sh "docker pull ${taInfo.url}/library/install-script:${env.VERSION}"
-                                sh "docker tag ${taInfo.url}/library/install-script:${env.VERSION} feder8/install-script:${env.VERSION}"
+                                withBuildxBuilder() {
+                                    sh "THERAPEUTIC_AREA_URL=${taInfo.url} ./build-multi-arch.sh"
+                                    sh "docker pull ${taInfo.url}/library/install-script:${env.VERSION}"
+                                    sh "docker tag ${taInfo.url}/library/install-script:${env.VERSION} feder8/install-script:${env.VERSION}"
+                                }
                             }
                         } catch (e) {
-                            notifyPushFailed(taInfo.getRegistry())
+                            feder8.notifyPushFailed(taInfo.getRegistry())
                         }
                     }
                 }
@@ -74,13 +75,4 @@ pipeline {
             }
         }
     }
-}
-
-def notifyPushFailed(url) {
-  emailext (
-      subject: "FAILED To push image",
-      body: """<p>Jenkins failed to push image to ${url}</p>
-        <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-      to: "pmoorth1@its.jnj.com,sgyina1@its.jnj.com"
-    )
 }
