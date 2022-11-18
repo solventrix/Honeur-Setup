@@ -1,6 +1,9 @@
 # eCRF 
 
 ## Instructions for the initial installation
+
+!! Don't run the installation script if you already have an exiting installation!  Use the upgrade script instead: see [Instructions for upgrading an existing installation](#upgrade-installion)
+
 The eCRF tool can be installed by downloading and running the installation script.
 
 1. Download the installation script (**_install_ecrf_oncocologne.cmd_** for Windows or **_install_ecrf_oncocologne.sh_** for Linux/MacOS) by use of the following command:
@@ -25,7 +28,7 @@ Linux/MacOS:
 ./install_ecrf_oncocologne.sh
 ```
 
-## Instructions for upgrading an existing installation
+## <a id="upgrade-installion"></a> Instructions for upgrading an existing installation
 To upgrade your existing installation, please follow the steps below.
 
 1. Download the upgrade script (**_upgrade.cmd_** for Windows or **_upgrade.sh_** for Linux/MacOS) by use of the following command:
