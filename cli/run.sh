@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TAG=2.0.19
+TAG=2.0.20
 
 if systemctl show --property ActiveState docker &> /dev/null; then
     DOCKER_CERT_SUPPORT=true

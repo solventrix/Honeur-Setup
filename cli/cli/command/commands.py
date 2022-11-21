@@ -41,6 +41,7 @@ FEDER8_SCRIPT_VOLUME = "feder8-scripts"
 FEDER8_DATA_VOLUME = "feder8-data"
 R_LIBRARIES_VOLUME = "r_libraries"
 PY_ENV_VOLUME  = "py_environment"
+ECRF_STATIC_VOLUME = "static_volume"
 
 offline_mode = False
 
@@ -140,11 +141,11 @@ def validate_correct_docker_network(docker_client: DockerClient):
         sys.exit(1)
 
 
-def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
+def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str, restricted = False):
     if offline_mode:
         logging.info(f"Running in offline modus.  Image '{image}' expected to be present on the host machine")
         return
-    ImageManager.pull_image(docker_client, registry, image, email, cli_key)
+    ImageManager.pull_image(docker_client, registry, image, email, cli_key, restricted)
 
 
 def wait_for_healthy_container(docker_client:DockerClient, container:Container, interval:int, timeout:int):
@@ -1514,7 +1515,8 @@ def disease_explorer(therapeutic_area, email, cli_key):
     if cli_key is None:
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
 
-    pull_image(docker_client, registry, get_disease_explorer_image_name_tag(therapeutic_area_info), email, cli_key)
+    pull_image(docker_client, registry, get_disease_explorer_image_name_tag(therapeutic_area_info),
+               email, cli_key, restricted=True)
     check_volumes_and_create_if_not_exists(docker_client, [DISEASE_EXPLORER_CONFIG_VOLUME,
                                                            DISEASE_EXPLORER_COHORTS_VOLUME,
                                                            DISEASE_EXPLORER_TEMPLATES_VOLUME])
@@ -1699,7 +1701,7 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
 
     feder8_network = get_network_name()
     network_names = [feder8_network]
-    volume_names = [CONFIG_SERVER_VOLUME]
+    volume_names = [CONFIG_SERVER_VOLUME, ECRF_STATIC_VOLUME]
     container_names = ['nginx', 'config-server-update-configuration']
 
     check_networks_and_create_if_not_exists(docker_client, network_names)
@@ -1732,7 +1734,12 @@ def nginx(therapeutic_area, email, cli_key, host, enable_ssl, certificate_direct
     ports = {
         '8080/tcp': 80
     }
-    volumes = {}
+    volumes = {
+        ECRF_STATIC_VOLUME: {
+            'bind': '/code/entrytool/assets',
+            'mode': 'ro'
+        }
+    }
 
     if enable_ssl:
         environment_variables['FEDER8_SSL_ENABLED']='true'
