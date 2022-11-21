@@ -68,7 +68,7 @@ def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.12')
+    return get_image_name_tag(therapeutic_area_info, 'feder8-studio', '2.0.13')
 
 
 def get_vs_code_server_image_name_tag(therapeutic_area_info):
@@ -84,7 +84,7 @@ def get_shiny_server_image_name_tag(therapeutic_area_info):
 
 
 def get_disease_explorer_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.2.4')
+    return get_image_name_tag(therapeutic_area_info, 'disease-explorer', '0.3.1', restricted=True)
 
 
 def get_feder8_studio_app_installer_image_name_tag(therapeutic_area_info, app_name):
@@ -101,7 +101,7 @@ def get_task_manager_image_name_tag(therapeutic_area_info):
 
 
 def get_nginx_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.10')
+    return get_image_name_tag(therapeutic_area_info, 'nginx', '2.0.11')
 
 
 def get_vocabulary_update_image_name_tag(therapeutic_area_info):
@@ -156,8 +156,11 @@ def get_tianon_postgres_upgrade_9_6_to_13_image_name_tag():
     return 'tianon/postgres-upgrade:9.6-to-13'
 
 
-def get_image_name_tag(therapeutic_area_info, name, tag):
+def get_image_name_tag(therapeutic_area_info, name, tag, restricted=False):
     registry = therapeutic_area_info.registry
-    image_name = '/'.join([registry.registry_url, registry.project, name])
+    project = registry.project
+    if restricted:
+        project += "-restricted"
+    image_name = '/'.join([registry.registry_url, project, name])
     return ':'.join([image_name, tag])
 

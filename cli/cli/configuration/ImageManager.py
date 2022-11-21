@@ -14,12 +14,17 @@ def pull_all_images(docker_client: DockerClient, email, cli_key, therapeutic_are
     return images
 
 
-def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str):
+def pull_image(docker_client: DockerClient, registry: Registry, image: str, email: str, cli_key: str, restricted=False):
     print(f'Pulling image {image} ...')
     try:
         docker_client.login(username=email, password=cli_key, registry=registry.registry_url, reauth=True)
     except docker.errors.APIError:
-        print('Failed to pull image. Are the correct email and CLI Key provided?')
+        if restricted:
+            print(f'Failed to pull image {image}. Please check the provided email and CLI Key. '
+                  f'Access to this image is restricted. '
+                  f'Please request access if needed and re-run the installation script.')
+        else:
+            print('Failed to pull image. Are the correct email and CLI Key provided?')
         sys.exit(1)
     docker_client.images.pull(image)
     print(f'Done pulling image {image}')

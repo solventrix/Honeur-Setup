@@ -14,7 +14,7 @@ here = path.abspath(path.dirname(__file__))
 # setup the package
 setup(
     name='feder8',
-    version='2.0.19', # set by bump2version
+    version='2.0.20', # set by bump2version
     description='Feder8 command line interface',
     url='https://github.com/Solventrix/Honeur-Setup',
     packages=find_namespace_packages(),
