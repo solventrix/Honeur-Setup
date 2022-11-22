@@ -1882,13 +1882,7 @@ def remove_image(docker_client:DockerClient, image_name_tag):
 @click.option('-k', '--cli-key')
 def backup(therapeutic_area, email, cli_key):
     try:
-        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
-        directory_separator = '/'
-        current_directory = os.getenv('CURRENT_DIRECTORY', '')
-        if is_windows:
-            current_directory = directory_separator + current_directory.replace('\\', directory_separator).replace(':', '')
-
-        backup_folder = current_directory + directory_separator + 'backup'
+        backup_folder = os.path.join(get_current_directory(), 'backup')
 
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
@@ -1908,6 +1902,57 @@ def backup(therapeutic_area, email, cli_key):
         backup_database_and_container_files(docker_client=docker_client, email=email, cli_key=cli_key,
                                             therapeutic_area_info=therapeutic_area_info,
                                             backup_folder=backup_folder)
+
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+
+def get_current_directory():
+    is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+    directory_separator = '/'
+    current_directory = os.getenv('CURRENT_DIRECTORY', '')
+    if is_windows:
+        current_directory = directory_separator + current_directory.replace('\\', directory_separator).replace(':', '')
+    return current_directory
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+@click.option('-f', '--file')
+def restore(therapeutic_area, email, cli_key, file):
+    try:
+
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                                  choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+
+        restore_config = questionary.confirm("Do you wish to restore the configuration volume?", default=False).ask()
+        restore_r_libraries = questionary.confirm("Do you wish to restore the r_libraries volume?", default=False).ask()
+        if file is None:
+            file = questionary.text("Location of backup archive").ask()
+
+        docker_client = get_docker_client()
+
+        validate_correct_docker_network(docker_client)
+
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+
+        if email is None:
+            email, cli_key = get_image_repo_credentials(therapeutic_area, email, cli_key)
+
+        is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
+        directory_separator = '/'
+        if is_windows:
+            file = directory_separator + file.replace('\\', directory_separator).replace(':', '')
+
+        restore_database_and_volumes(docker_client=docker_client, email=email, cli_key=cli_key,
+                                     therapeutic_area_info=therapeutic_area_info,
+                                     restore_file=file, restore_config=restore_config,
+                                     restore_r_libraries=restore_r_libraries)
 
     except KeyboardInterrupt:
         sys.exit(1)
@@ -1944,8 +1989,7 @@ def backup_database_and_container_files(docker_client: DockerClient, email, cli_
                                                  environment=environment_variables,
                                                  volumes=volumes,
                                                  detach=True)
-        for l in container.logs(stream=True):
-            print(l.decode('UTF-8'), end='')
+        stream_logs(container)
 
         container = docker_client.containers.get(container.attrs['Name'])
         container.stop()
@@ -1958,6 +2002,69 @@ def backup_database_and_container_files(docker_client: DockerClient, email, cli_
     except Exception as e:
         print(e)
         sys.exit(1)
+
+
+def restore_database_and_volumes(docker_client: DockerClient, email, cli_key,
+                                 therapeutic_area_info: TherapeuticArea,
+                                 restore_file: str, restore_config: bool, restore_r_libraries: bool):
+    print("Starting restore of database and volumes, This could take a while...")
+
+    try:
+        registry = therapeutic_area_info.registry
+        pull_image(docker_client, registry, get_local_restore_image_name_tag(therapeutic_area_info), email, cli_key)
+
+        excluded_volumes = []
+
+        if not restore_config:
+            excluded_volumes.append('feder8-config-server')
+        if not restore_r_libraries:
+            excluded_volumes.append('r_libraries')
+
+        environment_variables = {
+            'BACKUP_FILE': '/opt/backup.tar.gz',
+            'DATA_FOLDER_HOST': get_current_directory(),
+            'EXCLUDED_VOLUMES': ','.join(excluded_volumes)
+        }
+
+        volumes = {
+            restore_file: {
+                'bind': '/opt/backup.tar.gz'
+            },
+            get_current_directory(): {
+                'bind': '/data',
+                'mode': 'rw'
+            }
+        }
+
+
+        volumes = add_docker_sock_volume_mapping(volumes)
+
+        feder8_network = get_network_name()
+        container = docker_client.containers.run(
+            image=get_local_restore_image_name_tag(therapeutic_area_info),
+            remove=True,
+            name='feder8-local-restore',
+            network=feder8_network,
+            volumes=volumes,
+            environment=environment_variables,
+            detach=True
+        )
+
+        stream_logs(container)
+
+        if container.wait()['StatusCode'] != 0:
+            print('Something went wrong while restoring the backup. Exiting the installation script. '
+                  'If you continue to experience this error, please contact the Feder8 team.')
+            sys.exit(1)
+
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+
+
+def stream_logs(container):
+    for l in container.logs(stream=True):
+        print(l.decode('UTF-8'), end='')
 
 
 @init.command()

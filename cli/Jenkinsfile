@@ -8,34 +8,25 @@ pipeline {
                 script: 'cat Honeur-Setup/cli/VERSION',
                 returnStdout: true
             ).trim()
-        ENV = getEnvironment()
     }
 
     stages {
-        stage('build image') {
-            steps {
-                echo "Currently running pipeline for ${ENV} environment"
-                script {
-                    dir('Honeur-Setup/cli') {
-                        withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                            sh './build.sh'
-                        }
-                    }
-                }
-            }
-        }
-        stage('upload image') {
+        stage('build & upload image') {
             steps {
                 script {
                     dir('Honeur-Setup/cli') {
-                        credentialsId = env.ENV.equals('UAT') ? "harbor-honeur-library-robot-uat" : "harbor-honeur-library-robot"
-                        hostname = env.ENV.equals('UAT') ? "harbor-uat.honeur.org" : "harbor.honeur.org"
+                        credentialsId = feder8.getCurrentEnvironment() == 'uat' ? "harbor-honeur-library-robot-uat" : "harbor-honeur-library-robot"
+                        taInfo = feder8.getInfoForTA('honeur')
                         try {
-                            withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
-                                sh "THERAPEUTIC_AREA_URL=${hostname} ./publish.sh"
+                            withDockerRegistry(credentialsId: credentialsId, url: taInfo.getRegistry()) {
+                                withBuildxBuilder() {
+                                    sh "THERAPEUTIC_AREA_URL=${taInfo.url} ./build-multi-arch.sh"
+                                    sh "docker pull ${taInfo.url}/library/install-script:${env.VERSION}"
+                                    sh "docker tag ${taInfo.url}/library/install-script:${env.VERSION} feder8/install-script:${env.VERSION}"
+                                }
                             }
                         } catch (e) {
-                            notifyPushFailed("https://${hostname}")
+                            feder8.notifyPushFailed(taInfo.getRegistry())
                         }
                     }
                 }
@@ -44,17 +35,16 @@ pipeline {
         stage('Save dependencies') {
             steps {
                 script {
-                    sh "docker run --rm --name feder8-installer -e CURRENT_DIRECTORY=\$(pwd) -e IS_WINDOWS=false -e IS_MAC=false -e DOCKER_CERT_SUPPORT=false -v /output:/output -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:${env.VERSION} feder8 init export-all-image-name-tags -o /output"
+                        sh "docker run --rm --name feder8-installer -e CURRENT_DIRECTORY=\$(pwd) -e IS_WINDOWS=false -e IS_MAC=false -e DOCKER_CERT_SUPPORT=false -v /output:/output -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:${env.VERSION} feder8 init export-all-image-name-tags -o /output"
 //                     files = sh(script: 'ls -1 /output', returnStdout: true).split()
 //                     files.each() { file ->
                         file = 'honeur'
                         echo "attempting login for ${file}"
-                        domain = getTADomain(file)
+                        info = feder8.getInfoForTA(file)
 
-                        credentialsId = env.ENV.equals('UAT') ? "harbor-${file}-robot-uat" : "harbor-${file}-robot"
-                        hostname = env.ENV.equals('UAT') ? "harbor-uat.${domain}" : "harbor.${domain}"
+                        credentialsId = feder8.getCurrentEnvironment() == 'uat' ? "harbor-${file}-robot-uat" : "harbor-${file}-robot"
 
-                        withDockerRegistry(credentialsId: credentialsId, url: "https://${hostname}") {
+                        withDockerRegistry(credentialsId: credentialsId, url: info.getRegistry()) {
                             fileString = readFile encoding: 'UTF-8', file: '/output/' + file
                             tags = fileString.split()
                             successFullyPulledTags = []
@@ -67,7 +57,7 @@ pipeline {
                                 }
                             }
 
-                            successFullyPulledTags.add("${hostname}/library/install-script")
+                            successFullyPulledTags.add("${info.url}/library/install-script")
 
                             tagsForSaving = successFullyPulledTags.join(" ")
                             outputFile = "./feder8-local-install-${env.VERSION}"
@@ -75,49 +65,14 @@ pipeline {
                             sh "docker save ${tagsForSaving} -o ${outputFile}/images.tar"
                             sh "cp -RT Honeur-Setup/local-installation/offline-helper-scripts ${outputFile}/"
                             sh "tar -zcvf ./${file}.tar.gz ${outputFile}"
-                            sh "aws s3 cp ./${file}.tar.gz s3://feder8-download-bucket/${file}/feder8-local-install-${env.VERSION}.tar.gz"
+
+                            bucket = feder8.getCurrentEnvironment() == 'uat' ? "feder8-download-bucket-uat" : "feder8-download-bucket"
+
+                            sh "aws s3 cp ./${file}.tar.gz s3://${bucket}/${file}/feder8-local-install-${env.VERSION}.tar.gz"
                         }
 //                     }
                 }
             }
         }
     }
-}
-
-def notifyPushFailed(url) {
-  emailext (
-      subject: "FAILED To push image",
-      body: """<p>Jenkins failed to push image to ${url}</p>
-        <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-      to: "pmoorth1@its.jnj.com,sgyina1@its.jnj.com"
-    )
-}
-
-def getTADomain(area) {
-  switch(area) {
-    case "honeur":
-        return "honeur.org"
-    case "phederation":
-        return "phederation.org"
-    case "esfurn":
-        return "esfurn.org"
-    case "athena":
-        return "athenafederation.org"
-    case "lupus":
-        return "lupusnet.org"
-    case "athena":
-        return "athenafederation.org"
-    default:
-        return "honeur.org"
-  }
-}
-
-def getEnvironment() {
-   if (env.GIT_BRANCH.startsWith('origin/release/')) {
-        return 'UAT'
-   } else if (env.GIT_BRANCH.equals('origin/master')) {
-        return 'PRD'
-   } else {
-        return 'UAT'
-   }
 }
