@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-TAG=2.0.19
+TAG=2.0.20
 REGISTRY=harbor.honeur.org
 
 docker volume create new-pgdata

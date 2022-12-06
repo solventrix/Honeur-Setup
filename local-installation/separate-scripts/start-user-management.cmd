@@ -1,6 +1,6 @@
 @ECHO off
 
-SET TAG=2.0.19
+SET TAG=2.0.20
 SET REGISTRY=harbor.honeur.org
 
 docker pull %REGISTRY%/library/install-script:%TAG%
