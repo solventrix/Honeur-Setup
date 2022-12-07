@@ -1505,9 +1505,14 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
 @click.option('-e', '--email')
 @click.option('-k', '--cli-key')
 def disease_explorer(therapeutic_area, email, cli_key):
-    docker_client = get_docker_client()
+    if therapeutic_area is None:
+        therapeutic_area = questionary.select("Name of Therapeutic Area?",
+                                              choices=Globals.therapeutic_areas.keys()).unsafe_ask()
     therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
     registry = therapeutic_area_info.registry
+
+    docker_client = get_docker_client()
+    connect_install_container_to_network(docker_client, therapeutic_area_info)
 
     configuration: ConfigurationController = get_configuration(therapeutic_area)
     if email is None:
