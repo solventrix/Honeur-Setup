@@ -103,7 +103,7 @@ class CustomConceptsUpdatePipeline:
         return self._docker_client.get_image_name_tag('postgres', 'omopcdm-add-constraints-2.0.0')
 
     def get_update_custom_concepts_image_name_tag(self):
-        return self._docker_client.get_image_name_tag('omopcdm-update-custom-concepts', 'latest')
+        return self._docker_client.get_image_name_tag('postgres-omopcdm-update-custom-concepts', 'latest')
 
     def get_rebuild_concept_hierarchy_image_name_tag(self):
         return self._docker_client.get_image_name_tag('postgres', 'results-rebuild-concept-hierarchy-2.0.2')
