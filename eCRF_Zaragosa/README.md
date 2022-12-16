@@ -62,7 +62,7 @@ Linux/MacOS:
 ./install_ecrf_stand_alone.sh
 ```
 
-### Extend timeout (for existing installations)
+### <a id="extend-timeout"></a> Extend timeout (for existing installations)
 To extend the timeout setting of existing installations.
 
 1. Download the script (**_extend_timeout.sh_**) by use of the following command:
