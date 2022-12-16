@@ -62,3 +62,17 @@ Linux/MacOS:
 ./install_ecrf_stand_alone.sh
 ```
 
+### Extend timeout (for existing installations)
+To extend the timeout setting of existing installations.
+
+1. Download the script (**_extend_timeout.sh_**) by use of the following command:
+
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF_Zaragosa/extend_timeout.sh --output extend_timeout.sh && chmod +x extend_timeout.sh
+```
+2. Run the script
+
+```
+./extend_timeout.sh
+```
+
