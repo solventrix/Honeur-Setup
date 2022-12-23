@@ -42,7 +42,7 @@ echo "02b. Create server.csr"
 openssl req -subj "/CN=$DOCKER_HOSTNAME" -sha256 -new -key server-key.pem -out server.csr
 echo "02c. Create server-cert.pem"
 echo -n "" > extfile.cnf
-echo subjectAltName = DNS:$DOCKER_HOSTNAME,IP:127.0.0.1 >> extfile.cnf
+echo subjectAltName = DNS:$DOCKER_HOSTNAME,IP:127.0.0.1,IP:172.17.0.1 >> extfile.cnf
 echo extendedKeyUsage = serverAuth >> extfile.cnf
 openssl x509 -req -passin pass:$CA_PWD -days $VALIDITY_DAYS -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf
 
