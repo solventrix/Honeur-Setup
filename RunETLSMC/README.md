@@ -2,7 +2,7 @@
 
 ## Prerequisites
 1. Docker is installed and running.
-2. The user has access to the Honeur CAV Harbor repository containing the ETL image.
+2. The user has access to the Honeur Sourasky Harbor repository containing the ETL image.
 3. The HONEUR OMOP CDM database is running in a Docker container named `postgres`:
     * Check this by running `docker ps`. You should see the `postgres` container listed as running and healthy.
     * See [https://github.com/solventrix/Honeur-Setup/blob/master/OMOPCDM/README.md](https://github.com/solventrix/Honeur-Setup/blob/master/README.md) for more info.
@@ -34,20 +34,20 @@ Please review the log files to confirm that no patient-level information was wri
 *The default file names are:*
 
 ```
-    demographics_01012022.csv
-    disease_admission_01012022.csv
-    disease_ambulatory_01012022.csv
-    disease_characteristics_myeloma_01012022.csv
-    disease_chronicdiagnosis_01012022.csv
-    disease_hematodiagnosis_01012022.csv
-    lab_data_cytogenetics_01012022.csv
+    demographics.csv
+    disease_admission.csv
+    disease_ambulatory.csv
+    disease_characteristics_myeloma.csv
+    disease_chronicdiagnosis.csv
+    disease_hematodiagnosis.csv
+    lab_data_cytogenetics.csv
     lab_data_fish.csv
-    lab_data_test2021_2022.csv
     lab_data_test2010_2015.csv
-    lab_data_test2019_2020.csv
     lab_data_test2016_2018.csv
-    treatment_cato_01012022.csv
-    treatment_map_01012022.csv
-    treatment_medication_01012022.csv
+    lab_data_test2019_2020.csv
+    lab_data_test2021_2022.csv
+    treatment_cato.csv
+    treatment_map.csv
+    treatment_medication.csv
 ```
 
