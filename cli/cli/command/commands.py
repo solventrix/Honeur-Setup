@@ -172,6 +172,10 @@ def get_or_create_network(docker_client:DockerClient, therapeutic_area_info):
     return network
 
 
+def host_has_docker_cert_support():
+    return os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
+
+
 def add_docker_sock_volume_mapping(volumes: dict, raw=False):
     is_windows = os.getenv('IS_WINDOWS', 'false') == 'true'
     is_mac = os.getenv('IS_MAC', 'false') == 'true'
@@ -479,6 +483,8 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 @click.option('-lbdn', '--ldap-base-dn')
 @click.option('-edr', '--enable-docker-runner')
 def local_portal(therapeutic_area, email, cli_key, host, security_method, username, password, ldap_url, ldap_dn, ldap_base_dn, enable_docker_runner):
+    docker_cert_support = host_has_docker_cert_support()
+    docker_cert_path_internal = '/home/feder8/certs'
     try:
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?",
@@ -522,6 +528,9 @@ def local_portal(therapeutic_area, email, cli_key, host, security_method, userna
                 ldap_dn = configuration.get_configuration('feder8.local.security.ldap-dn')
             if ldap_base_dn is None:
                 ldap_base_dn = configuration.get_configuration('feder8.local.security.ldap-base-dn')
+
+        if docker_cert_support:
+            feder8_certificate_directory = configuration.get_configuration('feder8.local.host.docker-cert-directory')
     except KeyboardInterrupt:
         sys.exit(1)
 
@@ -555,6 +564,8 @@ def local_portal(therapeutic_area, email, cli_key, host, security_method, userna
             config_update['FEDER8_LOCAL_SECURITY_LDAP-BASE-DN'] = ldap_base_dn
         else:
             config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
+    if docker_cert_support:
+        config_update['FEDER8_LOCAL_HOST_DOCKER-CERT-DIRECTORY'] = feder8_certificate_directory
 
     update_config_on_config_server(docker_client=docker_client,
                                    email=email, cli_key=cli_key,
@@ -584,7 +595,14 @@ def local_portal(therapeutic_area, email, cli_key, host, security_method, userna
                 'mode': 'ro'
             }
         }
-    volumes = add_docker_sock_volume_mapping(volumes, raw=True)
+
+    if docker_cert_support:
+        volumes[feder8_certificate_directory] = {
+            'bind': docker_cert_path_internal,
+            'mode': 'rw'
+        }
+    else:
+        volumes = add_docker_sock_volume_mapping(volumes, raw=True)
 
     environment_variables = {
             'FEDER8_THERAPEUTIC_AREA_NAME': therapeutic_area_info.name,
@@ -612,6 +630,11 @@ def local_portal(therapeutic_area, email, cli_key, host, security_method, userna
         environment_variables['FEDER8_LDAP_DN'] = ldap_dn
     elif security_method == 'JDBC':
         environment_variables['FEDER8_JDBC_AUTH_ENABLED'] = 'true'
+
+    if docker_cert_support:
+        environment_variables['FEDER8_DOCKER_HOST'] = '172.17.0.1'
+        environment_variables['FEDER8_DOCKER_PORT'] = '2376'
+        environment_variables['FEDER8_DOCKER_CERT_PATH'] = docker_cert_path_internal
 
     container = docker_client.containers.run(
         image=local_portal_image_name_tag,
@@ -1345,9 +1368,9 @@ def distributed_analytics(therapeutic_area, email, cli_key, organization):
 @click.option('-lsu', '--ldap-system-username')
 @click.option('-lsp', '--ldap-system-password')
 def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_url, ldap_dn, ldap_base_dn, ldap_system_username, ldap_system_password):
+    docker_cert_support = host_has_docker_cert_support()
+    docker_cert_path_internal = '/home/certs'
     try:
-        docker_cert_support = os.getenv('DOCKER_CERT_SUPPORT', 'false') == 'true'
-
         if therapeutic_area is None:
             therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
 
@@ -1418,6 +1441,8 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
             config_update['FEDER8_LOCAL_SECURITY_LDAP-SYSTEM-PASSWORD'] = ldap_system_password
         else:
             config_update['FEDER8_LOCAL_SECURITY_SECURITY-METHOD'] = 'JDBC'
+    if docker_cert_support:
+        config_update['FEDER8_LOCAL_HOST_DOCKER-CERT-DIRECTORY'] = feder8_certificate_directory
 
     update_config_on_config_server(docker_client=docker_client,
                                    email=email, cli_key=cli_key,
@@ -1460,7 +1485,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
         environment_variables['WEBAPI_ADMIN_USERNAME'] = 'ohdsi_admin_user'
     if docker_cert_support:
         environment_variables['PROXY_DOCKER_URL'] = 'https://172.17.0.1:2376'
-        environment_variables['PROXY_DOCKER_CERT_PATH'] = '/home/certs'
+        environment_variables['PROXY_DOCKER_CERT_PATH'] = docker_cert_path_internal
 
     feder8_studio_volumes = {
         SHARED_VOLUME: {
@@ -1474,7 +1499,7 @@ def feder8_studio(therapeutic_area, email, cli_key, host, security_method, ldap_
     }
     if docker_cert_support:
         feder8_studio_volumes[feder8_certificate_directory] = {
-            'bind': '/home/certs',
+            'bind': docker_cert_path_internal,
             'mode': 'rw'
         }
     else:
@@ -2040,7 +2065,6 @@ def restore_database_and_volumes(docker_client: DockerClient, email, cli_key,
                 'mode': 'rw'
             }
         }
-
 
         volumes = add_docker_sock_volume_mapping(volumes)
 
