@@ -16,7 +16,7 @@ services:
       DB_SCHEMA: db_schema
       DB_USER: db_username
       DB_PASSWORD: db_password
-      RELEASE_DATE: date_last_export
+      LAST_DATA_EXPORT: date_last_export
       VERBOSITY_LEVEL: verbosity_level
       DELIMITER: source_delimiter
       ETL_DATE_FORMAT: etl_date_format
