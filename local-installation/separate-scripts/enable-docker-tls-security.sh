@@ -21,7 +21,7 @@ unset DOCKER_TLS_VERIFY
 echo "01a. Create policy file"
 echo -n "" > $CERTIFICATE_FOLDER/policy.json
 echo '{"name":"full-access","users":["", "host"],"actions":[""]}' >> $CERTIFICATE_FOLDER/policy.json
-echo '{"name":"honeur-studio","users":["feder8"],"actions":["container_create","container_inspect","container_logs","container_start","container_delete","network_connect","network_disconnect"]}' >> $CERTIFICATE_FOLDER/policy.json
+echo '{"name":"feder8-studio","users":["feder8"],"actions":["container_create","container_inspect","container_list","container_logs","container_start","container_delete","docker_version","image_list","network_connect","network_disconnect"]}' >> $CERTIFICATE_FOLDER/policy.json
 echo "01b. Stop and remove authorization broker container if exists"
 docker stop authz-broker > /dev/null 2>&1 || true
 docker rm authz-broker > /dev/null 2>&1 || true
@@ -52,6 +52,7 @@ sudo systemctl restart docker
 # Secure Docker client
 echo "03. Secure Docker client"
 mkdir -pv ~/.docker
+rm -rf ~/.docker/*.pem
 cp -v $CERTIFICATE_FOLDER/host-client-key.pem ~/.docker/key.pem
 cp -v $CERTIFICATE_FOLDER/host-client-cert.pem ~/.docker/cert.pem
 cp -v $CERTIFICATE_FOLDER/ca.pem ~/.docker

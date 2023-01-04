@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eux
 
-VERSION=2.0.20
+VERSION=2.0.21
 TAG=$VERSION
 THERAPEUTIC_AREA_URL="${THERAPEUTIC_AREA_URL:=harbor.honeur.org}"
 REPOSITORY=library
