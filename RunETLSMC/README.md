@@ -7,7 +7,7 @@
     * Check this by running `docker ps`. You should see the `postgres` container listed as running and healthy.
     * See [https://github.com/solventrix/Honeur-Setup/blob/master/OMOPCDM/README.md](https://github.com/solventrix/Honeur-Setup/blob/master/README.md) for more info.
 
-## Execution steps
+## Execution steps (Mac/Linux)
 1. Open a terminal window 
 2. Create a new directory for the ETL script execution, e.g.:
    * `mkdir etl_smc`
@@ -26,6 +26,29 @@
     * the date of last update of the data-export, double-quoted, example: "2022-10-30"
 5. The script will run the ETL code and show the output of the code
 7. The `etl_<datetime>.log` log file will be available in the `log` folder. 
+
+
+## Execution steps (Windows)
+
+1. Open a terminal window 
+2. Create a new directory for the ETL script execution, e.g.:
+   * `mkdir etl_smc`
+   * `cd etl_smc`
+3. Download the installation script:
+   * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLSMC/runETL.cmd --output runETL.cmd`
+4. Execute the `runETL.cmd` script by running `.\runETL.cmd` from inside the directory where the script is located.
+5. The script will request for:
+   * the path to the folder that contains the input data files
+   * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
+   * the tag name for the Docker Hub image
+   * the delimiter used in the source files (if different from default, make sure to quote the string as in ";")
+   * the name of the source files, if different from the default names (see below). 
+   * the encoding used for the source files
+   * the verbosity level [DEBUG, INFO, WARNING, ERROR]
+   * the date of last update of the data-export, double-quoted, example: "2022-10-30"
+6. The script will run the ETL code and show the output of the code
+7. The `etl_<datetime>.log` log file will be available in the `log` folder. 
+
 
 Please review the log files to confirm that no patient-level information was written out before sharing them.
 
