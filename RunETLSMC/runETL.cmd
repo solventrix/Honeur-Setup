@@ -7,7 +7,7 @@ set "db_schema=omopcdm"
 set /p "db_schema=DB schema [%db_schema%]: "
 
 set "db_username=honeur_admin"
-set /p "db_username=DB username [%honeur_admin%]: "
+set /p "db_username=DB username [%db_username%]: "
 
 set "db_password="
 set /p "db_password=DB password [%db_password%]: "
