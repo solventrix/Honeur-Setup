@@ -2459,7 +2459,7 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
         name = 'postgres-fix-default-privileges',
         volumes = volumes,
         environment={
-            'FEDER8_THERAPEUTIC_AREA': therapeutic_area_info.name
+            'FEDER8_THERAPEUTIC_AREA': 'feder8'
         },
         group_add=[socket_gid, 0],
         detach = True)
