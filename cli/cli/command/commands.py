@@ -418,9 +418,9 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
         'FEDER8_LOCAL_DATASOURCE_HOST': container_names[0],
         'FEDER8_LOCAL_DATASOURCE_NAME': 'OHDSI',
         'FEDER8_LOCAL_DATASOURCE_PORT': '5432',
-        'FEDER8_LOCAL_DATASOURCE_USERNAME': therapeutic_area_info.name,
+        'FEDER8_LOCAL_DATASOURCE_USERNAME': 'feder8',
         'FEDER8_LOCAL_DATASOURCE_PASSWORD': user_password,
-        'FEDER8_LOCAL_DATASOURCE_ADMIN-USERNAME': therapeutic_area_info.name + '_admin',
+        'FEDER8_LOCAL_DATASOURCE_ADMIN-USERNAME': 'feder8_admin',
         'FEDER8_LOCAL_DATASOURCE_ADMIN-PASSWORD': admin_password,
     }
 
@@ -2519,6 +2519,7 @@ def add_cdm_schema_54(therapeutic_area, cdm_schema, vocabulary_schema, results_s
         configuration: ConfigurationController = get_configuration(therapeutic_area)
         email = configuration.get_configuration('feder8.central.service.image-repo-username')
         cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+        feder8_admin_username = configuration.get_configuration('feder8.local.datasource.admin-username')
 
         if cdm_schema is None:
             cdm_schema = questionary.text("Name of cdm schema", default='omopcdm_5_4').ask()
@@ -2533,6 +2534,7 @@ def add_cdm_schema_54(therapeutic_area, cdm_schema, vocabulary_schema, results_s
     AddCdmSchema54Pipeline(
         docker_client=DockerClientFacade(therapeutic_area_info, email, cli_key, docker_client),
         therapeutic_area_info=therapeutic_area_info,
+        feder8_admin_username=feder8_admin_username,
         cdm_schema=cdm_schema,
         vocabulary_schema=vocabulary_schema,
         results_schema=results_schema,
