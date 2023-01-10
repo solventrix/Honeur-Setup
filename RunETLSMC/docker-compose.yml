@@ -37,9 +37,19 @@ services:
       ETL_FILENAME_TREATMENT_MEDICATION: file_name_treatment_medication
       ETL_ENCODING_DEMOGRAPHICS: encoding_demographics
       ETL_ENCODING_DISEASE_ADMISSION: encoding_disease_admission
+      ETL_ENCODING_DISEASE_AMBULATORY: encoding_disease_ambulatory
+      ETL_ENCODING_DISEASE_CHARACTERISTICS_MYELOMA: encoding_disease_char
+      ETL_ENCODING_DISEASE_CHRONICDIAGNOSIS: encoding_disease_chronic
+      ETL_ENCODING_DISEASE_HEMATODIAGNOSIS: encoding_disease_hema
       ETL_ENCODING_LAB_DATA_FISH: encoding_lab_fish
+      ETL_ENCODING_LAB_DATA_CYTOGENETICS: encoding_lab_cytogenetics
+      ETL_ENCODING_LAB_DATA_TEST_2010_2015: encoding_lab_test_1015
+      ETL_ENCODING_LAB_DATA_TEST_2016_2018: encoding_lab_test_1618
+      ETL_ENCODING_LAB_DATA_TEST_2019_2020: encoding_lab_test_1920
+      ETL_ENCODING_LAB_DATA_TEST_2021_2022: encoding_lab_test_2122
       ETL_ENCODING_TREATMENT_CATO: encoding_treatment_cato
       ETL_ENCODING_TREATMENT_MAP: encoding_treatment_map
+      ETL_ENCODING_TREATMENT_MEDICATION: encoding_treatment_medication
 networks:
   honeur-net:
     external:
