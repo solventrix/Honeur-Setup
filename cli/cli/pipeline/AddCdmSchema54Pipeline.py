@@ -15,13 +15,17 @@ SHARED_VOLUME = 'shared'
 
 class AddCdmSchema54Pipeline:
 
-    def __init__(self, docker_client: DockerClientFacade, therapeutic_area_info: TherapeuticArea, cdm_schema: str,
-                 vocabulary_schema: str, results_schema: str) -> None:
+    def __init__(self, docker_client: DockerClientFacade,
+                 therapeutic_area_info: TherapeuticArea,
+                 feder8_admin_username: str,
+                 cdm_schema: str, vocabulary_schema: str, results_schema: str) -> None:
         self._docker_client = docker_client
+        self._therapeutic_area_info = therapeutic_area_info
+        self._feder8_admin_username = feder8_admin_username
         self._results_schema = results_schema
         self._vocabulary_schema = vocabulary_schema
         self._cdm_schema = cdm_schema
-        self._therapeutic_area_info = therapeutic_area_info
+
 
     def execute(self):
         self.validate_postgres_running()
@@ -83,7 +87,7 @@ class AddCdmSchema54Pipeline:
             'CDMOMOP_CDM_VERSION': '5.4',
             'DB_HOST': 'postgres',
             'DB_RESULTS_SCHEMA': self._results_schema,
-            'FEDER8_ADMIN_USERNAME': self._therapeutic_area_info.name + '_admin',
+            'FEDER8_ADMIN_USERNAME': self._feder8_admin_username,
         }
 
         logging.info('Initializing results schema...')
@@ -168,7 +172,7 @@ class AddCdmSchema54Pipeline:
             'CDMOMOP_CDM_VERSION': '5.4',
             'DB_HOST': 'postgres',
             'DB_OMOPCDM_SCHEMA': self._cdm_schema,
-            'FEDER8_ADMIN_USERNAME': self._therapeutic_area_info.name + '_admin',
+            'FEDER8_ADMIN_USERNAME': self._feder8_admin_username,
         }
 
         logging.info('Initializing OMOP CDM v5.4 schema...')
