@@ -433,6 +433,11 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
     cdm_version = get_omop_cdm_version(docker_client, therapeutic_area)
     check_containers_and_remove_if_not_exists(docker_client, therapeutic_area_info, container_names)
 
+    db_user_username = configuration.get_optional_configuration('feder8.local.datasource.username')
+    if not db_user_username: db_user_username = 'feder8'
+    db_admin_username = configuration.get_optional_configuration('feder8.local.datasource.admin-username')
+    if not db_admin_username: db_admin_username = 'feder8_admin'
+
     config_update = {
         'FEDER8_CONFIG_SERVER_THERAPEUTIC_AREA': therapeutic_area_info.name,
         'FEDER8_CENTRAL_SERVICE_IMAGE-REPO': registry.registry_url,
@@ -441,9 +446,9 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
         'FEDER8_LOCAL_DATASOURCE_HOST': container_names[0],
         'FEDER8_LOCAL_DATASOURCE_NAME': 'OHDSI',
         'FEDER8_LOCAL_DATASOURCE_PORT': '5432',
-        'FEDER8_LOCAL_DATASOURCE_USERNAME': 'feder8',
+        'FEDER8_LOCAL_DATASOURCE_USERNAME': db_user_username,
         'FEDER8_LOCAL_DATASOURCE_PASSWORD': user_password,
-        'FEDER8_LOCAL_DATASOURCE_ADMIN-USERNAME': 'feder8_admin',
+        'FEDER8_LOCAL_DATASOURCE_ADMIN-USERNAME': db_admin_username,
         'FEDER8_LOCAL_DATASOURCE_ADMIN-PASSWORD': admin_password,
     }
 
