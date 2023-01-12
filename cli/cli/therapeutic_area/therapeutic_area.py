@@ -2,6 +2,7 @@ from typing import List
 from cli.registry.registry import Registry
 from cli.configuration.cdm_version import CdmVersion
 
+
 class TherapeuticArea:
     def __init__(self, name:str, light_theme:str, dark_theme:str, portal_url:str, catalogue_url:str, distributed_analytics_url:str, cas_url:str, registry:Registry, organizations: List[str], cdm_version: CdmVersion = CdmVersion.v5_3_1) -> None:
         self.name:str = name

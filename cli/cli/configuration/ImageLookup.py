@@ -2,9 +2,11 @@ import logging
 from cli.globals import Globals
 
 
-def get_all_feder8_local_image_name_tags(therapeutic_area_info):
+def get_all_feder8_local_image_name_tags(therapeutic_area_info, cdm_version):
+    if not cdm_version:
+        cdm_version = therapeutic_area_info.cdm_version
     return [
-        get_postgres_image_name_tag(therapeutic_area_info),
+        get_postgres_image_name_tag(therapeutic_area_info, cdm_version),
         get_config_server_image_name_tag(therapeutic_area_info),
         get_update_configuration_image_name_tag(therapeutic_area_info),
         get_local_portal_image_name_tag(therapeutic_area_info),
@@ -26,8 +28,7 @@ def get_all_feder8_local_image_name_tags(therapeutic_area_info):
     ]
 
 
-def get_postgres_image_name_tag(therapeutic_area_info):
-    cdm_version = therapeutic_area_info.cdm_version
+def get_postgres_image_name_tag(therapeutic_area_info, cdm_version):
     return get_image_name_tag(therapeutic_area_info, 'postgres', f'13-omopcdm-{cdm_version}-webapi-2.9.0-2.0.9')
 
 
