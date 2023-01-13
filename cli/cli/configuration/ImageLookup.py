@@ -121,6 +121,10 @@ def get_fix_default_privileges_image_name_tag(therapeutic_area_info):
     return get_image_name_tag(therapeutic_area_info, 'postgres', 'fix-default-permissions-2.0.1')
 
 
+def get_add_postgres_user_image_name_tag(therapeutic_area_info):
+    return get_image_name_tag(therapeutic_area_info, 'postgres-add-user', '2.0.0')
+
+
 def get_postgres_omopcdm_initialize_schema_image_name_tag(therapeutic_area_info, cdm_version):
     return get_image_name_tag(therapeutic_area_info, 'postgres-omopcdm-initialize-schema', str(cdm_version) + '-2.0.2')
 

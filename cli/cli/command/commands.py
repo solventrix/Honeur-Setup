@@ -74,8 +74,7 @@ def run_container(docker_client: DockerClient, image: str, remove: bool, name: s
     container = docker_client.containers.run(
         image, remove=remove, name=name, environment=environment, network=network_name, volumes=volumes, detach=detach)
     if show_logs:
-        for l in container.logs(stream=True):
-            print(l.decode('UTF-8'), end='')
+        stream_logs(container)
     return container
 
 
@@ -493,9 +492,8 @@ def postgres(ctx, therapeutic_area, email, cli_key, user_password, admin_passwor
 
     wait_for_healthy_container(docker_client, container, 5, 120)
 
+    ctx.invoke(add_feder8_db_users_if_needed, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
     ctx.invoke(fix_default_privileges, therapeutic_area=therapeutic_area, email=email, cli_key=cli_key)
-
-
 
 
 @init.command()
@@ -1620,9 +1618,7 @@ def install_feder8_studio_app(therapeutic_area, email, cli_key, app_name):
         volumes=volumes,
         detach=True
     )
-
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
+    stream_logs(container)
 
 
 def install_radiant_dependencies(therapeutic_area, email, cli_key):
@@ -1718,8 +1714,7 @@ def install_r_app_dependencies(therapeutic_area, email, cli_key,
                                              entrypoint="/bin/bash",
                                              command=command,
                                              detach=True)
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
+    stream_logs(container)
 
 @init.command()
 @click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
@@ -2210,8 +2205,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
                                              network=network_names[0],
                                              volumes=volumes,
                                              detach=True)
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
+    stream_logs(container)
     container.stop()
     container.remove(v=True)
     print('Done upgrading vocabulary')
@@ -2231,8 +2225,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
                                             },
                                             command='ash -c "chown 999:999 /var/lib/shared/honeur.env"',
                                             detach=True)
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
+    stream_logs(container)
     container.stop()
     container.remove(v=True)
 
@@ -2248,8 +2241,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
                                             },
                                             command='ash -c "chown 999:999 /var/lib/shared/honeur.env"',
                                             detach=True)
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
+    stream_logs(container)
     container.stop()
     container.remove(v=True)
 
@@ -2295,8 +2287,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
                                                 }
                                             },
                                             detach=True)
-    for l in container.logs(stream=True):
-            print(l.decode('UTF-8'), end='')
+    stream_logs(container)
     container.stop()
     container.remove(v=True)
 
@@ -2321,9 +2312,7 @@ def upgrade_database(therapeutic_area, email, cli_key):
                                             },
                                             command='ash -c "cd /from ; cp -av . /to"',
                                             detach=True)
-    for l in container.logs(stream=True):
-            print(l.decode('UTF-8'), end='')
-
+    stream_logs(container)
     container.stop()
     container.remove(v=True)
 
@@ -2494,13 +2483,85 @@ def fix_default_privileges(therapeutic_area, email, cli_key):
         group_add=[socket_gid, 0],
         detach = True)
 
-    for l in container.logs(stream=True):
-        print(l.decode('UTF-8'), end='')
-
+    stream_logs(container)
     container.stop()
     container.remove(v=True)
 
     print('Done fix-default-privileges container')
+
+
+@init.command()
+@click.option('-ta', '--therapeutic-area', type=click.Choice(Globals.therapeutic_areas.keys()))
+@click.option('-e', '--email')
+@click.option('-k', '--cli-key')
+def add_feder8_db_users_if_needed(therapeutic_area, email, cli_key):
+    try:
+        if therapeutic_area is None:
+            therapeutic_area = questionary.select("Name of Therapeutic Area?", choices=Globals.therapeutic_areas.keys()).unsafe_ask()
+        docker_client = get_docker_client()
+        validate_correct_docker_network(docker_client)
+        therapeutic_area_info = Globals.therapeutic_areas[therapeutic_area]
+        registry = therapeutic_area_info.registry
+        connect_install_container_to_network(docker_client, therapeutic_area_info)
+        configuration:ConfigurationController = get_configuration(therapeutic_area)
+        if email is None:
+            email = configuration.get_configuration('feder8.central.service.image-repo-username')
+        if cli_key is None:
+            cli_key = configuration.get_configuration('feder8.central.service.image-repo-key')
+    except KeyboardInterrupt:
+        sys.exit(1)
+
+    add_postgres_user_image_tag = get_add_postgres_user_image_name_tag(therapeutic_area_info)
+    pull_image(docker_client, registry, add_postgres_user_image_tag, email, cli_key)
+
+    logging.info("Checking existence of Feder8 DB users...")
+
+    socket_gid = os.stat("/var/run/docker.sock").st_gid
+    volumes = {
+        SHARED_VOLUME: {
+            'bind': '/var/lib/shared',
+            'mode': 'ro'
+        }
+    }
+    volumes = add_docker_sock_volume_mapping(volumes)
+
+    feder8_user_password = configuration.get_configuration('feder8.local.datasource.password')
+    container = docker_client.containers.run(
+        image=add_postgres_user_image_tag,
+        remove=True,
+        name='postgres-add-user-feder8',
+        volumes=volumes,
+        environment={
+            'DB_HOST': 'postgres',
+            'DB_PORT': 5432,
+            'DB_USER_USERNAME': 'feder8',
+            'DB_USER_PASSWORD': feder8_user_password,
+            'DB_USER_ROLE': 'ohdsi_app'
+        },
+        network=get_network_name(),
+        group_add=[socket_gid, 0],
+        detach=True)
+    stream_logs(container)
+
+    feder8_admin_user_password = configuration.get_configuration('feder8.local.datasource.admin-password')
+    container = docker_client.containers.run(
+        image=add_postgres_user_image_tag,
+        remove=True,
+        name='postgres-add-user-feder8-admin',
+        volumes=volumes,
+        environment={
+            'DB_HOST': 'postgres',
+            'DB_PORT': 5432,
+            'DB_USER_USERNAME': 'feder8_admin',
+            'DB_USER_PASSWORD': feder8_admin_user_password,
+            'DB_USER_ROLE': 'ohdsi_admin'
+        },
+        network=get_network_name(),
+        group_add=[socket_gid, 0],
+        detach=True)
+    stream_logs(container)
+
+    logging.info("Done checking Feder8 DB users...")
 
 
 @init.command()
