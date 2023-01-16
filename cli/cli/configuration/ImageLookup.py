@@ -41,7 +41,7 @@ def get_update_configuration_image_name_tag(therapeutic_area_info):
 
 
 def get_local_portal_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.13')
+    return get_image_name_tag(therapeutic_area_info, 'local-portal', '2.0.14')
 
 
 def get_user_mgmt_image_name_tag(therapeutic_area_info):
@@ -65,7 +65,7 @@ def get_distributed_analytics_r_server_image_name_tag(therapeutic_area_info):
 
 
 def get_distributed_analytics_remote_image_name_tag(therapeutic_area_info):
-    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.6')
+    return get_image_name_tag(therapeutic_area_info, 'distributed-analytics', 'remote-2.0.7')
 
 
 def get_feder8_studio_image_name_tag(therapeutic_area_info):
