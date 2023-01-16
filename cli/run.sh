@@ -14,5 +14,4 @@ else
   IS_MAC=false
 fi
 
-docker pull ${REGISTRY}/library/install-script:${TAG}
 docker run --rm -it --name feder8-installer -e CURRENT_DIRECTORY=${PWD} -e IS_WINDOWS=false -e IS_MAC=$IS_MAC -e DOCKER_CERT_SUPPORT=$DOCKER_CERT_SUPPORT -v /var/run/docker.sock:/var/run/docker.sock feder8/install-script:${TAG} feder8 init full

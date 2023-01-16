@@ -17,11 +17,11 @@ class Globals:
         return "PRD"
 
     therapeutic_areas:Dict[str, TherapeuticArea] = {
-        "HONEUR": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['CAV','CCL','CHU Dijon','CHU Lille','CHU Montpellier','CLLEAR','DOS','EMMOS','GMV','iOMEDICO','IUCT','Janssen','OIS','Oncotyrol','RMG','Sourasky','UHL']),
-        "PHederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Actelion','Janssen']),
-        "Esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Janssen']),
-        "Athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'distributed-analytics.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['AZ Groeninge', 'CHU Liege', 'edenceHealth', 'Illumina', 'Imec', 'Janssen', 'KU Leuven', 'OLVZ Aalst', 'UGent', 'UZ Leuven MM', 'UZ Leuven UC', 'ZOL']),
-        "Lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal.lupusnet.org', 'catalogue.lupusnet.org', 'distributed-analytics.lupusnet.org', 'cas.lupusnet.org', Registry('harbor.lupusnet.org', 'lupus'), ['Gladel', 'Janssen'], cdm_version=CdmVersion.v5_4)
+        "honeur": TherapeuticArea('honeur', '#0794e0', '#002562', 'portal.honeur.org', 'catalogue.honeur.org', 'distributed-analytics.honeur.org', 'cas.honeur.org', Registry('harbor.honeur.org', 'honeur'), ['CAV','CCL','CHU Dijon','CHU Lille','CHU Montpellier','CLLEAR','DOS','EMMOS','GMV','iOMEDICO','IUCT','Janssen','OIS','Oncotyrol','RMG','Sourasky','UHL']),
+        "phederation": TherapeuticArea('phederation', '#3590d5', '#0741ad', 'portal.phederation.org', 'catalogue.phederation.org', 'distributed-analytics.phederation.org', 'cas.phederation.org', Registry('harbor.phederation.org', 'phederation'), ['Actelion','Janssen']),
+        "esfurn": TherapeuticArea('esfurn', '#668772', '#44594c', 'portal.esfurn.org', 'catalogue.esfurn.org', 'distributed-analytics.esfurn.org', 'cas.esfurn.org', Registry('harbor.esfurn.org', 'esfurn'), ['Janssen']),
+        "athena": TherapeuticArea('athena', '#0794e0', '#002562', 'portal.athenafederation.org', 'catalogue.athenafederation.org', 'distributed-analytics.athenafederation.org', 'cas.athenafederation.org', Registry('harbor.athenafederation.org', 'athena'), ['AZ Groeninge', 'CHU Liege', 'edenceHealth', 'Illumina', 'Imec', 'Janssen', 'KU Leuven', 'OLVZ Aalst', 'UGent', 'UZ Leuven MM', 'UZ Leuven UC', 'ZOL']),
+        "lupus": TherapeuticArea('lupus', '#0794e0', '#002562', 'portal.lupusnet.org', 'catalogue.lupusnet.org', 'distributed-analytics.lupusnet.org', 'cas.lupusnet.org', Registry('harbor.lupusnet.org', 'lupus'), ['Gladel', 'Janssen'], cdm_version=CdmVersion.v5_4)
     }
 
     all_questions:Dict[str,Question] = {

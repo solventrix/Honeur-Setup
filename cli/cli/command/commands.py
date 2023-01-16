@@ -148,7 +148,12 @@ def get_omop_cdm_version(docker_client: DockerClient, therapeutic_area: str) -> 
     if CDM_VERSION:
         return CDM_VERSION
 
-    existing_postgres_container = docker_client.containers.get(POSTGRES_CONTAINER_NAME)
+    try:
+        existing_postgres_container = docker_client.containers.get(POSTGRES_CONTAINER_NAME)
+    except:
+        logging.info("No running postgres container")
+        existing_postgres_container = None
+
     if existing_postgres_container:
         current_postgres_image_name_tag = existing_postgres_container.image.tags[0]
         if CdmVersion.v5_3_1.value in current_postgres_image_name_tag:
@@ -157,7 +162,7 @@ def get_omop_cdm_version(docker_client: DockerClient, therapeutic_area: str) -> 
             CDM_VERSION = CdmVersion.v5_4
     if not CDM_VERSION:
         configuration: ConfigurationController = get_configuration(therapeutic_area)
-        CDM_VERSION = CdmVersion[configuration.get_configuration('feder8.local.db.cdm-version')]
+        CDM_VERSION = CdmVersion.value_of(configuration.ask('feder8.local.db.cdm-version'))
     return CDM_VERSION
 
 
