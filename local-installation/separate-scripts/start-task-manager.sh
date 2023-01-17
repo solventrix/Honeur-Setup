@@ -1,5 +1,5 @@
-TAG=2.0.20
-REGISTRY=harbor.honeur.org
+TAG=2.0.21
+REGISTRY=harbor-uat.honeur.org
 
 if [[ $OSTYPE == 'darwin'* ]]; then
   IS_MAC=true

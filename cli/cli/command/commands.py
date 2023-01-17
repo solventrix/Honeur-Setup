@@ -139,7 +139,7 @@ def ta_specific_docker_network_exists(docker_client: DockerClient):
 
 def validate_correct_docker_network(docker_client: DockerClient):
     if ta_specific_docker_network_exists(docker_client):
-        print("We notice that you have an outdated setup installed. This seperate script is not compatible with this older version of your setup. Please run the full installer to update all components. You can follow the installation instruction at https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/helper-scripts#installation-instruction")
+        print("We notice that you have an outdated setup installed. This seperate script is not compatible with this older version of your setup. Please run the full installer to update all components. You can follow the installation instruction at https://github.com/solventrix/Honeur-Setup/tree/release/1.10.1/local-installation/helper-scripts#installation-instruction")
         sys.exit(1)
 
 

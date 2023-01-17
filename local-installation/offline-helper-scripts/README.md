@@ -17,7 +17,7 @@ Offline helper scripts combines the installation of Feder8 components and provid
 
 ### <a id="offline-install-package"></a> Offline install package
 1. Please download the offline install package from a machine with internet access:
-    * https://download.honeur.org/honeur/feder8-local-install-2.0.19.tar.gz
+   * https://download-uat.honeur.org/honeur/feder8-local-install-2.0.19.tar.gz
    > You will need to login with your central account credentials.
 
 2. Copy the install package to the installation system
@@ -53,7 +53,7 @@ On Linux, please download and run the following 2 scripts before running the ins
 
 Download the "Docker certificates generation script":
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/generate-docker-certificates.sh --output generate-docker-certificates.sh && chmod +x generate-docker-certificates.sh
 ```
 
 Run the "Docker certificates generation script":
@@ -63,7 +63,7 @@ Run the "Docker certificates generation script":
 
 Download the "enable Docker TLS security script":
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/enable-docker-tls-security.sh --output enable-docker-tls-security.sh && chmod +x enable-docker-tls-security.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/enable-docker-tls-security.sh --output enable-docker-tls-security.sh && chmod +x enable-docker-tls-security.sh
 ```
 
 Run the "enable Docker TLS security script":
@@ -106,11 +106,11 @@ Windows
 .\start-feder8-offline.cmd
 ```
 1. The script will ask for the applicable therapeutic area. Please choose the therapeutic area that corresponds with the credentials you received:
-    1. HONEUR for https://portal.honeur.org
-    2. PHederation for https://portal.phederation.org
-    3. ESFURN for https://portal.esfurn.org
-    4. ATHENA for https://portal.athenafederation.org
-    5. LupusNet for https://portal.lupusnet.org
+    1. HONEUR for https://portal-uat.honeur.org
+    2. PHederation for https://portal-uat.phederation.org
+    3. ESFURN for https://portal-uat.esfurn.org
+    4. ATHENA for https://portal-uat.athenafederation.org
+    5. LupusNet for https://portal-uat.lupusnet.org
 2. If a previous installation is present, the script will ask to remove the previous installation.  Choose Yes if the ETL will be re-executed after the re-installation.
 3. If a previous installation is present, the script will ask to create a backup of the Postgres database.  Choose Yes if there is no recent backup of the database.
 4. The script will prompt to enter a new password for feder8 database user.

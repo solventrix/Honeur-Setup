@@ -50,9 +50,9 @@ On Linux Docker compose (v1.24 or higher) should be installed separately.
 ### Docker images
 The docker images are located on a central repository. Make sure you have a central platform account before trying to run the local setup installation scripts:
 
-* For HONEUR: https://portal.honeur.org
-* For PHederation: https://portal.phederation.org
-* For ESFURN: https://portal.esfurn.org
+* For HONEUR: https://portal-uat.honeur.org
+* For PHederation: https://portal-uat.phederation.org
+* For ESFURN: https://portal-uat.esfurn.org
 
 Please request access by sending a mail to Michel Van Speybroeck (mvspeybr@its.jnj.com)
 
@@ -66,12 +66,12 @@ The Postgres database can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-postgres.sh --output start-postgres.sh && chmod +x start-postgres.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-postgres.cmd --output start-postgres.cmd
 ```
 
 2. You can run this script using the following command:
@@ -89,11 +89,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a new password for standard database user.
 8. The script will prompt to enter a new password for admin database user.
@@ -107,12 +107,12 @@ The configuration server can be installed by downloading and running the install
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-config-server.sh --output start-config-server.sh && chmod +x start-config-server.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-config-server.sh --output start-config-server.sh && chmod +x start-config-server.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-config-server.cmd --output start-config-server.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-config-server.cmd --output start-config-server.cmd
 ```
 
 2. Run the script using the following command:
@@ -130,11 +130,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the configuration server docker image and will create the docker container.
@@ -146,12 +146,12 @@ The Local Portal can be installed by downloading and running the installation sc
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-local-portal.sh --output start-local-portal.sh && chmod +x start-local-portal.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-local-portal.sh --output start-local-portal.sh && chmod +x start-local-portal.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-local-portal.cmd --output start-local-portal.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-local-portal.cmd --output start-local-portal.cmd
 ```
 
 2. Run the script using the following command:
@@ -169,11 +169,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 
 Once done, the script will download the local portal docker image and will create the docker container.
@@ -186,12 +186,12 @@ The Task Manager can be installed by downloading and running the installation sc
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-task-manager.sh --output start-task-manager.sh && chmod +x start-task-manager.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-task-manager.sh --output start-task-manager.sh && chmod +x start-task-manager.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-task-manager.cmd --output start-task-manager.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-task-manager.cmd --output start-task-manager.cmd
 ```
 
 2. Run the script using the following command:
@@ -216,12 +216,12 @@ Atlas/WebAPI can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-atlas-webapi.sh --output start-atlas-webapi.sh && chmod +x start-atlas-webapi.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-atlas-webapi.cmd --output start-atlas-webapi.cmd
 ```
 
 2. You can run this script using the following command:
@@ -239,11 +239,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Atlas/WebAPI will only be accessible on the host machine (via localhost) if you accept the default ‘localhost’ value.
 8. The script will prompt to enable authentication.  Choose "None" if authentication is not required. The same authentication mechanism should be selected for all local components.
@@ -260,12 +260,12 @@ Zeppelin can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-zeppelin.sh --output start-zeppelin.sh && chmod +x start-zeppelin.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-zeppelin.cmd --output start-zeppelin.cmd
 ```
 
 2. You can run this script using the following command:
@@ -283,11 +283,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a directory on the host machine to save the zeppelin logs and notebooks. Please provide an absolute path.
 8. The script will prompt you to enter the security options for Zeppelin. If you have existing HONEUR Components like Postgres/Atlas/WebAPI or Feder8 Studio. Please use the same security settings as with these previous installation.
@@ -306,12 +306,12 @@ User Management can be installed by running the installation script.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-user-management.sh --output start-user-management.sh && chmod +x start-user-management.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-user-management.cmd --output start-user-management.cmd
 ```
 
 2. Run this script using the following command:
@@ -329,11 +329,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter credentials for the administrator user that can manage users and roles.
 
@@ -350,12 +350,12 @@ Distributed Analytics can be installed by downloading and running the installati
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-distributed-analytics.sh --output start-distributed-analytics.sh && chmod +x start-distributed-analytics.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/distributed-analytics.cmd --output start-distributed-analytics.cmd
 ```
 
 2. Run this script using the following command:
@@ -373,11 +373,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt you to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to select the name of your organization.
 
@@ -390,12 +390,12 @@ Feder8 Studio can be installed by downloading and running the installation scrip
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-feder8-studio.sh --output start-feder8-studio.sh && chmod +x start-feder8-studio.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-feder8-studio.cmd --output start-feder8-studio.cmd
 ```
 
 2. Run the script using the following command:
@@ -413,11 +413,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to enter a Fully Qualified Domain Name (FQDN) or IP Address of the host machine. Feder8 Studio will only be accessible on the host machine (via localhost) if you enter ‘localhost’ as host name.
 8. The script will prompt to enter the directory of where the Feder8 Studio will store its working directory files.
@@ -440,12 +440,12 @@ During the installation, the script will ask you if you want to enable HTTPS sup
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-nginx.sh --output start-nginx.sh && chmod +x start-nginx.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-nginx.cmd --output start-nginx.cmd
 ```
 
 2. Run the script using the following command:
@@ -463,11 +463,11 @@ Windows
 3. The script will prompt to select the applicable therapeutic area.
 4. The script will prompt to enter the email address of the account you use to login on the central platform.
 5. The script will prompt to enter your CLI secret for pulling our images. This secret can be found on our central image repository. Surf to:
-    * https://harbor.honeur.org for HONEUR
-    * https://harbor.phederation.org for PHederation
-    * https://harbor.esfurn.org for ESFURN
-    * https://harbor.athenafederation.org for ATHENA
-    * https://harbor.lupusnet.org for Lupus
+    * https://harbor-uat.honeur.org for HONEUR
+    * https://harbor-uat.phederation.org for PHederation
+    * https://harbor-uat.esfurn.org for ESFURN
+    * https://harbor-uat.athenafederation.org for ATHENA
+    * https://harbor-uat.lupusnet.org for Lupus
 6. Login using the button "LOGIN VIA OIDC PROVIDER". Then click your account name on the top right corner of the screen and click "User Profile". Copy the CLI secret by clicking the copy symbol next to the text field.
 7. The script will prompt to ask wheter you want to enable HTTPS support. :warning: Before you can enable HTTPS support, you should have a folder containing a public key certificate file named "feder8.crt" and a private key file named "feder8.key".
 8. The script will prompt to enter a directory on the host machine where the public key certificate file named "feder8.crt" and a private key file named "feder8.key" are located.
@@ -481,12 +481,12 @@ The Disease Trajectory Analyser (DiTrAn) can be installed by downloading and run
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-disease-explorer.sh --output start-disease-explorer.sh && chmod +x start-disease-explorer.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-disease-explorer.sh --output start-disease-explorer.sh && chmod +x start-disease-explorer.sh
 ```
 
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-disease-explorer.cmd --output start-disease-explorer.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-disease-explorer.cmd --output start-disease-explorer.cmd
 ```
 
 2. Run the script using the following command:
@@ -510,11 +510,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-omop-indexes-and-constraints.sh --output start-omop-indexes-and-constraints.sh && chmod +x start-omop-indexes-and-constraints.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-omop-indexes-and-constraints.cmd --output start-omop-indexes-and-constraints.cmd
 ```
 3.	Run the script
 
@@ -535,11 +535,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 3.	Run the script
 
@@ -561,11 +561,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-qa-database.sh --output start-qa-database.sh && chmod +x start-qa-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-qa-database.sh --output start-qa-database.sh && chmod +x start-qa-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-qa-database.cmd --output start-qa-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-qa-database.cmd --output start-qa-database.cmd
 ```
 3.	Run the script
 
@@ -584,11 +584,11 @@ Removal steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/remove-qa-database.sh --output remove-qa-database.sh && chmod +x remove-qa-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/remove-qa-database.sh --output remove-qa-database.sh && chmod +x remove-qa-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/remove-qa-database.cmd --output remove-qa-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/remove-qa-database.cmd --output remove-qa-database.cmd
 ```
 3.	Run the script
 
@@ -608,11 +608,11 @@ Windows
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/backup-database.sh --output backup-database.sh && chmod +x backup-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/backup-database.cmd --output backup-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/backup-database.cmd --output backup-database.cmd
 ```
 2. Run the script
 
@@ -632,11 +632,11 @@ Copy the backup file to a save location for long term storage.
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/restore-database.sh  --output restore-database.sh  && chmod +x restore-database.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/restore-database.cmd --output restore-database.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/restore-database.cmd --output restore-database.cmd
 ```
 2. Run the script and provide the name of the backup file as parameter. The backup file should be present in the folder where the script is executed.
 
@@ -655,7 +655,7 @@ The database volume can be copied to a new volume (with a different name) to tak
 1. Download the script
 
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/clone-docker-volume.sh --output clone-docker-volume.sh && chmod +x clone-volume.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/clone-docker-volume.sh --output clone-docker-volume.sh && chmod +x clone-volume.sh
 ```
 
 2. Run the script, provide the source volume as first parameter and the target volume as second parameter.
@@ -671,11 +671,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-vocabulary-update.sh --output start-vocabulary-update.sh && chmod +x start-vocabulary-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-vocabulary-update.sh --output start-vocabulary-update.sh && chmod +x start-vocabulary-update.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-vocabulary-update.cmd --output start-vocabulary-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-vocabulary-update.cmd --output start-vocabulary-update.cmd
 ```
 3.	Run the script
 
@@ -696,11 +696,11 @@ Installation steps:
 
 Linux/MacOS
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-custom-concepts-update.sh --output start-custom-concepts-update.sh && chmod +x start-custom-concepts-update.sh
 ```
 Windows
 ```
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/release/1.10.1/local-installation/separate-scripts/start-custom-concepts-update.cmd --output start-custom-concepts-update.cmd
 ```
 3.	Run the script
 
