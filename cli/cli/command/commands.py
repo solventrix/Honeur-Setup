@@ -2724,7 +2724,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         if admin_password is None:
             admin_password = configuration.get_configuration('feder8.local.datasource.admin-password')
         if host is None:
-            host = configuration.get_configuration('feder8.local.host.name')
+            host = configuration.get_configuration('feder8.local.host.name', required=True)
 
         if security_method is None:
             security_method = configuration.ask('feder8.local.security.security-method')

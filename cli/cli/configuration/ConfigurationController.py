@@ -12,14 +12,18 @@ class ConfigurationController:
         self.question_environment = QuestionaryEnvironment(self.therapeutic_area, current_directory, is_windows, offline_mode)
         self.config_server_environment = ConfigurationServerEnvironment(self.therapeutic_area)
 
-    def get_configuration(self, key: str) -> str:
+    def get_configuration(self, key: str, required=False) -> str:
         response = self.config_server_environment.get_configuration(key)
         if response == '':
-            response = self.ask(key)
+            response = self.ask(key, required=required)
         return response
 
-    def ask(self, key: str):
-        return self.question_environment.get_configuration(key)
+    def ask(self, key: str, required=False):
+        answer = self.question_environment.get_configuration(key)
+        if not required:
+            return answer
+        while not answer or answer.strip() == '':
+            return self.ask(key=key, required=required)
 
     def get_optional_configuration(self, key: str) -> str:
         response = self.config_server_environment.get_configuration(key)
