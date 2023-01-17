@@ -2744,7 +2744,7 @@ def full(ctx, therapeutic_area, email, cli_key, user_password, admin_password, h
         install_feder8_studio = questionary.confirm("Do you want to install Feder8 Studio?").unsafe_ask()
 
         install_disease_explorer = False
-        if install_feder8_studio and therapeutic_area == "HONEUR":
+        if install_feder8_studio and therapeutic_area.lower() == "honeur":
             install_disease_explorer = questionary.confirm("Do you want to install the Disease Explorer app in Feder8 Studio?").unsafe_ask()
 
         install_distributed_analytics = questionary.confirm("Do you want to install distributed analytics?").unsafe_ask()
