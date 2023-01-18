@@ -12,6 +12,10 @@ class ConfigurationController:
         self.question_environment = QuestionaryEnvironment(self.therapeutic_area, current_directory, is_windows, offline_mode)
         self.config_server_environment = ConfigurationServerEnvironment(self.therapeutic_area)
 
+    @staticmethod
+    def is_valid_answer(answer: str):
+        return answer and answer.strip() != ''
+
     def get_configuration(self, key: str, required=False) -> str:
         response = self.config_server_environment.get_configuration(key)
         if response == '':
@@ -20,10 +24,11 @@ class ConfigurationController:
 
     def ask(self, key: str, required=False):
         answer = self.question_environment.get_configuration(key)
-        if not required:
+        if self.is_valid_answer(answer) or not required:
             return answer
-        while not answer or answer.strip() == '':
-            return self.ask(key=key, required=required)
+        while not self.is_valid_answer(answer):
+            answer = self.question_environment.get_configuration(key)
+        return answer
 
     def get_optional_configuration(self, key: str) -> str:
         response = self.config_server_environment.get_configuration(key)
