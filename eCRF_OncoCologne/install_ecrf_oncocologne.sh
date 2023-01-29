@@ -4,7 +4,7 @@ set -e
 REGISTRY=harbor.honeur.org
 SITE=oncocologne
 REPOSITORY=ecrf/${SITE}
-VERSION=0.2
+VERSION=0.2.1
 NETWORK=honeur-net
 DATABASE_NAME=opal
 

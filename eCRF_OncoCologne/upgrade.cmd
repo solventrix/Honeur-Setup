@@ -6,7 +6,7 @@ SET BACKUP_FOLDER=%cd%\backup
 SET REGISTRY=harbor.honeur.org
 SET SITE=oncocologne
 SET REPOSITORY=ecrf/%SITE%
-SET TAG=0.2.1
+SET TAG=0.2.2
 SET NETWORK=honeur-net
 
 

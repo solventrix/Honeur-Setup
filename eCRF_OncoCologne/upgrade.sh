@@ -6,7 +6,7 @@ DATABASE_NAME=opal
 REGISTRY=harbor.honeur.org
 SITE=oncocologne
 REPOSITORY=ecrf/${SITE}
-TAG=0.2.1
+TAG=0.2.2
 NETWORK=honeur-net
 
 
