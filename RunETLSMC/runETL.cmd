@@ -10,7 +10,7 @@ set "db_username=honeur_admin"
 set /p "db_username=DB username [%db_username%]: "
 
 set "db_password="
-set /p "db_password=DB password [%db_password%]: "
+set /p "db_password=DB password: "
 
 set "source_delimiter=,"
 set /p "source_delimiter=Source data delimiter [%source_delimiter%]: "
@@ -111,9 +111,18 @@ set /p "verbosity_level=Output verbosity level [%verbosity_level%]: "
 set "image_tag=current"
 set /p "image_tag=Docker Hub image tag [%image_tag%]: "
 
-set "date_last_export=2022-10-01"
-set /p "date_last_export=Date of last export yyyy-mm-dd [%date_last_export%]: "
+:extraction_date
+set "date_last_export="
+set /p "date_last_export=Date of last export yyyy-mm-dd: "
+IF [%date_last_export%]==[] (
+	echo Please enter the date of the source data export!
+	Timeout /T 2 /NoBreak>nul
+	goto extraction_date
+) ELSE (
+	goto next_step
+)
 
+:next_step
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLSMC/docker-compose.yml --output docker-compose.yml
 
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'data_folder', '%data_folder%' | Set-Content docker-compose.yml"
