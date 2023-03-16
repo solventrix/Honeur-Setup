@@ -76,3 +76,25 @@ curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF
 ./extend_timeout.sh
 ```
 
+### Upgrade eCRF app
+1. Download the upgrade script (**_upgrade_ecrf.cmd_** for Windows or **_upgrade_ecrf.sh_** for Linux/MacOS) by use of the following command:
+
+Windows:
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF_Zaragosa/upgrade_ecrf.cmd --output upgrade_ecrf.cmd
+```
+Linux/MacOS:
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF_Zaragosa/upgrade_ecrf.sh --output upgrade_ecrf.sh && chmod +x upgrade_ecrf.sh
+```
+2. Run the installation script
+
+Windows:
+```
+.\upgrade_ecrf.cmd
+```
+
+Linux/MacOS:
+```
+./upgrade_ecrf.sh
+```
