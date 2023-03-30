@@ -81,4 +81,7 @@ mkdir -p feder8-client-certificates
 mv feder8-client-key.pem feder8-client-certificates/key.pem
 mv feder8-client-cert.pem feder8-client-certificates/cert.pem
 cp -v ca.pem feder8-client-certificates/ca.pem
+chmod +r feder8-client-certificates/key.pem
+#echo "Change ownership of feder8-client-certificates/key.pem (sudo password required)"
+#sudo chown 54321:54321 feder8-client-certificates/key.pem
 echo "Feder8 certificates can be found in $(pwd)/feder8-client-certificates"
