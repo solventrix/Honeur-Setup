@@ -501,6 +501,21 @@ Windows
 .\start-disease-explorer.cmd
 ```
 
+3. Download the data preparation script (**_run-ditran-data-pipeline.sh_** for Linux/MacOS using the following command:
+
+Linux/MacOS
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/run-ditran-data-pipeline.sh --output run-ditran-data-pipeline.sh && chmod +x run-ditran-data-pipeline.sh
+```
+
+4. Run the data preparation script using the following command:
+
+Linux/MacOS
+```
+./run-ditran-data-pipeline.sh
+```
+
+
 ## Post ETL installation steps
 ### Add constraints and indexes
 After the ETL is successfully executed, it’s recommended to add the constraints and indexes to the OMOP CDM tables. It will improve the performance and reduce the risk of corrupt data in the database.
