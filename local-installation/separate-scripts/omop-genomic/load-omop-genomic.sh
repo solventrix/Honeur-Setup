@@ -74,4 +74,6 @@ LOAD_STMT="SET search_path = omopcdm;
           INSERT INTO concept_relationship SELECT * FROM temp_concept_relationship WHERE NOT EXISTS (SELECT 1 FROM concept_relationship WHERE concept_relationship.concept_id_1 = temp_concept_relationship.concept_id_1 and concept_relationship.concept_id_2=temp_concept_relationship.concept_id_2 and concept_relationship.relationship_id=temp_concept_relationship.relationship_id);"
 docker exec -it postgres psql -U postgres -d OHDSI -t -c "$LOAD_STMT"
 
+echo "Cleanup"
 rm -rf omop-genomic-voc
+docker exec -it -u $UID postgres bash -c "rm -rf /tmp/omop-genomic-voc"
