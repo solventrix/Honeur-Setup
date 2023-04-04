@@ -3,10 +3,10 @@ set -e
 
 mkdir -p omop-genomic-voc
 
-Echo "Download OMOP Genomic vocabulary"
+echo "Download OMOP Genomic vocabulary"
 curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/local-installation/separate-scripts/omop-genomic/omop-genomic.zip --output omop-genomic.zip
 
-Echo "Unzip OMOP Genomic vocabulary"
+echo "Unzip OMOP Genomic vocabulary"
 unzip omop-genomic.zip -d omop-genomic-voc
 
 docker cp omop-genomic-voc/ postgres:/tmp
