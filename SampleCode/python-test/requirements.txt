@@ -1,0 +1,5 @@
+requests
+uuid
+sqlalchemy
+pandas
+https://github.com/solventrix/Honeur-Setup/raw/master/pyfeder8/pyfeder8-2.3.tar.gz
