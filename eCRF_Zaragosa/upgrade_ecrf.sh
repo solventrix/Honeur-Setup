@@ -4,7 +4,7 @@ set -e
 REGISTRY=harbor.honeur.org
 SITE=zaragosa
 REPOSITORY=ecrf/${SITE}
-VERSION=0.2.3
+VERSION=0.2.4
 NETWORK=feder8-net
 DATABASE_NAME=postgres
 
