@@ -1,0 +1,10 @@
+docker stop zeppelin
+docker stop atlas
+docker stop webapi
+docker stop feder8-studio
+docker stop task-manager
+docker stop user-mgmt
+docker stop nginx
+docker stop local-portal
+docker stop config-server
+docker stop postgres
