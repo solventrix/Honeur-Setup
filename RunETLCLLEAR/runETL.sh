@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-VERSION=1.0.0
+VERSION=1.1.0
 TAG=$VERSION
 REGISTRY=harbor.honeur.org
 REPOSITORY=etl-cllear
@@ -14,6 +14,8 @@ read -p "DB username [honeur_admin]: " db_username
 db_username=${db_username:-honeur_admin}
 read -p "DB password [honeur_admin]: " db_password
 db_password=${db_password:-honeur_admin}
+read -p "Export date [2023-04-05]: " export_date
+export_date=${export_date:-"2023-04-05"}
 
 docker pull $REGISTRY/$REPOSITORY/etl:$TAG
 
@@ -30,6 +32,7 @@ echo "DB_NAME=OHDSI" >> etl-cllear.env
 echo "DB_USERNAME=$db_username" >> etl-cllear.env
 echo "DB_PASSWORD=$db_password" >> etl-cllear.env
 echo "DATA_FOLDER=/etl/data" >> etl-cllear.env
+echo "EXPORT_DATE=$export_date" >> etl-cllear.env
 
 docker run \
 --rm \
