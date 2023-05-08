@@ -12,4 +12,4 @@ fi
 echo "Update policy file"
 echo -n "" > $CERTIFICATE_FOLDER/policy.json
 echo '{"name":"full-access","users":["", "host"],"actions":[""]}' >> $CERTIFICATE_FOLDER/policy.json
-echo '{"name":"feder8-studio","users":["feder8"],"actions":["container_create","container_inspect","container_list","container_logs","container_start","container_delete","docker_version","image_list","image_create","network_connect","network_disconnect"]}' >> $CERTIFICATE_FOLDER/policy.json
+echo '{"name":"feder8-studio","users":["feder8"],"actions":["container_create","container_inspect","container_list","container_logs","container_start","container_delete","docker_auth","docker_version","image_list","image_create","image_inspect","network_connect","network_disconnect","volume_list","volume_create"]}' >> $CERTIFICATE_FOLDER/policy.json
