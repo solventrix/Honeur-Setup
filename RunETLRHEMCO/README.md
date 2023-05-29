@@ -20,6 +20,7 @@
     * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
     * the tag name for the Docker Hub image
     * the verbosity level [DEBUG, INFO, WARNING, ERROR]
+    * The names of the 3 source files for molecule, hemo, and indiv data
     * the date of last update of the data-export, double-quoted, example: "2021-06-30"
 5. The script will run the ETL code and show the output of the code
 7. The `etl_<datetime>.log` log file will be available in the `log` folder. 
