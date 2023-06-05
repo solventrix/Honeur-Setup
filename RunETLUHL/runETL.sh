@@ -4,7 +4,7 @@ set -ex
 REGISTRY=harbor.honeur.org
 REPOSITORY=library
 IMAGE=etl-runner
-VERSION=1.1.0
+VERSION=1.1.1
 TAG=$VERSION
 
 LOG_FOLDER_HOST=${PWD}/log
