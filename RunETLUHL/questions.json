@@ -1,0 +1,42 @@
+{
+  "questions": [
+    { "question":  "ETL image tag: ",
+      "env-var":  "ETL_IMAGE_TAG",
+      "default-value": "1.3.0"
+    },
+    { "question": "Input Data folder",
+      "env-var": "DATA_FOLDER_HOST"
+    },
+    { "question": "Input Data file",
+      "env-var": "DATA_FILE"
+    },
+    { "question": "Input Data sheet",
+      "env-var": "DATA_SHEET",
+      "default-value": "Sheet1"
+    },
+    { "question": "Source encoding",
+      "env-var": "ENCODING",
+      "default-value": "utf-8"
+    },
+    { "question": "Log folder",
+      "env-var": "LOG_FOLDER_HOST"
+    },
+    { "question": "Log verbosity level",
+      "env-var": "VERBOSITY_LEVEL",
+      "allowed-values": "INFO,DEBUG",
+      "default-value": "INFO"
+    },
+    { "question": "Data quality reports folder",
+      "env-var": "QA_FOLDER_HOST"
+    },
+    {
+      "question": "Date of last export (yyyy-mm-dd)",
+      "env-var": "LAST_DATA_EXPORT",
+      "validation": {
+        "date-format": "%Y-%m-%d",
+        "date-after": "2021-01-01",
+        "date-before": "now"
+      }
+    }
+  ]
+}
