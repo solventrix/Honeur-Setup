@@ -28,13 +28,12 @@ services:
       ETL_FILENAME_DISEASE_HEMATODIAGNOSIS: file_name_disease_hema
       ETL_FILENAME_LAB_DATA_CYTOGENETICS: file_name_lab_cytogenetics
       ETL_FILENAME_LAB_DATA_FISH: file_name_lab_fish
-      ETL_FILENAME_LAB_DATA_TEST_2010_2015: file_name_lab_test_1015
-      ETL_FILENAME_LAB_DATA_TEST_2016_2018: file_name_lab_test_1618
-      ETL_FILENAME_LAB_DATA_TEST_2019_2020: file_name_lab_test_1920
-      ETL_FILENAME_LAB_DATA_TEST_2021_2022: file_name_lab_test_2122
+      ETL_FILENAME_LAB_DATA_TEST: file_name_lab_test
       ETL_FILENAME_TREATMENT_CATO: file_name_treatment_cato
       ETL_FILENAME_TREATMENT_MAP: file_name_treatment_map
       ETL_FILENAME_TREATMENT_MEDICATION: file_name_treatment_medication
+      ETL_FILENAME_BODY_MEAS: file_name_body_meas
+      ETL_FILENAME_IMMUNOFIXATION: file_name_immunofixation
       ETL_ENCODING_DEMOGRAPHICS: encoding_demographics
       ETL_ENCODING_DISEASE_ADMISSION: encoding_disease_admission
       ETL_ENCODING_DISEASE_AMBULATORY: encoding_disease_ambulatory
@@ -43,13 +42,12 @@ services:
       ETL_ENCODING_DISEASE_HEMATODIAGNOSIS: encoding_disease_hema
       ETL_ENCODING_LAB_DATA_FISH: encoding_lab_fish
       ETL_ENCODING_LAB_DATA_CYTOGENETICS: encoding_lab_cytogenetics
-      ETL_ENCODING_LAB_DATA_TEST_2010_2015: encoding_lab_test_1015
-      ETL_ENCODING_LAB_DATA_TEST_2016_2018: encoding_lab_test_1618
-      ETL_ENCODING_LAB_DATA_TEST_2019_2020: encoding_lab_test_1920
-      ETL_ENCODING_LAB_DATA_TEST_2021_2022: encoding_lab_test_2122
+      ETL_ENCODING_LAB_DATA_TEST: encoding_lab_test
       ETL_ENCODING_TREATMENT_CATO: encoding_treatment_cato
       ETL_ENCODING_TREATMENT_MAP: encoding_treatment_map
       ETL_ENCODING_TREATMENT_MEDICATION: encoding_treatment_medication
+      ETL_ENCODING_BODY_MEAS: encoding_body_meas
+      ETL_ENCODING_IMMUNOFIXATION: encoding_immunofixation
 networks:
   honeur-net:
     external:
