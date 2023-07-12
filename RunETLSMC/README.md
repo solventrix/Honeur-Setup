@@ -65,12 +65,11 @@ Please review the log files to confirm that no patient-level information was wri
     disease_hematodiagnosis.csv
     lab_data_cytogenetics.csv
     lab_data_fish.csv
-    lab_data_test2010_2015.csv
-    lab_data_test2016_2018.csv
-    lab_data_test2019_2020.csv
-    lab_data_test2021_2022.csv
+    lab_data_test.csv
     treatment_cato.csv
     treatment_map.csv
     treatment_medication.csv
+    body_measurements.csv
+    immunofixation.csv
 ```
 

@@ -39,17 +39,8 @@ set /p "file_name_lab_cytogenetics=Source file name - lab data cytogenetics [%fi
 set "file_name_lab_fish=lab_data_fish.csv"
 set /p "file_name_lab_fish=Source file name - lab data fish [%file_name_lab_fish%]: "
 
-set "file_name_lab_test_1015=lab_data_test2010_2015.csv"
-set /p "file_name_lab_test_1015=Source file name - lab data test 2010 - 2015 [%file_name_lab_test_1015%]: "
-
-set "file_name_lab_test_1618=lab_data_test2016_2018.csv"
-set /p "file_name_lab_test_1618=Source file name - lab data test 2016 - 2018 [%file_name_lab_test_1618%]: "
-
-set "file_name_lab_test_1920=lab_data_test2019_2020.csv"
-set /p "file_name_lab_test_1920=Source file name - lab data test 2019 - 2020 [%file_name_lab_test_1920%]: "
-
-set "file_name_lab_test_2122=lab_data_test2021_2022.csv"
-set /p "file_name_lab_test_2122=Source file name - lab data test 2021 - 2022 [%file_name_lab_test_2122%]: "
+set "file_name_lab_test=lab_data_test.csv"
+set /p "file_name_lab_test=Source file name - lab data test [%file_name_lab_test%]: "
 
 set "file_name_treatment_cato=treatment_cato.csv"
 set /p "file_name_treatment_cato=Source file name - treatment cato [%file_name_treatment_cato%]: "
@@ -59,6 +50,12 @@ set /p "file_name_treatment_map=Source file name - treatment map [%file_name_tre
 
 set "file_name_treatment_medication=treatment_medication.csv"
 set /p "file_name_treatment_medication=Source file name - treatment medication [%file_name_treatment_medication%]: "
+
+set "file_name_body_meas=body_measurements.csv"
+set /p "file_name_body_meas=Source file name - body measurements [%file_name_body_meas%]: "
+
+set "file_name_immunofixation=immunofixation.csv"
+set /p "file_name_immunofixation=Source file name - immunofixation [%file_name_immunofixation%]: "
 
 set "encoding_demographics=Windows-1255"
 set /p "encoding_demographics=File encoding - demographics [%encoding_demographics%]: "
@@ -84,17 +81,8 @@ set /p "encoding_lab_cytogenetics=File encoding - lab data cytogenetics[%encodin
 set "encoding_lab_fish=Windows-1255"
 set /p "encoding_lab_fish=File encoding - lab data fish [%encoding_lab_fish%]: "
 
-set "encoding_lab_test_1015=Windows-1255"
-set /p "encoding_lab_test_1015=File encoding - lab data test 2010 - 2015 [%encoding_lab_test_1015%]: "
-
-set "encoding_lab_test_1618=Windows-1255"
-set /p "encoding_lab_test_1618=File encoding - lab data test 2016 - 2018 [%encoding_lab_test_1618%]: "
-
-set "encoding_lab_test_1920=Windows-1255"
-set /p "encoding_lab_test_1920=File encoding - lab data test 2019 - 2020 [%encoding_lab_test_1920%]: "
-
-set "encoding_lab_test_2122=Windows-1255"
-set /p "encoding_lab_test_2122=File encoding - lab data test 2021 - 2022 [%encoding_lab_test_2122%]: "
+set "encoding_lab_test=Windows-1255"
+set /p "encoding_lab_test=File encoding - lab data test [%encoding_lab_test%]: "
 
 set "encoding_treatment_cato=Windows-1255"
 set /p "encoding_treatment_cato=File encoding - treatment cato [%encoding_treatment_cato%]: "
@@ -104,6 +92,12 @@ set /p "encoding_treatment_map=File encoding - treatment map [%encoding_treatmen
 
 set "encoding_treatment_medication=Windows-1255"
 set /p "encoding_treatment_medication=File encoding - treatment medication [%encoding_treatment_medication%]: "
+
+set "encoding_body_meas=Windows-1255"
+set /p "encoding_body_meas=File encoding - body measurements [%encoding_body_meas%]: "
+
+set "encoding_immunofixation=Windows-1255"
+set /p "encoding_immunofixation=File encoding - immunofixation [%encoding_immunofixation%]: "
 
 set "verbosity_level=INFO"
 set /p "verbosity_level=Output verbosity level [%verbosity_level%]: "
@@ -138,13 +132,12 @@ powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_disea
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_disease_hema', '%file_name_disease_hema%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_cytogenetics', '%file_name_lab_cytogenetics%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_fish', '%file_name_lab_fish%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_test_1015', '%file_name_lab_test_1015%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_test_1618', '%file_name_lab_test_1618%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_test_1920', '%file_name_lab_test_1920%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_test_2122', '%file_name_lab_test_2122%' | Set-Content docker-compose.yml"
+powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_lab_test', '%file_name_lab_test%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_treatment_cato', '%file_name_treatment_cato%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_treatment_map', '%file_name_treatment_map%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_treatment_medication', '%file_name_treatment_medication%' | Set-Content docker-compose.yml"
+powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_body_meas', '%file_name_body_meas%' | Set-Content docker-compose.yml"
+powershell -Command "(Get-Content docker-compose.yml) -creplace 'file_name_immunofixation', '%file_name_immunofixation%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_demographics', '%encoding_demographics%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_disease_admission', '%encoding_disease_admission%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_disease_ambulatory', '%encoding_disease_ambulatory%' | Set-Content docker-compose.yml"
@@ -153,13 +146,12 @@ powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_diseas
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_disease_hema', '%encoding_disease_hema%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_cytogenetics', '%encoding_lab_cytogenetics%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_fish', '%encoding_lab_fish%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_test_1015', '%encoding_lab_test_1015%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_test_1618', '%encoding_lab_test_1618%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_test_1920', '%encoding_lab_test_1920%' | Set-Content docker-compose.yml"
-powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_test_2122', '%encoding_lab_test_2122%' | Set-Content docker-compose.yml"
+powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_lab_test', '%encoding_lab_test%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_treatment_cato', '%encoding_treatment_cato%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_treatment_map', '%encoding_treatment_map%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_treatment_medication', '%encoding_treatment_medication%' | Set-Content docker-compose.yml"
+powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_body_meas', '%encoding_body_meas%' | Set-Content docker-compose.yml"
+powershell -Command "(Get-Content docker-compose.yml) -creplace 'encoding_immunofixation', '%encoding_immunofixation%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'verbosity_level', '%verbosity_level%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'image_tag', '%image_tag%' | Set-Content docker-compose.yml"
 powershell -Command "(Get-Content docker-compose.yml) -creplace 'date_last_export', '%date_last_export%' | Set-Content docker-compose.yml"
