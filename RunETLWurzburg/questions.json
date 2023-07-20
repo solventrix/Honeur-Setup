@@ -1,0 +1,17 @@
+{
+  "questions": [
+    { "question":  "ETL image name:",
+      "env-var":  "ETL_IMAGE_NAME",
+      "default-value": "etl-wurzburg/etl"
+    },
+    { "question":  "ETL image tag:",
+      "env-var":  "ETL_IMAGE_TAG",
+      "default-value": "latest"
+    },
+    { "question": "Input data folder (host)",
+      "env-var": "DATA_FOLDER_HOST"
+    }
+  ]
+}
+
+
