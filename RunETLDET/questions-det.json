@@ -1,0 +1,23 @@
+{
+  "questions": [
+    { "question":  "ETL version: ",
+      "env-var":  "ETL_IMAGE_TAG",
+      "default-value": "v1.1.1"
+    },
+    { "question":  "Source database server: ",
+      "env-var":  "DB_SRC_SERVER",
+      "default-value": "ecrf-postgres"
+    },
+    { "question":  "Source database schema: ",
+      "env-var":  "DB_SRC_SCHEMA",
+      "default-value": "opal"
+    },
+    { "question":  "Source database username: ",
+      "env-var":  "DB_SRC_USER",
+      "default-value": "postgres"
+    },
+    { "question":  "Source database password: ",
+      "env-var":  "DB_SRC_PASSWORD"
+    }
+    ]
+}
