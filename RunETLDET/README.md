@@ -24,17 +24,17 @@
 2. Create a new directory for the ETL script execution, e.g.:
     * `mkdir etl_det`
     * `cd etl_det`
-2. Download the ETL run script:
+3. Download the ETL run script:
     * Linux/MacOS: `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLDET/runETL.sh --output runETL.sh && chmod +x runETL.sh`
     * Windows: `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLDET/runETL.cmd --output runETL.cmd`
-3. Execute the script by running
+4. Execute the script by running
     * Linux/MacOS: `./runETL.sh`
     * Windows: `.\runETL.cmd`
-4. The script will request input for the 
+5. The script will request input for the 
     * the ETL version 
-    * the source dataase (Opal)
-    * the target database (OMOP CDM)
-5. The script will run the ETL code and show the output of the code
-7. The `etl_<datetime>.log` log file will be available in the `log` folder.
+    * the source database parameters (Opal)
+    * the target database schema (OMOP CDM v5.4)
+6. The script will run the ETL code and show the output of the code
+7. The `etl_<datetime>.log` log file will be available in the `log` folder. The results of the Data Quality Pipeline will be available in the `qa` folder
 
 Please review the log files to confirm that no patient-level information was written out before sharing them.
