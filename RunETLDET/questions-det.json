@@ -8,6 +8,10 @@
       "env-var":  "DB_SRC_SERVER",
       "default-value": "ecrf-postgres"
     },
+    { "question":  "Source database name: ",
+      "env-var":  "DB_SRC_DBNAME",
+      "default-value": "postgres"
+    },
     { "question":  "Source database schema: ",
       "env-var":  "DB_SRC_SCHEMA",
       "default-value": "opal"
@@ -18,6 +22,10 @@
     },
     { "question":  "Source database password: ",
       "env-var":  "DB_SRC_PASSWORD"
+    },
+    { "question":  "Target database schema: ",
+      "env-var":  "DB_OMOP_SCHEMA",
+      "default-value": "omopcdm54"
     }
     ]
 }

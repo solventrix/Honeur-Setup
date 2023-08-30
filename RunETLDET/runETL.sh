@@ -33,7 +33,7 @@ echo "DB_SRC_PORT=5432" >> etl-runner.env
 echo "DB_SRC_SERVER=ecrf-postgres" >> etl-runner.env
 echo "DB_SRC_DBNAME=postgres" >> etl-runner.env
 echo "DB_SRC_SCHEMA=opal" >> etl-runner.env
-echo "RUN_DQD=false" >> etl-runner.env
+echo "RUN_DQD=true" >> etl-runner.env
 
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLDET/questions-det.json --output ${PWD}/questions-det.json
 
