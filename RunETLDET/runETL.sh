@@ -16,8 +16,8 @@ docker pull $REGISTRY/$REPOSITORY/$IMAGE:$TAG
 touch etl-runner.env
 echo "THERAPEUTIC_AREA=honeur" >> etl-runner.env
 echo "REGISTRY=$REGISTRY" >> etl-runner.env
-echo "LOG_LEVEL=DEBUG" >> etl-runner.env
-echo "VERBOSITY_LEVEL=DEBUG" >> etl-runner.env
+echo "LOG_LEVEL=INFO" >> etl-runner.env
+echo "VERBOSITY_LEVEL=INFO" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=/log" >> etl-runner.env
 echo "ETL_IMAGE_NAME=etl-det/etl" >> etl-runner.env
