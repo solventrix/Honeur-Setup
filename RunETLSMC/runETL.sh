@@ -145,7 +145,7 @@ sed -i -e "s/encoding_lab_test/$encoding_lab_test/g" docker-compose.yml
 sed -i -e "s/encoding_treatment_cato/$encoding_treatment_cato/g" docker-compose.yml
 sed -i -e "s/encoding_treatment_map/$encoding_treatment_map/g" docker-compose.yml
 sed -i -e "s/encoding_treatment_medication/$encoding_treatment_medication/g" docker-compose.yml
-sed -i -e "s/encoding_lbody_meas/$encoding_lbody_meas/g" docker-compose.yml
+sed -i -e "s/encoding_body_meas/$encoding_body_meas/g" docker-compose.yml
 sed -i -e "s/encoding_immunofixation/$encoding_immunofixation/g" docker-compose.yml
 
 sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
