@@ -47,6 +47,7 @@ docker volume create static_volume
 SET NETWORK=feder8-net
 
 echo "Connect postgres container to network %NETWORK%"
+docker network create %NETWORK%
 docker network connect %NETWORK% honeur_ecrf_postgres
 docker network disconnect honeur-net honeur_ecrf_postgres
 docker network rm honeur-net
