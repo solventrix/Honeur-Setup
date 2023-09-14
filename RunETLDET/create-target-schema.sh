@@ -5,7 +5,7 @@ echo "Docker login"
 docker login harbor.honeur.org
 
 echo "Initialize new OMOP CDM 5.4 database schema"
-SCHEMA=omopcdm54test
+SCHEMA=omopcdm54
 docker run --rm --name omopcdm-initialize-schema -v shared:/var/lib/shared --env DB_HOST=postgres --env DB_PORT=5432 --env DB_DATABASE_NAME=OHDSI --env DB_OMOPCDM_SCHEMA=$SCHEMA --env FEDER8_ADMIN_USERNAME=feder8_admin --network feder8-net harbor.honeur.org/honeur/postgres-omopcdm-initialize-schema:5.4-2.0.2
 
 echo "Load vocabularies"
