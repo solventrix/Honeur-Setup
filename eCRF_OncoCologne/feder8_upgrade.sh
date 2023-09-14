@@ -35,6 +35,8 @@ POSTGRES_PASSWORD=$POSTGRES_PASSWORD ./backup_ecrf_db.sh
 echo "Stop running eCRF app"
 docker stop honeur_ecrf_app || true
 docker rm honeur_ecrf_app || true
+docker stop ecrf-app || true
+docker rm ecrf-app || true
 
 echo "Stop running NGINX"
 docker stop honeur_ecrf_nginx || true
@@ -42,19 +44,19 @@ docker rm honeur_ecrf_nginx || true
 
 echo "Recreate static volume"
 docker volume rm static_volume || true
-docker volume create static_volume
+docker volume create static_volume || true
 
 NETWORK=feder8-net
 
 echo "Connect postgres container to network %NETWORK%"
 docker network create $NETWORK || true
-docker network connect $NETWORK honeur_ecrf_postgres
-docker network disconnect honeur-net honeur_ecrf_postgres
-docker network rm honeur-net
+docker network connect $NETWORK honeur_ecrf_postgres || true
+docker network disconnect honeur-net honeur_ecrf_postgres || true
+docker network rm honeur-net || true
 
 echo "Install new eCRF app"
 docker pull $REGISTRY/$REPOSITORY/app:$TAG
-docker run -d --name ecrf-app --network $NETWORK --volume static_volume:/code/entrytool/assets --env DJANGO_ROOT_LOG_LEVEL=INFO --env DJANGO_LOG_LEVEL=INFO --env OPAL_SUPER_USER_PASSWORD=$OPAL_SUPER_USER_PASSWORD --env OPAL_DB_USER=postgres --env OPAL_DB_PASSWORD=$POSTGRES_PASSWORD --env OPAL_DB_NAME=$DATABASE_NAME --env OPAL_DB_HOST=honeur_ecrf_postgres --env OPAL_DB_PORT=5432 --env OPAL_FLUSH_DB=false --env OPAL_ENABLE_USER_DB=false --env OPAL_ENABLE_LDAP=false --restart=always $REGISTRY/$REPOSITORY/app:$TAG gunicorn -b 0.0.0.0:8000 --timeout 900 entrytool.wsgi
+docker run -d --name ecrf-app --network $NETWORK --volume static_volume:/code/entrytool/assets --env DJANGO_ROOT_LOG_LEVEL=INFO --env DJANGO_LOG_LEVEL=INFO --env OPAL_SUPER_USER_PASSWORD=$OPAL_SUPER_USER_PASSWORD --env OPAL_DB_USER=postgres --env OPAL_DB_PASSWORD=$POSTGRES_PASSWORD --env OPAL_DB_NAME=$DATABASE_NAME --env OPAL_DB_HOST=ecrf-postgres --env OPAL_DB_PORT=5432 --env OPAL_FLUSH_DB=false --env OPAL_ENABLE_USER_DB=false --env OPAL_ENABLE_LDAP=false --restart=always $REGISTRY/$REPOSITORY/app:$TAG gunicorn -b 0.0.0.0:8000 --timeout 900 entrytool.wsgi
 i=1
 while [[ $i -lt 20 ]] ; do
    printf "."

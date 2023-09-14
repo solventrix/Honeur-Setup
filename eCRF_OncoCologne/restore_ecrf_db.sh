@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
+echo "Stop ecrf app"
+docker stop ecrf-app
+i=1
+while [[ $i -lt 5 ]] ; do
+   printf "."
+   sleep 1
+  (( i += 1 ))
+done
+printf "\n"
+
 DATABASE_NAME=opal
 
 DATABASE_BACKUP_FILE=
@@ -26,9 +36,12 @@ done
 
 echo "Restore database $DATABASE_NAME"
 docker run \
---network="honeur-net" \
+--network="feder8-net" \
 --rm \
 -e DB_NAME=$DATABASE_NAME \
 -e PGPASSWORD=$POSTGRES_PASSWORD \
 -v ${DATABASE_BACKUP_FILE}:/opt/database/backup.dump \
-postgres:13.0-alpine sh -c 'set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_restore --clean -h honeur_ecrf_postgres -U postgres -d ${DB_NAME} /opt/database/backup.dump'
+postgres:13.0-alpine sh -c 'set -e; cd /opt/database; PGPASSWORD=${PGPASSWORD} pg_restore --clean --create -h ecrf-postgres -U postgres -d postgres /opt/database/backup.dump'
+
+echo "Start ecrf app"
+docker start ecrf-app

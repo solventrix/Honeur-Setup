@@ -28,6 +28,23 @@ Linux/MacOS:
 ./install_ecrf_oncocologne.sh
 ```
 
+## Instructions for the initial installation as part of Feder8
+
+The eCRF tool can be installed by downloading and running the installation script.
+
+1. Download the installation script (**_feder8_install.sh_** for Linux) by use of the following command:
+
+Linux:
+```
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/eCRF_OncoCologne/feder8_install.sh --output feder8_install.sh && chmod +x feder8_install.sh
+```
+2. Run the installation script
+
+Linux:
+```
+./feder8_install.sh
+```
+
 ## <a id="upgrade-installation"></a> Instructions for upgrading an existing installation
 To upgrade your existing installation, please follow the steps below.
 
