@@ -27,7 +27,7 @@
       "env-var":  "DB_OMOP_SCHEMA",
       "default-value": "omopcdm"
     },
-    { "question":  "Target database schema: ",
+    { "question":  "Name of center or data set: ",
       "env-var":  "CENTER_SPECIFIC_CODE",
       "default-value": "OncoCologne"
     }
