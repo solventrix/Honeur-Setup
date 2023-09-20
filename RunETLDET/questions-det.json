@@ -10,7 +10,7 @@
     },
     { "question":  "Source database name: ",
       "env-var":  "DB_SRC_DBNAME",
-      "default-value": "postgres"
+      "default-value": "opal"
     },
     { "question":  "Source database schema: ",
       "env-var":  "DB_SRC_SCHEMA",
@@ -25,7 +25,11 @@
     },
     { "question":  "Target database schema: ",
       "env-var":  "DB_OMOP_SCHEMA",
-      "default-value": "omopcdm54"
+      "default-value": "omopcdm"
+    },
+    { "question":  "Target database schema: ",
+      "env-var":  "CENTER_SPECIFIC_CODE",
+      "default-value": "OncoCologne"
     }
     ]
 }
