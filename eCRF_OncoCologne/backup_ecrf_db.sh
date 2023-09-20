@@ -4,6 +4,7 @@ set -e
 DATABASE_NAME=opal
 BACKUP_FOLDER=${PWD}/backup
 NETWORK=feder8-net
+POSTGRES_HOSTNAME=ecrf-postgres
 
 if [[ "$POSTGRES_PASSWORD" == "" ]]
 then
@@ -25,8 +26,9 @@ create_db_dump () {
   --rm \
   -e DB_NAME=$DB_NAME \
   -e PGPASSWORD=$PGPASSWORD \
+  -e POSTGRES_HOSTNAME=$POSTGRES_HOSTNAME \
   -v ${BACKUP_FOLDER}:/opt/database \
-  postgres:13.0-alpine sh -c 'set -e; cd /opt/database; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); PGPASSWORD=${PGPASSWORD} pg_dump --clean --create -h ecrf-postgres -U postgres -Fc ${DB_NAME} > /opt/database/${DB_NAME}_${CURRENT_TIME}.dump'
+  postgres:13.0-alpine sh -c 'set -e; cd /opt/database; export CURRENT_TIME=$(date "+%Y-%m-%d_%H-%M-%S"); PGPASSWORD=${PGPASSWORD} pg_dump --clean --create -h ${POSTGRES_HOSTNAME} -U postgres -Fc ${DB_NAME} > /opt/database/${DB_NAME}_${CURRENT_TIME}.dump'
 }
 
 create_db_dump $DATABASE_NAME $POSTGRES_PASSWORD
