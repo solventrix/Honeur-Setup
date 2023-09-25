@@ -10,6 +10,8 @@ DATA_FOLDER_HOST=${PWD}/data
 DATA_FOLDER=/script/etl/data
 QA_FOLDER_HOST=${PWD}/qa
 QA_FOLDER_ETL=/script/etl/wurzburg/reports
+LOG_FOLDER_HOST=${PWD}/log
+LOG_FOLDER_ETL=/script/etl/wurzburg/log
 
 echo "Download questions for ETL"
 curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLWurzburg/questions.json --output questions.json
@@ -29,6 +31,8 @@ echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
 echo "DATA_FOLDER=$DATA_FOLDER" >> etl-runner.env
 echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
 echo "QA_FOLDER_ETL=$QA_FOLDER_ETL" >> etl-runner.env
+echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
+echo "LOG_FOLDER=$LOG_FOLDER_ETL" >> etl-runner.env
 echo "RUN_DQD=false" >> etl-runner.env
 
 echo "Run ETL"
