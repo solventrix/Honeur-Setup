@@ -34,6 +34,7 @@ echo "QA_FOLDER_ETL=$QA_FOLDER_ETL" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=$LOG_FOLDER_ETL" >> etl-runner.env
 echo "RUN_DQD=true" >> etl-runner.env
+echo "CDM_VERSION=5.4" >> etl-runner.env
 
 echo "Run ETL"
 docker run \
