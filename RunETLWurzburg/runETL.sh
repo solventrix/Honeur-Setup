@@ -33,7 +33,7 @@ echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
 echo "QA_FOLDER_ETL=$QA_FOLDER_ETL" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=$LOG_FOLDER_ETL" >> etl-runner.env
-echo "RUN_DQD=false" >> etl-runner.env
+echo "RUN_DQD=true" >> etl-runner.env
 
 echo "Run ETL"
 docker run \
@@ -51,4 +51,4 @@ rm -rf etl-runner.env
 echo "ETL run finished"
 
 echo "Set correct permissions on new database schema's"
-docker exec -it postgres psql -U postgres -d OHDSI -c "REASSIGN OWNED BY feder8_admin TO ohdsi_admin;REASSIGN OWNED BY ohdsi_app_user TO ohdsi_app;"
+docker exec -it postgres psql -U postgres -d OHDSI -c "REASSIGN OWNED BY feder8_admin TO ohdsi_admin;REASSIGN OWNED BY ohdsi_app_user TO ohdsi_app;grant usage on schema wurzburg_final to ohdsi_app;GRANT SELECT ON ALL TABLES IN SCHEMA wurzburg_final TO ohdsi_app;"
