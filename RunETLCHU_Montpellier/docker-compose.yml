@@ -28,4 +28,4 @@ services:
 networks:
   honeur_honeur-net:
     external:
-      name: honeur-net
+      name: feder8-net
