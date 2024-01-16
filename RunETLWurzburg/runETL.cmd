@@ -27,4 +27,5 @@ echo "ETL run finished"
 
 echo "Set correct permissions on new database schema's"
 docker exec -it postgres psql -U postgres -d OHDSI -c "REASSIGN OWNED BY feder8_admin TO ohdsi_admin;REASSIGN OWNED BY ohdsi_app_user TO ohdsi_app;grant usage on schema wurzburg_final to ohdsi_app;GRANT SELECT ON ALL TABLES IN SCHEMA wurzburg_final TO ohdsi_app;"
+docker exec -it postgres psql -U postgres -d OHDSI -c "GRANT USAGE ON SCHEMA wurzburg_cdm TO ohdsi_app;GRANT SELECT ON ALL TABLES IN SCHEMA wurzburg_cdm TO ohdsi_app;GRANT USAGE ON SCHEMA wurzburg_src TO ohdsi_app;GRANT SELECT ON ALL TABLES IN SCHEMA wurzburg_src TO ohdsi_app;"
 
