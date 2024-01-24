@@ -4,7 +4,7 @@
 1. The local installation for HONEUR is installed and running
 2. The user has access to the HONEUR Harbor repository for DiTrAn
 3. DiTrAn is installed
-   1. If DiTrAn is not yet installed, follow the instructions [here](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/separate-scripts#ditran)
+   1. If DiTrAn is not yet installed, follow the instructions <a href="https://github.com/solventrix/Honeur-Setup/tree/master/local-installation/separate-scripts#ditran" target="_blank">here</a>
 
 ## Execution steps
 1. Open a terminal window
