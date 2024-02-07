@@ -1,6 +1,6 @@
 @ECHO off
 
-SET VERSION=1.1.7
+SET VERSION=1.1.9
 SET TAG=$VERSION
 SET REGISTRY=harbor.honeur.org
 SET REPOSITORY=honeur-restricted

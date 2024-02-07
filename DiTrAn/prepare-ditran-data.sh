@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-VERSION=1.1.7
+VERSION=1.1.9
 TAG=$VERSION
 REGISTRY=harbor.honeur.org
 REPOSITORY=honeur-restricted
