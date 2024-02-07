@@ -4,7 +4,7 @@ set -ex
 REGISTRY=harbor.honeur.org
 REPOSITORY=distributed-analytics
 IMAGE=data-quality-pipeline
-VERSION=1.4.0
+VERSION=1.6
 TAG=$VERSION
 
 QA_FOLDER_HOST=${PWD}/qa

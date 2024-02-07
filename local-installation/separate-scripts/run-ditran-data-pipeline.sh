@@ -4,7 +4,7 @@ set -ex
 REGISTRY=harbor.honeur.org
 REPOSITORY=honeur-restricted
 IMAGE=disease-explorer-data-preparation
-VERSION=1.1.3
+VERSION=1.1.9
 TAG=$VERSION
 
 echo "Analysis table is present in the following schema:"
