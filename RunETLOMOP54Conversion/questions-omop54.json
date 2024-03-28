@@ -2,7 +2,7 @@
   "questions": [
     { "question":  "ETL version: ",
       "env-var":  "ETL_IMAGE_TAG",
-      "default-value": "v1.2"
+      "default-value": "v1.2.3"
     },
     { "question":  "Vocabulary schema: ",
       "env-var":  "SRC_VOCAB_DB_SCHEMA",
