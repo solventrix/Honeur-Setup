@@ -17,6 +17,27 @@
    * Windows:
      ```upgrade-ditran.cmd```
 
+
+# How to create the analysis table
+
+## Prerequisites
+1. The local installation for HONEUR is installed and running
+2. The user has access to the HONEUR Harbor repository 
+
+## Execution steps
+1. Open a terminal window
+2. Download the 'generate-analysis-table' script:
+    * Linux:
+      ```curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/DiTrAn/generate-analysis-table.sh --output generate-analysis-table.sh  && chmod +x generate-analysis-table.sh```
+    * Windows:
+      ```curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/DiTrAn/generate-analysis-table.cmd --output generate-analysis-table.cmd```
+3. Execute the script (from the directory where the script is downloaded)
+    * Linux:
+      ```./generate-analysis-table.sh```
+    * Windows:
+      ```generate-analysis-table.cmd```
+4. The script will create the analysis table in the results schema and show the output of the code
+
 # How to execute the DiTrAn data pipeline
 
 ## Prerequisites
@@ -38,4 +59,3 @@
     * Windows:
       ```prepare-ditran-data.cmd```
 4. The script will run the DiTrAn Data Pipeline and show the output of the code
-
