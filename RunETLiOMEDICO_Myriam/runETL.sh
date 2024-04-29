@@ -1,30 +1,46 @@
-if [ $(docker ps --filter "name=etl" | grep -w 'etl' | wc -l) = 1 ]; then
-  docker stop -t 1 etl && docker rm etl;
-fi
+#!/usr/bin/env bash
+set -ex
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLiOMEDICO_Myriam/docker-compose.yml --output docker-compose.yml
+REGISTRY=harbor.honeur.org
+REPOSITORY=library
+IMAGE=etl-runner
+VERSION=1.1.2
+TAG=$VERSION
 
-read -p "Input Data folder [./data]: " data_folder
-data_folder=${data_folder:-./data}
-read -p "DB username [honeur_admin]: " db_username
-db_username=${db_username:-honeur_admin}
-read -p "DB password [honeur_admin]: " db_password
-db_password=${db_password:-honeur_admin}
-read -p "Output verbosity level [INFO]: " verbosity_level
-verbosity_level=${verbosity_level:-INFO}
-read -p "Docker Hub image tag [current]: " image_tag
-image_tag=${image_tag:-current}
-until read -r -p "Date of last export yyyy-mm-dd: " date_last_export && test "$date_last_export" != ""; do
-  continue
-done
+DATA_FOLDER_HOST=${PWD}/data
+LOG_FOLDER_HOST=${PWD}/log
+QA_FOLDER_HOST=${PWD}/qa
 
-sed -i -e "s@data_folder@$data_folder@g" docker-compose.yml
-sed -i -e "s/db_username/$db_username/g" docker-compose.yml
-sed -i -e "s/db_password/$db_password/g" docker-compose.yml
-sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
-sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
-sed -i -e "s/date_last_export/$date_last_export/g" docker-compose.yml
+echo "Pull ETL runner image"
+docker pull $REGISTRY/$REPOSITORY/$IMAGE:$TAG
 
-docker login harbor.honeur.org
-docker-compose pull
-docker-compose run --rm --name etl etl
+echo "Download ETL questions"
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLiOMEDICO_Myriam/questions.json --output questions.json
+
+touch etl-runner.env
+echo "THERAPEUTIC_AREA=honeur" >> etl-runner.env
+echo "REGISTRY=$REGISTRY" >> etl-runner.env
+echo "VERBOSITY_LEVEL=INFO" >> etl-runner.env
+echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
+echo "LOG_FOLDER=/log" >> etl-runner.env
+echo "ETL_IMAGE_NAME=etl-iomedico-myriam/etl" >> etl-runner.env
+echo "ETL_IMAGE_TAG=current" >> etl-runner.env
+echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
+echo "DATA_FOLDER=/data" >> etl-runner.env
+echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
+echo "RUN_DQD=true" >> etl-runner.env
+echo "SCRIPT_UUID=9719aeb1-84c4-49c5-a2a1-c6ea3af00305" >> etl-runner.env
+
+echo "Run ETL"
+docker run \
+-it \
+--rm \
+--name etl-runner \
+--env-file etl-runner.env \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v ${PWD}/questions.json:/script/questions.json \
+--network feder8-net \
+$REGISTRY/$REPOSITORY/$IMAGE:$TAG
+
+echo "End of ETL run"
+rm -rf etl-runner.env

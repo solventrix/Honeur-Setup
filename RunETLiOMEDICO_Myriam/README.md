@@ -17,7 +17,6 @@
 3. Execute the `runETL.sh` script by running `./runETL.sh` from inside the directory where the script is located.
 4. The script will request for:
     * the path to the folder that contains the input CSV data files
-    * the username and password to connect to the OMOP CDM database (a running Docker container named `postgres`)
     * the tag name for the Docker Hub image
     * the verbosity level [DEBUG, INFO, WARNING, ERROR]
     * the date of last update of the data-export, double-quoted, example: "2021-06-30"
