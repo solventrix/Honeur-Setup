@@ -1,12 +1,12 @@
 @ECHO off
 
 SET VERSION=1.1.9
-SET TAG=$VERSION
+SET TAG=%VERSION%
 SET REGISTRY=harbor.honeur.org
 SET REPOSITORY=honeur-restricted
 SET IMAGE=disease-explorer-data-preparation
 
-echo "Docker login at $REGISTRY"
+echo "Docker login at %REGISTRY%"
 docker login %REGISTRY%
 
 echo "Pull image"
