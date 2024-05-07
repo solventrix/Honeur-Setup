@@ -17,6 +17,7 @@ touch data-quality-pipeline.env
 echo "REGISTRY=$REGISTRY" >> data-quality-pipeline.env
 echo "THERAPEUTIC_AREA=honeur" >> data-quality-pipeline.env
 echo "INDICATION=mm" >> data-quality-pipeline.env
+echo "CDM_VERSION=5.4"  >> data-quality-pipeline.env
 echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> data-quality-pipeline.env
 echo "SCRIPT_UUID=5ebd99bd-4a1e-4d3e-93f0-706637951091" >> data-quality-pipeline.env
 
