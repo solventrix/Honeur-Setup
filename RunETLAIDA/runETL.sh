@@ -15,23 +15,24 @@ echo "Pull ETL runner image"
 docker pull $REGISTRY/$REPOSITORY/$IMAGE:$TAG
 
 echo "Download ETL questions"
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/features/AEKR-2115/RunETLAIDA/questions.json --output questions.json
+#curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLAIDA/questions.json --output questions.json
 
 touch etl-runner.env
 echo "THERAPEUTIC_AREA=honeur" >> etl-runner.env
 echo "REGISTRY=$REGISTRY" >> etl-runner.env
-echo "LOG_LEVEL=$VERBOSITY_LEVEL" >> etl-runner.env
+echo "LOG_LEVEL=INFO" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=/var/log" >> etl-runner.env
 echo "ETL_IMAGE_NAME=etl-aida/etl" >> etl-runner.env
-echo "ETL_IMAGE_TAG=$ETL_IMAGE_TAG" >> etl-runner.env
+echo "ETL_IMAGE_TAG=current" >> etl-runner.env
 echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
-echo "DATA_FOLDER=/etl/data" >> etl-runner.env
-echo "DATA_FILE=$DATA_FILE" >> etl-runner.env
+echo "DATA_FOLDER=/data" >> etl-runner.env
+echo "DATA_FILE=aida_data.csv" >> etl-runner.env
 echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
-echo "CDM_SCHEMA=$CDM_SCHEMA" >> etl-runner.env
-echo "VOCAB_SCHEMA=$VOCAB_SCHEMA" >> etl-runner.env
-echo "RESULTS_SCHEMA=$RESULTS_SCHEMA" >> etl-runner.env
+echo "CDM_SCHEMA=omopcdm_aida" >> etl-runner.env
+echo "VOCAB_SCHEMA=omopcdm_aida" >> etl-runner.env
+echo "RESULTS_SCHEMA=results_aida" >> etl-runner.env
+echo "DELIMITER=," >> etl-runner.env
 
 echo "Run ETL"
 docker run \
