@@ -33,6 +33,7 @@ echo "CDM_SCHEMA=omopcdm_aida" >> etl-runner.env
 echo "VOCAB_SCHEMA=omopcdm_aida" >> etl-runner.env
 echo "RESULTS_SCHEMA=results_aida" >> etl-runner.env
 echo "DELIMITER=," >> etl-runner.env
+echo "RUN_DQD=yes" >> etl-runner.env
 
 echo "Run ETL"
 docker run \

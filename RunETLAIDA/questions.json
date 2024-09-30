@@ -38,6 +38,10 @@
       "allowed-values": "INFO,DEBUG",
       "default-value": "INFO"
     },
+    { "question": "Run Data quality pipeline: ",
+      "env-var": "RUN_DQD",
+      "allowed-values": "yes,no"
+    },
     { "question": "Data quality reports folder: ",
       "env-var": "QA_FOLDER_HOST"
     },
