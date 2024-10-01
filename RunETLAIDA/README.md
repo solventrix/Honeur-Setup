@@ -1,4 +1,4 @@
-# How to execute the ETL for UHL
+# How to execute the ETL for AIDA
 
 ## Prerequisites
 1. Docker is installed 
@@ -10,7 +10,7 @@
     * `curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLAIDA/runETL.sh --output runETL.sh && chmod +x runETL.sh`
 3. Execute the 'runETL.sh' script
 4. The script will request for:
-    * the folder, filename and sheet of the Excel input file containing the raw data
+    * the folder and filename the CSV input file containing the raw data
 5. The script will run the ETL code and show the output of the code
 6. The log file will be available in a 'logs' folder
 
