@@ -12,6 +12,7 @@ echo "DB_HOST=postgres" >> omopcdm-initialize-schema.env
 echo "DB_PORT=5432" >> omopcdm-initialize-schema.env
 echo "DB_DATABASE_NAME=OHDSI" >> omopcdm-initialize-schema.env
 echo "DB_OMOPCDM_SCHEMA=$SCHEMA" >> omopcdm-initialize-schema.env
+echo "FEDER8_ADMIN_USERNAME=feder8_admin" >> omopcdm-initialize-schema.env
 
 docker run \
 --rm \
