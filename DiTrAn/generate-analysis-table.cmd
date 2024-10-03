@@ -3,7 +3,7 @@
 SET REGISTRY=harbor.honeur.org
 SET REPOSITORY=distributed-analytics
 SET IMAGE=analysis-table-generator
-SET VERSION=1.1.7
+SET VERSION=1.1.10
 SET TAG=%VERSION%
 
 docker pull %REGISTRY%/%REPOSITORY%/%IMAGE%:%TAG%
