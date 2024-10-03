@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -ex
 
+echo "Dropping PK from cost table before running the ETL"
+docker exec -it postgres psql -U postgres -d OHDSI -c "ALTER TABLE omopcdm.cost DROP CONSTRAINT IF EXISTS xpk_visit_cost;ALTER TABLE omopcdm.cost DROP CONSTRAINT IF EXISTS xpk_cost;"
+
 REGISTRY=harbor.honeur.org
 REPOSITORY=library
 IMAGE=etl-runner
