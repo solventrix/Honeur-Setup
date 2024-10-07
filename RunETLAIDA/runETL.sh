@@ -15,7 +15,7 @@ echo "Pull ETL runner image"
 docker pull $REGISTRY/$REPOSITORY/$IMAGE:$TAG
 
 echo "Download ETL questions"
-#curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLAIDA/questions.json --output questions.json
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLAIDA/questions.json --output questions.json
 
 touch etl-runner.env
 echo "THERAPEUTIC_AREA=honeur" >> etl-runner.env
