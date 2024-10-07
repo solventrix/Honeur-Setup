@@ -15,7 +15,7 @@ echo "Pull ETL runner image"
 docker pull $REGISTRY/$REPOSITORY/$IMAGE:$TAG
 
 echo "Download ETL questions"
-curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLAIDA/questions.json --output questions.json
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLAIDA/questions.json --output ${PWD}/questions.json
 
 touch etl-runner.env
 echo "THERAPEUTIC_AREA=honeur" >> etl-runner.env
@@ -33,7 +33,7 @@ echo "CDM_SCHEMA=omopcdm_aida" >> etl-runner.env
 echo "VOCAB_SCHEMA=omopcdm_aida" >> etl-runner.env
 echo "RESULTS_SCHEMA=results_aida" >> etl-runner.env
 echo "DELIMITER=," >> etl-runner.env
-echo "RUN_DQD=yes" >> etl-runner.env
+echo "RUN_DQD=no" >> etl-runner.env
 
 echo "Run ETL"
 docker run \
