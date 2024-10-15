@@ -1,0 +1,48 @@
+{
+  "questions": [
+    { "question":  "ETL image tag: ",
+      "env-var":  "ETL_IMAGE_TAG",
+      "default-value": "current"
+    },
+    { "question": "Source data folder",
+      "env-var": "DATA_FOLDER_HOST"
+    },
+    { "question": "Source data files",
+      "env-var": "FILENAME",
+      "default-value": "1_rhemco_21_tt_molecule_1980_2020.txt:rhemco_21_hemo_1980_2020.txt:rhemco_21_indiv_1980_2020.txt"
+    },
+    { "question": "Log folder",
+      "env-var": "LOG_FOLDER_HOST"
+    },
+    { "question": "Log verbosity level",
+      "env-var": "VERBOSITY_LEVEL",
+      "allowed-values": "INFO,DEBUG",
+      "default-value": "INFO"
+    },
+    { "question": "Data quality reports folder",
+      "env-var": "QA_FOLDER_HOST"
+    },
+    {
+      "question": "Date of last export (yyyy-mm-dd)",
+      "env-var": "LAST_DATA_EXPORT",
+      "validation": {
+        "date-format": "%Y-%m-%d",
+        "date-after": "2021-01-01",
+        "date-before": "now"
+      }
+    },
+    {
+      "question": "Date of last follow-up (yyyy-mm-dd)",
+      "env-var": "DATE_OF_LAST_OBSERVATION",
+      "validation": {
+        "date-format": "%Y-%m-%d",
+        "date-after": "2022-01-01",
+        "date-before": "now"
+      }
+    },
+    { "question": "Run Data quality pipeline: ",
+      "env-var": "RUN_DQD",
+      "allowed-values": "yes,no"
+    }
+  ]
+}

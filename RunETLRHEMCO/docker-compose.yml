@@ -18,6 +18,7 @@ services:
       DB_PASSWORD: db_password
       FILENAME: "file_names"
       LAST_DATA_EXPORT: "date_last_export"
+      DATE_OF_LAST_OBSERVATION: "date_last_observation"
       VERBOSITY_LEVEL: verbosity_level
 
 networks:

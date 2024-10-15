@@ -1,38 +1,47 @@
-if [ $(docker ps --filter "name=etl" | grep -w 'etl' | wc -l) = 1 ]; then
-  docker stop -t 1 etl && docker rm etl;
-fi
+#!/usr/bin/env bash
+set -ex
 
-curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLRHEMCO/docker-compose.yml --output docker-compose.yml
+REGISTRY=harbor.honeur.org
+REPOSITORY=library
+IMAGE=etl-runner
+VERSION=1.1.3
+TAG=$VERSION
 
-read -p "Input Data folder [./data]: " data_folder
-data_folder=${data_folder:-./data}
-read -p "DB username [honeur_admin]: " db_username
-db_username=${db_username:-honeur_admin}
-read -p "DB password [honeur_admin]: " db_password
-db_password=${db_password:-honeur_admin}
-read -p "Output verbosity level [INFO]: " verbosity_level
-verbosity_level=${verbosity_level:-INFO}
-read -p "Docker Hub image tag [current]: " image_tag
-image_tag=${image_tag:-current}
-read -p "Molecule source file name [1_rhemco_21_tt_molecule_1980_2020.txt]: " mol_file
-mol_file=${mol_file:-1_rhemco_21_tt_molecule_1980_2020.txt}
-read -p "Hemo source file name [rhemco_21_hemo_1980_2020.txt]: " hemo_file
-hemo_file=${hemo_file:-rhemco_21_hemo_1980_2020.txt}
-read -p "Indiv source file name [rhemco_21_indiv_1980_2020.txt]: " indiv_file
-indiv_file=${indiv_file:-rhemco_21_indiv_1980_2020.txt}
-file_names="${mol_file}:${hemo_file}:${indiv_file}"
-until read -r -p "Date of last export yyyy-mm-dd: " date_last_export && test "$date_last_export" != ""; do
-  continue
-done
+DATA_FOLDER_HOST=${PWD}/data
+LOG_FOLDER_HOST=${PWD}/log
+QA_FOLDER_HOST=${PWD}/qa
 
-sed -i -e "s@data_folder@$data_folder@g" docker-compose.yml
-sed -i -e "s/db_username/$db_username/g" docker-compose.yml
-sed -i -e "s/db_password/$db_password/g" docker-compose.yml
-sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
-sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
-sed -i -e "s@file_names@$file_names@g" docker-compose.yml
-sed -i -e "s@date_last_export@$date_last_export@g" docker-compose.yml
+echo "Pull ETL runner image"
+docker pull $REGISTRY/$REPOSITORY/$IMAGE:$TAG
 
-docker login harbor.honeur.org
-docker-compose pull
-docker-compose run --rm --name etl etl
+echo "Download ETL questions"
+curl -fsSL https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLRHEMCO/questions.json --output questions.json
+
+touch etl-runner.env
+echo "THERAPEUTIC_AREA=honeur" >> etl-runner.env
+echo "REGISTRY=$REGISTRY" >> etl-runner.env
+echo "LOG_LEVEL=INFO" >> etl-runner.env
+echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
+echo "LOG_FOLDER=/log" >> etl-runner.env
+echo "ETL_IMAGE_NAME=etl-rhemco/etl" >> etl-runner.env
+echo "ETL_IMAGE_TAG=current" >> etl-runner.env
+echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
+echo "DATA_FOLDER=/data" >> etl-runner.env
+echo "DATA_FILE=Honeur data 180922 UHL MG.xlsx" >> etl-runner.env
+echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
+echo "RUN_DQD=yes" >> etl-runner.env
+echo "SCRIPT_UUID=30220b6a-a1c2-4e72-8ad3-f0873f53908b" >> etl-runner.env
+
+echo "Run ETL"
+docker run \
+-it \
+--rm \
+--name etl-runner \
+--env-file etl-runner.env \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v ${PWD}/questions.json:/script/questions.json \
+--network feder8-net \
+$REGISTRY/$REPOSITORY/$IMAGE:$TAG
+
+echo "End of ETL run"
+rm -rf etl-runner.env
