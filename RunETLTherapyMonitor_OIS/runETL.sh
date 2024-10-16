@@ -8,10 +8,10 @@ read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}
 read -p "Filename [TM_MM_DE_OIS_OMOP_Testdata.csv]: " filename
 filename=${filename:-TM_MM_DE_OIS_OMOP_Testdata.csv}
-read -p "DB username [honeur_admin]: " db_username
-db_username=${db_username:-honeur_admin}
-read -p "DB password [honeur_admin]: " db_password
-db_password=${db_password:-honeur_admin}
+read -p "DB username [feder8_admin]: " db_username
+db_username=${db_username:-feder8_admin}
+read -p "DB password [feder8_admin]: " db_password
+db_password=${db_password:-feder8_admin}
 read -p "Output verbosity level [INFO]: " verbosity_level
 verbosity_level=${verbosity_level:-INFO}
 read -p "Docker Hub image tag [current]: " image_tag
@@ -25,5 +25,6 @@ sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 sed -i -e "s/filename/$filename/g" docker-compose.yml
 
 docker login harbor.honeur.org
-docker-compose pull
-docker-compose run --rm --name etl etl
+docker exec -it postgres psql -U postgres -d OHDSI -c "ALTER TABLE omopcdm.cost DROP CONSTRAINT IF EXISTS xpk_visit_cost;ALTER TABLE omopcdm.cost DROP CONSTRAINT IF EXISTS xpk_cost;"
+docker compose pull
+docker compose run --rm -d --name etl etl
