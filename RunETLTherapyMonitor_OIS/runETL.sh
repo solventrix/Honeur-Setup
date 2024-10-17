@@ -24,6 +24,14 @@ sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
 sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 sed -i -e "s/filename/$filename/g" docker-compose.yml
 
+
+docker exec -it postgres psql -U postgres -d OHDSI -c "
+ALTER TABLE omopcdm.cost DROP CONSTRAINT IF EXISTS xpk_visit_cost;
+ALTER TABLE omopcdm.cost DROP CONSTRAINT IF EXISTS xpk_cost;
+ALTER TABLE omopcdm.cohort_definition ADD CONSTRAINT xpk_cohort_definition PRIMARY KEY (cohort_definition_id);
+ALTER TABLE omopcdm.attribute_definition ADD CONSTRAINT xpk_attribute_definition PRIMARY KEY (attribute_definition_id);
+"
+
 docker login harbor.honeur.org
 docker-compose pull
 docker-compose run --rm --name etl etl
