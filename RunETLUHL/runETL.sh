@@ -4,7 +4,7 @@ set -ex
 REGISTRY=harbor.honeur.org
 REPOSITORY=library
 IMAGE=etl-runner
-VERSION=1.1.2
+VERSION=1.1.3
 TAG=$VERSION
 
 DATA_FOLDER_HOST=${PWD}/data
@@ -24,7 +24,7 @@ echo "LOG_LEVEL=INFO" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=/var/log" >> etl-runner.env
 echo "ETL_IMAGE_NAME=etl-uhl/etl" >> etl-runner.env
-echo "ETL_IMAGE_TAG=1.3.0" >> etl-runner.env
+echo "ETL_IMAGE_TAG=1.3.1" >> etl-runner.env
 echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
 echo "DATA_FOLDER=/etl/data" >> etl-runner.env
 echo "DATA_FILE=Honeur data 180922 UHL MG.xlsx" >> etl-runner.env
