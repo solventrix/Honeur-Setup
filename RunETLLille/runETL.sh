@@ -17,6 +17,8 @@ read -p "Source encoding [\"utf-8\"]: " source_encoding
 source_encoding=${source_encoding:-\"utf-8\"}
 read -p "Output verbosity level [INFO]: " verbosity_level
 verbosity_level=${verbosity_level:-INFO}
+read -p "Display all unmapped drugs: " unmapped_drugs
+unmapped_drugs=${unmapped_drugs:-False}
 read -p "Docker Hub image tag [current]: " image_tag
 image_tag=${image_tag:-current}
 until read -r -p "Date of last export yyyy-mm-dd: " date_last_export && test "$date_last_export" != ""; do
@@ -32,6 +34,7 @@ sed -i -e "s/source_encoding/$source_encoding/g" docker-compose.yml
 sed -i -e "s/verbosity_level/$verbosity_level/g" docker-compose.yml
 sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 sed -i -e "s/date_last_export/$date_last_export/g" docker-compose.yml
+sed -i -e "s/unmapped_drugs/$unmapped_drugs/g" docker-compose.yml
 
 docker login harbor.honeur.org
 docker-compose pull
