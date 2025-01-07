@@ -20,6 +20,7 @@ services:
       VERBOSITY_LEVEL: verbosity_level
       DELIMITER: source_delimiter
       ENCODING: source_encoding
+      ALL_UNMAPPED_DRUGS: all_unmapped_drugs
 
 networks:
   honeur-net:
