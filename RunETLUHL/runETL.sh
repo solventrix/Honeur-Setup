@@ -24,21 +24,19 @@ echo "LOG_LEVEL=INFO" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=/var/log" >> etl-runner.env
 echo "ETL_IMAGE_NAME=etl-uhl/etl" >> etl-runner.env
-echo "ETL_IMAGE_TAG=1.3.1" >> etl-runner.env
+echo "ETL_IMAGE_TAG=1.4.0" >> etl-runner.env
 echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
 echo "DATA_FOLDER=/etl/data" >> etl-runner.env
-echo "DATA_FILE=Honeur data 180922 UHL MG.xlsx" >> etl-runner.env
+echo "DATA_FILE=UHL_src_2024-11-24.xlsx" >> etl-runner.env
+echo "SOURCE_RELEASE_DATE=2024-11-24" >> etl-runner.env
 echo "DATA_SHEET=Sheet1" >> etl-runner.env
 echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
+echo "RUN_DQD=false" >> etl-runner.env
 #echo "SCRIPT_UUID=9719aeb1-84c4-49c5-a2a1-c6ea3af00305" >> etl-runner.env
-#echo "LAST_DATA_EXPORT=" >> etl-runner.env
 #echo "DATA_SET=" >> etl-runner.env
 
 echo "Run ETL"
-docker run \
--it \
---rm \
---name etl-runner \
+docker run -it --rm --name etl-runner \
 --env-file etl-runner.env \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v ${PWD}/questions.json:/script/questions.json \
