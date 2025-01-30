@@ -2,7 +2,7 @@
 set -ex
 
 IMAGE=etl-runner
-VERSION=1.1.2
+VERSION=1.1.3
 TAG=$VERSION
 REGISTRY=harbor.honeur.org
 REPOSITORY=library
@@ -33,9 +33,9 @@ echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
 echo "QA_FOLDER_ETL=$QA_FOLDER_ETL" >> etl-runner.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> etl-runner.env
 echo "LOG_FOLDER=$LOG_FOLDER_ETL" >> etl-runner.env
-echo "RUN_DQD=true" >> etl-runner.env
+echo "RUN_DQD=false" >> etl-runner.env
 echo "CDM_VERSION=5.4" >> etl-runner.env
-echo "SCRIPT_UUID=9719aeb1-84c4-49c5-a2a1-c6ea3af00305" >> etl-runner.env
+#echo "SCRIPT_UUID=30220b6a-a1c2-4e72-8ad3-f0873f53908b" >> etl-runner.env
 
 echo "Run ETL"
 docker run \
