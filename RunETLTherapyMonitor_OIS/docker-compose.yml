@@ -19,6 +19,8 @@ services:
       VERBOSITY_LEVEL: "verbosity_level"
       FILENAME: "filename"
       INSIDE_DOCKER: "True"
+      DEV_FLAG: "False"
+      DEATH_LOGS: "False"
 
 networks:
   honeur_honeur-net:
