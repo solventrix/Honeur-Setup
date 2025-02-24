@@ -18,7 +18,7 @@
     },
     { "question":  "Target OMOP v5.4 CDM schema name: ",
       "env-var":  "TARGET_DB_54_SCHEMA",
-      "default-value": "omopcdm"
+      "default-value": "omopcdm_54"
     },
     { "question":  "Current OMOP v5.3 results schema name: ",
       "env-var":  "SRC_RESULTS_DB_53_SCHEMA",
@@ -30,7 +30,7 @@
     },
     { "question":  "Target OMOP v5.4 results schema name: ",
       "env-var":  "TARGET_RESULTS_DB_54_SCHEMA",
-      "default-value": "results"
+      "default-value": "results_54"
     },
     { "question":  "Current OMOP v5.3 patient check schema name: ",
       "env-var":  "SRC_PATIENT_CHECK_DB_SCHEMA",
@@ -39,7 +39,7 @@
     { "question":  "Run Data Quality Pipeline after conversion: ",
       "env-var":  "RUN_DQD",
       "allowed-values": "true,false",
-      "default-value": "true"
+      "default-value": "false"
     },
     { "question":  "Verbosity level of ETL logging: ",
       "env-var":  "VERBOSITY_LEVEL",
