@@ -2,7 +2,7 @@
   "questions": [
     { "question":  "ETL image tag: ",
       "env-var":  "ETL_IMAGE_TAG",
-      "default-value": "1.4.0"
+      "default-value": "1.4.1"
     },
     { "question": "Input Data folder",
       "env-var": "DATA_FOLDER_HOST"
