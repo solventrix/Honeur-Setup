@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+  etl:
+    image: harbor.honeur.org/etl-uzl-mm/etl:image_tag
+    volumes:
+      - "./log:/log"
+      - "data_folder:/data"
+    networks:
+      - honeur_feder8-net
+    environment:
+      DB_DBMS: "postgresql"
+      DB_SERVER : "postgres"
+      DB_PORT: "5432"
+      DB_DBNAME: "OHDSI"
+      DB_SCHEMA: "omopcdm"
+      DB_USER: db_username
+      DB_PASSWORD: db_password
+      VERBOSITY_LEVEL: verbosity_level
+      FILENAME: "therapy.csv:supportivecare.csv:prognosis.csv:mrdassessments.csv:disease_characteristics.csv:demographics.csv"
+      LAST_DATA_EXPORT: date_last_export
+
+networks:
+  honeur_feder8-net:
+    external:
+      name: feder8-net
