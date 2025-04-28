@@ -26,5 +26,5 @@ sed -i -e "s/filename/$filename/g" docker-compose.yml
 sed -i -e "s/date_last_export/$date_last_export/g" docker-compose.yml
 
 docker login harbor.honeur.org
-docker-compose pull
-docker-compose run --rm --name etl etl
+docker compose pull
+docker compose run --rm --name etl etl
