@@ -1,0 +1,29 @@
+{
+  "questions": [
+    { "question":  "ETL image tag: ",
+      "env-var":  "ETL_IMAGE_TAG",
+      "default-value": "current"
+    },
+    { "question": "Input Data folder",
+      "env-var": "DATA_FOLDER_HOST"
+    },
+    { "question": "Source encoding",
+      "env-var": "ENCODING",
+      "default-value": "utf-8"
+    },
+    { "question": "Log verbosity level",
+      "env-var": "VERBOSITY_LEVEL",
+      "allowed-values": "INFO,DEBUG",
+      "default-value": "INFO"
+    },
+    {
+      "question": "Date of last export (yyyy-mm-dd)",
+      "env-var": "RELEASE_DATE",
+      "validation": {
+        "date-format": "%Y-%m-%d",
+        "date-after": "2024-01-01",
+        "date-before": "now"
+      }
+    }
+  ]
+}
