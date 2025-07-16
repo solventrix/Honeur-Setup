@@ -10,8 +10,8 @@ data_folder=${data_folder:-./data}
 read -p "DB schema [omopcdm]: " db_schema
 db_schema=${db_schema:-omopcdm}
 
-read -p "DB username [honeur_admin]: " db_username
-db_username=${db_username:-honeur_admin}
+read -p "DB username [feder8_admin]: " db_username
+db_username=${db_username:-feder8_admin}
 
 read -p "DB password: " db_password
 
@@ -60,47 +60,47 @@ file_name_body_meas=${file_name_body_meas:-\"body_measurements.csv\"}
 read -p "Source file name - immunofixation [\"immunofixation.csv\"]: " file_name_immunofixation
 file_name_immunofixation=${file_name_immunofixation:-\"immunofixation.csv\"}
 
-read -p "File encoding - demographics [\"Windows-1255\"]: " encoding_demographics
-encoding_demographics=${encoding_demographics:-\"Windows-1255\"}
+read -p "File encoding - demographics [\"utf-8\"]: " encoding_demographics
+encoding_demographics=${encoding_demographics:-\"utf-8\"}
 
-read -p "File encoding - disease admission [\"Windows-1255\"]: " encoding_disease_admission
-encoding_disease_admission=${encoding_disease_admission:-\"Windows-1255\"}
+read -p "File encoding - disease admission [\"utf-8\"]: " encoding_disease_admission
+encoding_disease_admission=${encoding_disease_admission:-\"utf-8\"}
 
-read -p "File encoding - disease ambulatory [\"Windows-1255\"]: " encoding_disease_ambulatory
-encoding_disease_ambulatory=${encoding_disease_ambulatory:-\"Windows-1255\"}
+read -p "File encoding - disease ambulatory [\"utf-8\"]: " encoding_disease_ambulatory
+encoding_disease_ambulatory=${encoding_disease_ambulatory:-\"utf-8\"}
 
-read -p "File encoding - disease characteristics myeloma [\"Windows-1255\"]: " encoding_disease_char
-encoding_disease_char=${encoding_disease_char:-\"Windows-1255\"}
+read -p "File encoding - disease characteristics myeloma [\"utf-8\"]: " encoding_disease_char
+encoding_disease_char=${encoding_disease_char:-\"utf-8\"}
 
-read -p "File encoding - disease chronic diagnosis [\"Windows-1255\"]: " encoding_disease_chronic
-encoding_disease_chronic=${encoding_disease_chronic:-\"Windows-1255\"}
+read -p "File encoding - disease chronic diagnosis [\"utf-8\"]: " encoding_disease_chronic
+encoding_disease_chronic=${encoding_disease_chronic:-\"utf-8\"}
 
-read -p "File encoding - disease hemato diagnosis [\"Windows-1255\"]: " encoding_disease_hema
-encoding_disease_hema=${encoding_disease_hema:-\"Windows-1255\"}
+read -p "File encoding - disease hemato diagnosis [\"utf-8\"]: " encoding_disease_hema
+encoding_disease_hema=${encoding_disease_hema:-\"utf-8\"}
 
-read -p "File encoding - lab data cytogenetics [\"Windows-1255\"]: " encoding_lab_cytogenetics
-encoding_lab_cytogenetics=${encoding_lab_cytogenetics:-\"Windows-1255\"}
+read -p "File encoding - lab data cytogenetics [\"utf-8\"]: " encoding_lab_cytogenetics
+encoding_lab_cytogenetics=${encoding_lab_cytogenetics:-\"utf-8\"}
 
-read -p "File encoding - lab data fish [\"Windows-1255\"]: " encoding_lab_fish
-encoding_lab_fish=${encoding_lab_fish:-\"Windows-1255\"}
+read -p "File encoding - lab data fish [\"utf-8\"]: " encoding_lab_fish
+encoding_lab_fish=${encoding_lab_fish:-\"utf-8\"}
 
-read -p "File encoding - lab data test [\"Windows-1255\"]: " encoding_lab_test
-encoding_lab_test=${encoding_lab_test:-\"Windows-1255\"}
+read -p "File encoding - lab data test [\"utf-8\"]: " encoding_lab_test
+encoding_lab_test=${encoding_lab_test:-\"utf-8\"}
 
-read -p "File encoding - treatment cato [\"Windows-1255\"]: " encoding_treatment_cato
-encoding_treatment_cato=${encoding_treatment_cato:-\"Windows-1255\"}
+read -p "File encoding - treatment cato [\"utf-8\"]: " encoding_treatment_cato
+encoding_treatment_cato=${encoding_treatment_cato:-\"utf-8\"}
 
-read -p "File encoding - treatment map [\"Windows-1255\"]: " encoding_treatment_map
-encoding_treatment_map=${encoding_treatment_map:-\"Windows-1255\"}
+read -p "File encoding - treatment map [\"utf-8\"]: " encoding_treatment_map
+encoding_treatment_map=${encoding_treatment_map:-\"utf-8\"}
 
-read -p "File encoding - treatment medication [\"Windows-1255\"]: " encoding_treatment_medication
-encoding_treatment_medication=${encoding_treatment_medication:-\"Windows-1255\"}
+read -p "File encoding - treatment medication [\"utf-8\"]: " encoding_treatment_medication
+encoding_treatment_medication=${encoding_treatment_medication:-\"utf-8\"}
 
-read -p "File encoding - body measurements [\"Windows-1255\"]: " encoding_body_meas
-encoding_body_meas=${encoding_body_meas:-\"Windows-1255\"}
+read -p "File encoding - body measurements [\"utf-8\"]: " encoding_body_meas
+encoding_body_meas=${encoding_body_meas:-\"utf-8\"}
 
-read -p "File encoding - immunofixation [\"Windows-1255\"]: " encoding_immunofixation
-encoding_immunofixation=${encoding_immunofixation:-\"Windows-1255\"}
+read -p "File encoding - immunofixation [\"utf-8\"]: " encoding_immunofixation
+encoding_immunofixation=${encoding_immunofixation:-\"utf-8\"}
 
 read -p "Output verbosity level [INFO]: " verbosity_level
 verbosity_level=${verbosity_level:-INFO}
@@ -153,5 +153,5 @@ sed -i -e "s/image_tag/$image_tag/g" docker-compose.yml
 sed -i -e "s/date_last_export/$date_last_export/g" docker-compose.yml
 
 docker login harbor.honeur.org
-docker-compose pull
-docker-compose run --rm --name etl etl
+docker compose pull
+docker compose run --rm --name etl etl
