@@ -35,9 +35,10 @@
     {
       "question": "Date of last follow-up (yyyy-mm-dd)",
       "env-var": "DATE_OF_LAST_OBSERVATION",
+      "default-value": "2025-03-01",
       "validation": {
         "date-format": "%Y-%m-%d",
-        "date-after": "2025-03-01",
+        "date-after": "2024-01-01",
         "date-before": "now"
       }
     },
