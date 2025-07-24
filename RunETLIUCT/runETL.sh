@@ -6,8 +6,10 @@ curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLI
 
 read -p "Input Data folder [./data]: " data_folder
 data_folder=${data_folder:-./data}
-read -p "DB schema [omopcdm]: " db_schema
+read -p "CDM schema [omopcdm]: " db_schema
 db_schema=${db_schema:-omopcdm}
+read -p "Vocabulary schema [omopcdm]: " vocab_schema
+vocab_schema=${vocab_schema:-omopcdm}
 read -p "DB username [honeur_admin]: " db_username
 db_username=${db_username:-honeur_admin}
 read -p "DB password: " db_password
@@ -22,6 +24,7 @@ date_last_export=${date_last_export:-\"2022-04-01\"}
 
 sed -i -e "s@data_folder@$data_folder@g" docker-compose.yml
 sed -i -e "s/db_schema/$db_schema/g" docker-compose.yml
+sed -i -e "s/vocab_schema/$vocab_schema/g" docker-compose.yml
 sed -i -e "s/db_username/$db_username/g" docker-compose.yml
 sed -i -e "s/db_password/$db_password/g" docker-compose.yml
 sed -i -e "s/source_file/$source_file/g" docker-compose.yml

@@ -14,6 +14,7 @@ services:
       DB_PORT: "5432"
       DB_DBNAME: "OHDSI"
       DB_SCHEMA: db_schema
+      VOCAB_SCHEMA: vocab_schema
       DB_USER: db_username
       DB_PASSWORD: db_password
       DATE_LAST_EXPORT: date_last_export
