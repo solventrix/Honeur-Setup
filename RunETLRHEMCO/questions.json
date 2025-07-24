@@ -44,8 +44,8 @@
     },
     { "question": "Run Data quality pipeline: ",
       "env-var": "RUN_DQD",
-      "default-value": "no",
-      "allowed-values": "yes,no"
+      "default-value": "false",
+      "allowed-values": "true,false"
     }
   ]
 }
