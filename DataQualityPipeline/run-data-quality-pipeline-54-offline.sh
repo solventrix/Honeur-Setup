@@ -4,10 +4,10 @@ set -ex
 REGISTRY=harbor.honeur.org
 REPOSITORY=distributed-analytics
 IMAGE=data-quality-pipeline
-VERSION=1.8.1
+VERSION=1.9
 TAG=$VERSION
 
-docker load --input DQP-v1.8.1.tar.gz
+docker load --input DQP-v1.9.tar.gz
 QA_FOLDER_HOST=${PWD}/qa
 
 touch data-quality-pipeline.env
