@@ -27,9 +27,8 @@ echo "ETL_IMAGE_NAME=etl-rhemco/etl" >> etl-runner.env
 echo "ETL_IMAGE_TAG=current" >> etl-runner.env
 echo "DATA_FOLDER_HOST=$DATA_FOLDER_HOST" >> etl-runner.env
 echo "DATA_FOLDER=/data" >> etl-runner.env
-echo "DATA_FILE=Honeur data 180922 UHL MG.xlsx" >> etl-runner.env
 echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> etl-runner.env
-echo "RUN_DQD=yes" >> etl-runner.env
+echo "RUN_DQD=false" >> etl-runner.env
 echo "SCRIPT_UUID=30220b6a-a1c2-4e72-8ad3-f0873f53908b" >> etl-runner.env
 
 echo "Run ETL"
