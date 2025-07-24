@@ -7,12 +7,27 @@ HONEUR-Setup is a public repository. This repository is used for files that can 
 
 ## Remote Docker Installation
 
-Remote installation Instructions can be found at [local-installation](https://github.com/solventrix/Honeur-Setup/tree/master/local-installation)
+Remote installation Instructions can be found at [local-installation](https://github.com/Feder8-Platform/Feder8-Setup/tree/main/local-installation)
 
 ## Run ETL
 
-- [12 d'octubre](https://github.com/solventrix/Honeur-Setup/tree/master/RunETL12doctubre)
+- [AIDA](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLAIDA)
+- [AMR](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLAMR)
+- [Cardiff and Vale](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCAV) 
+- [Cancer Center London](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCCL)
+- [CHU Montpellier](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCHU_Montpellier)
 - [CLLEAR](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCLLEAR)
 - [CMG](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLCMG)
-- [iOMEDICO - NHL](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLiOMEDICO_NHL)
+- [Data Entry Tool, DET](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLDET)
+- [Hospital 12 d'octubre](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLH12O)
+- [IUCT, Toulouse](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLIUCT)
+- [CHU Lille](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLLille)
+- [OMOP v5.3 to v5.4, ETL conversion](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLOMOP54Conversion)
+- [RHEMCO, Dijon](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLRHEMCO)
+- [Sourvasky Medical Center - Tel Aviv (SMC)](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLSMC)
+- [OIS TherapyMonitor](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLTherapyMonitor_OIS)
 - [UHL](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLUHL)
+- [UZ Leuven Filemaker exports](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLUZLMM)
+- [Würzburg](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLWurzburg)
+- [iOMEDICO - Myriam](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLiOMEDICO_Myriam)
+- [iOMEDICO - NHL](https://github.com/solventrix/Honeur-Setup/tree/master/RunETLiOMEDICO_NHL)
