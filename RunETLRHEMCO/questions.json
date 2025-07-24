@@ -9,7 +9,7 @@
     },
     { "question": "Source data files",
       "env-var": "FILENAME",
-      "default-value": "1_rhemco_21_tt_molecule_1980_2020.txt:rhemco_21_hemo_1980_2020.txt:rhemco_21_indiv_1980_2020.txt"
+      "default-value": "RHEMCO_21_tt_molecule_1980_2022.txt:RHEMCO_21_hemo_1980_2022.txt:RHEMCO_21_indiv_1980_2022.txt"
     },
     { "question": "Log folder",
       "env-var": "LOG_FOLDER_HOST"
@@ -25,9 +25,10 @@
     {
       "question": "Date of last export (yyyy-mm-dd)",
       "env-var": "LAST_DATA_EXPORT",
+      "default-value": "2025-06-19",
       "validation": {
         "date-format": "%Y-%m-%d",
-        "date-after": "2021-01-01",
+        "date-after": "2025-01-01",
         "date-before": "now"
       }
     },
@@ -36,12 +37,13 @@
       "env-var": "DATE_OF_LAST_OBSERVATION",
       "validation": {
         "date-format": "%Y-%m-%d",
-        "date-after": "2022-01-01",
+        "date-after": "2025-03-01",
         "date-before": "now"
       }
     },
     { "question": "Run Data quality pipeline: ",
       "env-var": "RUN_DQD",
+      "default-value": "no",
       "allowed-values": "yes,no"
     }
   ]
