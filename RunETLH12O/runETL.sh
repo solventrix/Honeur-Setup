@@ -41,16 +41,16 @@ echo "ADMINIST=HDOC_INFOBANCO_ADMINIST" >> etl-runner.env
 echo "ALERT=HDOC_INFOBANCO_ALERT" >> etl-runner.env
 echo "DEMOG=HDOC_INFOBANCO_DEMOG" >> etl-runner.env
 echo "DIAGPROCED=HDOC_INFOBANCO_DIAGPROCED" >> etl-runner.env
-echo "EPISODES=ONCOFAR_EPISODES"  >> etl-runner.env
 echo "FARHOS=HDOC_INFOBANCO_FARHOS" >> etl-runner.env
 echo "OBX=HDOC_INFOBANCO_OBX" >> etl-runner.env
-echo "REGIMENS=ONCOFAR_REGIMENS"  >> etl-runner.env
-echo "REGIMENS_DRUGS=ONCOFAR_REGIMENS_DRUGS" >> etl-runner.env
 echo "PRESC=HDOC_INFOBANCO_PRESC" >> etl-runner.env
 echo "PROB=HDOC_INFOBANCO_PROB" >> etl-runner.env
 echo "QUI=HDOC_INFOBANCO_QUI" >> etl-runner.env
 echo "VISIT_ADM_URG=HDOC_INFOBANCO_VISIT_ADM_URG" >> etl-runner.env
 echo "VISIT_AMB=HDOC_INFOBANCO_VISIT_AMB" >> etl-runner.env
+echo "EPISODES=ONCOFAR_EPISODES"  >> etl-runner.env
+echo "REGIMENS=ONCOFAR_REGIMENS"  >> etl-runner.env
+echo "REGIMENS_DRUGS=ONCOFAR_REGIMENS_DRUGS" >> etl-runner.env
 #echo "DATA_SET=" >> etl-runner.env
 
 echo "Run ETL"
