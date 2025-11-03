@@ -5,9 +5,9 @@ Check the honeur website at: https://www.honeur.org
 HONEUR-Setup is a public repository. This repository is used for files that can be downloaded without restrictions
 
 
-## Remote Docker Installation
+## Local Installation for HONEUR
 
-Remote installation Instructions can be found at [local-installation](https://github.com/Feder8-Platform/Feder8-Setup/tree/main/local-installation)
+Installation instructions for the local installation for HONEUR can be found at [local-installation](https://github.com/Feder8-Platform/Feder8-Setup/tree/main/local-installation)
 
 ## Run ETL
 
