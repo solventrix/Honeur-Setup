@@ -18,7 +18,7 @@
     },
     {
       "question": "Date of last export (yyyy-mm-dd)",
-      "env-var": "RELEASE_DATE",
+      "env-var": "SOURCE_RELEASE_DATE",
       "validation": {
         "date-format": "%Y-%m-%d",
         "date-after": "2024-01-01",
