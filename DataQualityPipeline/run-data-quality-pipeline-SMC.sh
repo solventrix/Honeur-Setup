@@ -23,7 +23,7 @@ echo "INDICATION=mm" >> data-quality-pipeline.env
 echo "QA_FOLDER_HOST=$QA_FOLDER_HOST" >> data-quality-pipeline.env
 echo "LOG_FOLDER_HOST=$LOG_FOLDER_HOST" >> data-quality-pipeline.env
 echo "LOG_FOLDER=$LOG_FOLDER" >> data-quality-pipeline.env
-echo "EXCLUDED_ANALYSIS_IDS=1824" >> data-quality-pipeline.env
+echo "EXCLUDED_ANALYSIS_IDS=724,824,1824" >> data-quality-pipeline.env
 echo "SCRIPT_UUID=30220b6a-a1c2-4e72-8ad3-f0873f53908b" >> data-quality-pipeline.env
 
 docker run \
