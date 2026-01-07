@@ -17,7 +17,7 @@ services:
       DB_USER: db_username
       DB_PASSWORD: db_password
       VERBOSITY_LEVEL: verbosity_level
-      FILENAME: "therapy.csv:supportivecare.csv:prognosis.csv:mrdassessments.csv:disease_characteristics.csv:demographics.csv"
+      FILENAME: "therapy.csv:supportivecare.csv:prognosis.csv:mrdassessments.csv:disease_characteristics.csv:demographics.csv:emd.csv"
       LAST_DATA_EXPORT: date_last_export
 
 networks:
