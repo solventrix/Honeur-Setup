@@ -45,6 +45,20 @@ Please review the log files to confirm that no patient-level information was wri
 
 # How to export treatment counts for Würzburg
 
+## Execution steps (Windows)
+1. Open a terminal window
+2. Download the export script:
+   * ```
+     curl -L https://raw.githubusercontent.com/solventrix/Honeur-Setup/master/RunETLWurzburg/export-treatment-counts.cmd --output export-treatment-counts.cmd
+     ```
+3. Execute the `export-treatment-counts.cmd` script from inside the directory where the script is located.
+4. The script will request for:
+   * the path to the folder that contains the source data files
+5. The script will export treatment data counts and show the output of the code
+7. The result files will be available in the `output` folder.
+
+Please review the result files to confirm that no patient-level information was written out before sharing them.
+
 ## Execution steps (Mac/Linux)
 1. Open a terminal window
 2. Download the export script:
@@ -58,5 +72,3 @@ Please review the log files to confirm that no patient-level information was wri
 7. The result files will be available in the `output` folder.
 
 Please review the result files to confirm that no patient-level information was written out before sharing them.
-
-
