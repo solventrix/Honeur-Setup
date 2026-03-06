@@ -6,8 +6,8 @@ DATABASE_NAME=opal
 REGISTRY=harbor.honeur.org
 SITE=oncocologne
 REPOSITORY=ecrf/${SITE}
-TAG=0.2.3
-NETWORK=honeur-net
+TAG=0.2.4
+NETWORK=feder8-net
 
 
 POSTGRES_PASSWORD=
